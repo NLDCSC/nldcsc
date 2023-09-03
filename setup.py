@@ -79,7 +79,7 @@ def long_description():
     try:
         return codecs.open("README.md", "r", "utf-8").read()
     except OSError:
-        return "Long description error: Missing README.rst file"
+        return "Long description error: Missing README.md file"
 
 
 setup(
