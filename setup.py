@@ -5,9 +5,8 @@ from itertools import chain
 
 from setuptools import setup, find_packages
 
-from .version import _version_from_git_describe
-
-NAME = "nldcsc"
+__NAME__ = "nldcsc"
+__VERSION__ = "0.0.1"
 
 # -*- Extras -*-
 
@@ -83,9 +82,9 @@ def long_description():
 
 
 setup(
-    name=NAME,
+    name=__NAME__,
     packages=find_packages(exclude=["tests", "test_data"]),
-    version=_version_from_git_describe(),
+    version=__VERSION__,
     description="Package with general devops code",
     long_description=long_description(),
     author="NLDCSC",
@@ -96,7 +95,7 @@ setup(
     install_requires=install_requires(),
     extras_require=extras_require(),
     python_requires=">=3.8",
-    package_data={"nldcsc": ["LICENSE", "VERSION"]},
+    package_data={"nldcsc": ["LICENSE"]},
     include_package_data=True,
     project_urls={
         "Code": "https://github.com/NLDCSC/nldcsc",
