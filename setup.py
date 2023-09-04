@@ -29,7 +29,6 @@ def _pip_requirement(req):
 
 
 def _reqs(*f):
-    # print(os.getcwd())
     return [
         _pip_requirement(r)
         for r in (
@@ -96,7 +95,6 @@ setup(
     install_requires=install_requires(),
     extras_require=extras_require(),
     python_requires=">=3.8",
-    package_data={"nldcsc": ["LICENSE"]},
     include_package_data=True,
     project_urls={
         "Code": "https://github.com/NLDCSC/nldcsc",
