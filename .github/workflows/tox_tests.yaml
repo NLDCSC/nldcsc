@@ -22,4 +22,4 @@ jobs:
         python -m pip install tox tox-gh-actions
     - name: Test with tox
       run: ls -all && tox
-      working-directory: /home/runner/work/nldcsc
+      working-directory: /home/runner/work/nldcsc/nldcsc
