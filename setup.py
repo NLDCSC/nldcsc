@@ -29,6 +29,7 @@ def _pip_requirement(req):
 
 
 def _reqs(*f):
+    print(os.getcwd())
     return [
         _pip_requirement(r)
         for r in (
