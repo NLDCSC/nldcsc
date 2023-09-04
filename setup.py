@@ -1,12 +1,44 @@
 #!/usr/bin/env python3
 import codecs
 import os
+import re
 from itertools import chain
 
 from setuptools import setup, find_packages
 
 __NAME__ = "nldcsc"
 __VERSION__ = "0.0.1"
+
+# -*- Distribution Meta -*-
+
+re_meta = re.compile(r"__(\w+?)__\s*=\s*(.*)")
+re_doc = re.compile(r'^"""(.+?)"""')
+
+
+def _add_default(m):
+    attr_name, attr_value = m.groups()
+    return ((attr_name, attr_value.strip("\"'")),)
+
+
+def _add_doc(m):
+    return (("doc", m.groups()[0]),)
+
+
+def parse_dist_meta():
+    """Extract metadata information from ``$dist/__init__.py``."""
+    pats = {re_meta: _add_default, re_doc: _add_doc}
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, __NAME__, "__init__.py")) as meta_fh:
+        distmeta = {}
+        for line in meta_fh:
+            if line.strip() == "# -eof meta-":
+                break
+            for pattern, handler in pats.items():
+                m = pattern.match(line.strip())
+                if m:
+                    distmeta.update(handler(m))
+        return distmeta
+
 
 # -*- Extras -*-
 
@@ -81,13 +113,15 @@ def long_description():
         return "Long description error: Missing README.md file"
 
 
+meta = parse_dist_meta()
+
 setup(
     name=__NAME__,
     packages=find_packages(exclude=["tests", "test_data"]),
-    version=__VERSION__,
+    version=meta["version"],
     description="Package with general devops code",
     long_description=long_description(),
-    author="NLDCSC",
+    author=meta["author"],
     author_email="NLDCSC@invalid.com",
     url="https://github.com/NLDCSC/nldcsc",
     license="GNU General Public License v3.0",
