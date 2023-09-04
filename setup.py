@@ -5,7 +5,7 @@ from itertools import chain
 
 from setuptools import setup, find_packages
 
-from nldcsc import _version_from_git_describe
+from .version import _version_from_git_describe
 
 NAME = "nldcsc"
 
