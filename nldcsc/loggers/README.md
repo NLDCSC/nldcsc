@@ -3,7 +3,9 @@
 #### expected environment variables and defaults
 
 ```
-LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "/app/data/logs/")
+# If no LOG_FILE_PATH is set, no file logging handler shall be created
+LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", "")
+
 LOG_FILE_NAME = os.getenv("LOG_FILE_NAME", "app.log")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 

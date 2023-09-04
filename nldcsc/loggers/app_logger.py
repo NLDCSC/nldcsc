@@ -53,26 +53,33 @@ class AppLogger(logging.Logger):
         cli.setLevel(os.getenv("LOG_LEVEL", "INFO"))
         self.addHandler(cli)
 
-        if not os.path.exists(os.getenv("LOG_FILE_PATH", "/app/data/logs/")):
-            os.makedirs(os.getenv("LOG_FILE_PATH", "/app/data/logs/"))
+        log_file_path = os.getenv("LOG_FILE_PATH", "")
 
-        crf = RotatingFileHandler(
-            filename=os.path.join(
-                os.getenv("LOG_FILE_PATH", "/app/data/logs/"),
-                os.getenv("LOG_FILE_NAME", "app.log"),
-            ),
-            maxBytes=100000000,
-            backupCount=5,
-        )
-        crf.setLevel(logging.DEBUG)
-        crf.setFormatter(self.formatter)
-        self.addHandler(crf)
+        if log_file_path != "":
+
+            if not os.path.exists(log_file_path):
+                os.makedirs(log_file_path)
+
+            crf = RotatingFileHandler(
+                filename=os.path.join(
+                    log_file_path,
+                    os.getenv("LOG_FILE_NAME", "app.log"),
+                ),
+                maxBytes=100000000,
+                backupCount=5,
+            )
+            crf.setLevel(logging.DEBUG)
+            crf.setFormatter(self.formatter)
+            self.addHandler(crf)
 
         if getenv_bool("SYSLOG_ENABLE", "False"):
+            syslog_server = os.getenv("SYSLOG_SERVER", "127.0.0.1")
+            syslog_port = int(os.getenv("SYSLOG_PORT", 5140))
+
             if getenv_bool("GELF_SYSLOG", "True"):
                 syslog = DCSCGelfUDPHandler(
-                    host=os.getenv("SYSLOG_SERVER", "127.0.0.1"),
-                    port=int(os.getenv("SYSLOG_PORT", 5140)),
+                    host=syslog_server,
+                    port=syslog_port,
                     _application_name=os.getenv("APP_NAME", "YADA"),
                     include_extra_fields=True,
                     debug=True,
@@ -82,10 +89,7 @@ class AppLogger(logging.Logger):
                 )
             else:
                 syslog = FullSysLogHandler(
-                    address=(
-                        os.getenv("SYSLOG_SERVER", "127.0.0.1"),
-                        int(os.getenv("SYSLOG_PORT", 5140)),
-                    ),
+                    address=(syslog_server, syslog_port),
                     facility=FullSysLogHandler.LOG_LOCAL0,
                     appname=os.getenv("APP_NAME", "YADA"),
                 )
