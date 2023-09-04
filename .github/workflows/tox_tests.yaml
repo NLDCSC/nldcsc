@@ -25,3 +25,4 @@ jobs:
         ls -all requirements && pwd
     - name: Test with tox
       run: tox
+      working-directory: /home/runner/work/nldcsc
