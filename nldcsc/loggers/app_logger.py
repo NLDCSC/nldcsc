@@ -57,7 +57,10 @@ class AppLogger(logging.Logger):
             os.makedirs(os.getenv("LOG_FILE_PATH", "/app/data/logs/"))
 
         crf = RotatingFileHandler(
-            filename=os.path.join(os.getenv("LOG_FILE_PATH", "/app/data/logs/"), os.getenv("LOG_FILE_NAME", "app.log")),
+            filename=os.path.join(
+                os.getenv("LOG_FILE_PATH", "/app/data/logs/"),
+                os.getenv("LOG_FILE_NAME", "app.log"),
+            ),
             maxBytes=100000000,
             backupCount=5,
         )
@@ -79,7 +82,10 @@ class AppLogger(logging.Logger):
                 )
             else:
                 syslog = FullSysLogHandler(
-                    address=(os.getenv("SYSLOG_SERVER", "127.0.0.1"), int(os.getenv("SYSLOG_PORT", 5140))),
+                    address=(
+                        os.getenv("SYSLOG_SERVER", "127.0.0.1"),
+                        int(os.getenv("SYSLOG_PORT", 5140)),
+                    ),
                     facility=FullSysLogHandler.LOG_LOCAL0,
                     appname=os.getenv("APP_NAME", "YADA"),
                 )
