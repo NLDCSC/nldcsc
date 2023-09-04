@@ -121,6 +121,7 @@ setup(
     version=meta["version"],
     description="Package with general devops code",
     long_description=long_description(),
+    long_description_content_type="text/markdown",
     author=meta["author"],
     author_email="NLDCSC@invalid.com",
     url="https://github.com/NLDCSC/nldcsc",
@@ -136,7 +137,6 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Framework :: NLDCSC Devops",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.10",
