@@ -1,0 +1,4 @@
+gunicorn~=21.2.0
+setuptools~=65.5.1
+ansicolors==1.1.8
+pygelf~=0.4.2
