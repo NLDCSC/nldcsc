@@ -61,7 +61,6 @@ class FlaskSqlMigrate(object):
         return self._commands
 
     def db_init(self) -> None:
-
         res = self.__cli_runner(self.commands.INIT)
         self.__parse_command_output(res)
 
@@ -78,11 +77,9 @@ class FlaskSqlMigrate(object):
         self.__parse_command_output(res)
 
     def __parse_command_output(self, cmd_output: CompletedProcess) -> None:
-
         if cmd_output.returncode != 0:
             self.logger.error(cmd_output.stdout.split("\n")[0])
         else:
-
             output_list = cmd_output.stdout.split("\n")
 
             for m in output_list:
@@ -90,7 +87,6 @@ class FlaskSqlMigrate(object):
                     self.logger.info(m)
 
     def __cli_runner(self, command: int) -> CompletedProcess:
-
         command_mapping = {
             1: f"flask{f' --app {self.app_ref}' if self.app_ref is not None else ''} db init",
             2: f"flask{f' --app {self.app_ref}' if self.app_ref is not None else ''} db migrate",

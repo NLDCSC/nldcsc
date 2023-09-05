@@ -31,7 +31,6 @@ class TestSqlMigrator:
         assert isinstance(fsm, FlaskSqlMigrate)
 
     def test_migration_run(self, sql_migrate_object):
-
         sql_migrate_object.db_init()
 
         assert os.path.exists(
