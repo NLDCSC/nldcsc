@@ -60,7 +60,6 @@ class TestSqlMigrator:
         sql_migrate_object.db_update()
 
     def test_user_insert(self, app, client):
-
         from tests.applications.migrate_app import db, User
 
         user1 = User(username="user1")
