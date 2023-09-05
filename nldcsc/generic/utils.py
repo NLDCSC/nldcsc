@@ -39,3 +39,7 @@ def getenv_dict(name: str, default: dict = None):
             raise
 
     return default
+
+
+def str2bool(v):
+    return v.lower() in ("yes", "true", "1")
