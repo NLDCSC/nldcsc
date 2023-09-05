@@ -3,3 +3,4 @@ flask~=2.3.3
 pyopenssl~=23.2.0
 
 -r loggers.txt
+-r sql_migrations.txt

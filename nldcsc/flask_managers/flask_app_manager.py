@@ -1,12 +1,14 @@
 import logging
 import multiprocessing
 import os
+from pathlib import Path
 
 from flask import Flask
 from gunicorn.app.base import BaseApplication
 
 from nldcsc.generic.utils import getenv_bool
 from nldcsc.loggers.app_logger import AppLogger
+from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
 
 logging.setLoggerClass(AppLogger)
 
@@ -89,7 +91,28 @@ class FlaskAppManager(object):
 
             else:
                 if self.init_sql_database:
-                    pass
+                    if not os.path.exists(
+                        os.path.join(self.app_working_dir, "INIT_COMPLETED")
+                    ):
+                        fsm = FlaskSqlMigrate()
+
+                        if not os.path.exists(
+                            os.path.join(self.app_working_dir, "migrations")
+                        ):
+                            fsm.db_init()
+
+                        fsm.db_migrate()
+                        fsm.db_update()
+
+                        try:
+                            Path(
+                                os.path.join(self.app_working_dir, "INIT_COMPLETED")
+                            ).touch()
+                        except FileNotFoundError:
+                            os.mkdir(os.path.join(self.app_working_dir))
+                            Path(
+                                os.path.join(self.app_working_dir, "INIT_COMPLETED")
+                            ).touch()
 
                 options = {
                     "bind": f"{self.bind_host}:{self.bind_port}",
