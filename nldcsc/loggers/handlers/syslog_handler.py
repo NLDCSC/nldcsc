@@ -40,7 +40,6 @@ class FullSysLogHandler(SysLogHandler):
         structured_data=OrderedDict(),
         enterprise_id=None,
     ):
-
         super().__init__(address, facility, socktype)
 
         self.hostname, self.appname, self.procid = hostname, appname, procid
@@ -121,7 +120,7 @@ class FullSysLogHandler(SysLogHandler):
             if isinstance(value, dict):
                 value = value.items()
             newvals = []
-            for (itemkey, itemvalue) in value:
+            for itemkey, itemvalue in value:
                 itemkey = (
                     itemkey.encode("ascii", "replace")
                     .replace('"', "")

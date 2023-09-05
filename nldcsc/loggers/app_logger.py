@@ -31,7 +31,6 @@ level_map = {
 
 class AppLogger(logging.Logger):
     def __init__(self, name, level=logging.NOTSET):
-
         self.formatter = DCSCTaskFormatter(
             "%(asctime)s - %(task_name)s - %(name)-8s - %(levelname)-8s - [%(task_id)s] %(message)s"
         )
@@ -56,7 +55,6 @@ class AppLogger(logging.Logger):
         log_file_path = os.getenv("LOG_FILE_PATH", "")
 
         if log_file_path != "":
-
             if not os.path.exists(log_file_path):
                 os.makedirs(log_file_path)
 

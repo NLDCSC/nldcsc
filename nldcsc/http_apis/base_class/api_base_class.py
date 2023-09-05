@@ -82,7 +82,6 @@ class ApiBaseClass(object):
         }
 
         if data is not None:
-
             if not isinstance(data, str):
                 data = json.dumps(data)
 
@@ -91,7 +90,6 @@ class ApiBaseClass(object):
         request_api_resource.update(self.kwargs)
 
         try:
-
             if method == self.methods.POST:
                 r = session.post(self._build_url(resource), **request_api_resource)
             elif method == self.methods.PUT:
