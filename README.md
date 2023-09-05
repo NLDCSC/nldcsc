@@ -61,3 +61,8 @@ fam.run()
 Depending on the configuration the FlaskAppManager uses a werkzeug (DEBUG == True)
 or a gunicorn webserver. TLS could be set for both webservers iaw the module specific
 README.md.
+
+### HTTP apis
+
+Baseclass for http api communication is present under 
+nldcsc.http_apis.base_class.api_base_class.ApiBaseClass
