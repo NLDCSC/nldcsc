@@ -1,1 +1,4 @@
 -r modules/loggers.txt
+-r modules/flask_managers.txt
+
+requests==2.31.0

@@ -7,7 +7,7 @@ import gunicorn.glogging
 from gunicorn.glogging import CONFIG_DEFAULTS
 
 
-class DCSCGunicornLogger(gunicorn.glogging.Logger):
+class GunicornLogger(gunicorn.glogging.Logger):
     def __init__(self, cfg):
         super().__init__(cfg)
 
