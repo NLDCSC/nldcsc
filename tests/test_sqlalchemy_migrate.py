@@ -23,10 +23,12 @@ def sql_migrate_object():
 
 
 class TestSqlMigrator:
-    def test_import(self, sql_migrate_object):
+    def test_import(self):
         from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
 
-        assert isinstance(sql_migrate_object, FlaskSqlMigrate)
+        fsm = FlaskSqlMigrate()
+
+        assert isinstance(fsm, FlaskSqlMigrate)
 
     def test_migration_run(self, sql_migrate_object):
 
