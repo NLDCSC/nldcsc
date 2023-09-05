@@ -1,3 +1,4 @@
+import os
 import threading
 
 import pytest
@@ -45,12 +46,16 @@ def runner():
     t.join()
 
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+
 class TestFlaskAppManager:
     def test_init(self):
         fam = FlaskAppManager(version="TEST_VERSION", app=app)
 
         assert isinstance(fam, FlaskAppManager)
 
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
     def test_web(self, runner):
 
         with requests.Session() as session:
