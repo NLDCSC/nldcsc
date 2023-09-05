@@ -18,6 +18,7 @@ jobs:
       with:
         project_path: .
         ignore_failure: true
+        config_file: ./pyproject.toml
 
     # This is optional
     - name: Security check report artifacts

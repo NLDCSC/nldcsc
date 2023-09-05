@@ -41,6 +41,8 @@ def index():
 @pytest.fixture(scope="session")
 def runner():
 
+    print(IN_GITHUB_ACTIONS)
+
     if not IN_GITHUB_ACTIONS:
 
         fam = FlaskAppManager(version="TEST_VERSION", app=app)
