@@ -14,12 +14,19 @@ def sql_migrate_object():
     )
     yield fsm
 
-    rmtree(
-        os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "applications", "migrations"
-        )
-    )
-    rmtree(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "instance"))
+
+@pytest.fixture()
+def app():
+    from tests.applications.migrate_app import app
+
+    yield app
+
+    # clean up / reset resources here
+
+
+@pytest.fixture()
+def client(app):
+    return app.test_client()
 
 
 class TestSqlMigrator:
@@ -51,3 +58,32 @@ class TestSqlMigrator:
         )
 
         sql_migrate_object.db_update()
+
+    def test_user_insert(self, app, client):
+
+        from tests.applications.migrate_app import db, User
+
+        user1 = User(username="user1")
+        user2 = User(username="user2")
+
+        with app.app_context():
+            User.query.delete()
+            db.session.add(user1)
+            db.session.add(user2)
+            db.session.commit()
+
+        res = client.get("/")
+
+        assert res.data == b'[{"user":"user1"},{"user":"user2"}]\n'
+
+        # cleanup... should be handled more elegantly...
+        rmtree(
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                "applications",
+                "migrations",
+            )
+        )
+        rmtree(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "instance")
+        )

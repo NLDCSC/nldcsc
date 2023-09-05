@@ -88,6 +88,8 @@ Check the command line help
 python3 -m nldcsc.sql_migrations.flask_sql_migrate -h
 ```
 
+Or initiate the FlaskSqlMigrate as a class and initiate the migration 
+process from there: 
 ```python
 from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
 fsm = FlaskSqlMigrate(app_ref="/path/to/script_with_flask_app.py")
