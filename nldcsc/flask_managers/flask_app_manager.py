@@ -72,7 +72,6 @@ class FlaskAppManager(object):
         self.logger.info("Trying to start the app...")
 
         try:
-
             self.logger.info(f"Running version: {self.version}")
 
             if self.debug:
@@ -89,7 +88,6 @@ class FlaskAppManager(object):
                     )
 
             else:
-
                 if self.init_sql_database:
                     pass
 
