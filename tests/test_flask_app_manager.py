@@ -7,6 +7,8 @@ from flask import Flask
 
 from nldcsc.flask_managers.flask_app_manager import FlaskAppManager
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
 
 class StoppableThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -38,15 +40,15 @@ def index():
 
 @pytest.fixture(scope="session")
 def runner():
-    fam = FlaskAppManager(version="TEST_VERSION", app=app)
 
-    t = StoppableThread(target=fam.run)
-    yield t.start()
+    if not IN_GITHUB_ACTIONS:
 
-    t.join()
+        fam = FlaskAppManager(version="TEST_VERSION", app=app)
 
+        t = StoppableThread(target=fam.run)
+        yield t.start()
 
-IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+        t.join()
 
 
 class TestFlaskAppManager:
@@ -55,7 +57,9 @@ class TestFlaskAppManager:
 
         assert isinstance(fam, FlaskAppManager)
 
-    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
+    @pytest.mark.skipif(
+        IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions."
+    )
     def test_web(self, runner):
 
         with requests.Session() as session:
