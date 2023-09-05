@@ -21,6 +21,16 @@ pip install nldcsc[loggers, flask_managers]
 
 ## Modules
 
+The following modules are available in the nldcsc package:
+
+* auth
+* datatables
+* flask_managers
+* flask_plugins
+* http_apis
+* loggers
+* sql_migrations
+
 ### Loggers
 
 There are two loggers provided:
