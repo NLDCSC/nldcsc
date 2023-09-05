@@ -76,3 +76,23 @@ README.md.
 
 Baseclass for http api communication is present under 
 nldcsc.http_apis.base_class.api_base_class.ApiBaseClass
+
+### SQL Migrations
+
+The sql migrations can be used to facilitate migration between different
+versions of sql models / versions. It relies on flask migrate to perform
+the different migrations. It has a CLI as well as an python class based API.
+
+Check the command line help
+```
+python3 -m nldcsc.sql_migrations.flask_sql_migrate -h
+```
+
+```python
+from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
+fsm = FlaskSqlMigrate(app_ref="/path/to/script_with_flask_app.py")
+
+fsm.db_init()
+fsm.db_migrate()
+fsm.db_update()
+```
