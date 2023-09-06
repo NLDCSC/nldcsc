@@ -1,0 +1,6 @@
+# sample regex patterns
+ignore:
+  - "tests"  # ignore folders and all its contents
+  - "**/*.txt"         # glob accepted
+  - "**/*.md"         # glob accepted
+#  - "test_*.rb"       # wildcards accepted
