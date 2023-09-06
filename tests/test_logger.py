@@ -1,3 +1,6 @@
+from tests.helpers.capture_logging import catch_logs, records_to_tuples
+
+
 class TestLogger:
     def test_logger_import(self):
         try:
@@ -6,13 +9,23 @@ class TestLogger:
 
             logging.setLoggerClass(AppLogger)
 
-            logger = logging.getLogger("TEST")
+            logger_name = "TEST"
+            logger = logging.getLogger(logger_name)
+            logger.propagate = True
 
-            logger.debug("Debug message")
-            logger.info("Info message")
-            logger.warning("Warning message")
-            logger.error("Error message")
-            logger.critical("Critical message")
+            with catch_logs(level=logging.DEBUG, logger=logger) as handler:
+                logger.debug("Debug message")
+                logger.info("Info message")
+                logger.warning("Warning message")
+                logger.error("Error message")
+                logger.critical("Critical message")
+                assert records_to_tuples(handler.records) == [
+                    (logger_name, logging.DEBUG, "Debug message"),
+                    (logger_name, logging.INFO, "Info message"),
+                    (logger_name, logging.WARNING, "Warning message"),
+                    (logger_name, logging.ERROR, "Error message"),
+                    (logger_name, logging.CRITICAL, "Critical message"),
+                ]
 
         except Exception:
             raise
