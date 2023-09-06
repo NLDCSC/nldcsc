@@ -6,7 +6,13 @@ from json import JSONDecodeError
 
 def getenv_bool(name: str, default: str = "False"):
     raw = os.getenv(name, default).title()
-    return ast.literal_eval(raw)
+
+    the_bool = ast.literal_eval(raw)
+
+    if not isinstance(the_bool, bool):
+        raise ValueError(f"Value translates to {type(the_bool)}; not a boolean!")
+
+    return the_bool
 
 
 def getenv_list(name: str, default: list = None):
