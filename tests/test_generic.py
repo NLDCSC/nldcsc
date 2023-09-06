@@ -21,6 +21,11 @@ class TestGeneric:
         assert isinstance(env_dict, dict)
         assert env_dict["key"] == "default"
 
+        env_dict = getenv_dict("DICT_ENV_NON_EXISTENT")
+
+        assert isinstance(env_dict, dict)
+        assert len(env_dict) == 0
+
         with pytest.raises(JSONDecodeError):
             getenv_dict("DICT_ENV_ERROR", {"key": "default"})
 
@@ -37,6 +42,11 @@ class TestGeneric:
 
         assert isinstance(env_list, list)
         assert env_list[0] == "default"
+
+        env_list = getenv_list("LIST_ENV_NON_EXISTENT")
+
+        assert isinstance(env_list, list)
+        assert len(env_list) == 0
 
         with pytest.raises(JSONDecodeError):
             getenv_list("LIST_ENV_ERROR", ["default"])
