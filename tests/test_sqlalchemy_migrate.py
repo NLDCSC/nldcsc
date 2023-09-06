@@ -36,6 +36,9 @@ class TestSqlMigrator:
         fsm = FlaskSqlMigrate()
 
         assert isinstance(fsm, FlaskSqlMigrate)
+        # test for 'Error: Could not locate a Flask application.'
+        fsm.db_init()
+        # assert 'Error: Could not locate a Flask application.' in caplog.text
 
     def test_migration_run(self, sql_migrate_object):
         sql_migrate_object.db_init()

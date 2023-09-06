@@ -103,7 +103,7 @@ class FlaskSqlMigrate(object):
                 cwd=self.current_dir,
             )
             return result
-        except KeyError:
+        except KeyError:  # pragma: no cover
             self.logger.error(f"Unknown command number received....")
 
     def __repr__(self) -> str:
