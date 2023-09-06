@@ -7,8 +7,6 @@ from subprocess import run, PIPE, STDOUT, CompletedProcess
 from nldcsc.loggers.app_logger import AppLogger
 
 logging.setLoggerClass(AppLogger)
-
-
 class FlaskSqlMigrate(object):
     def __init__(self, cwd: str = None, app_ref: str = None):
         """
