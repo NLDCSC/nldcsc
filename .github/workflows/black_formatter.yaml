@@ -17,7 +17,7 @@ jobs:
         with:
           black_args: "."
       - name: Create Pull Request
-        if: steps.action_black.outputs.is_formatted == 'true'
+        if: steps.action_black.outputs.is_formatted == 'true' && github.ref == 'refs/heads/master'
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
