@@ -1,5 +1,12 @@
 # NLDCSC package
 
+[![GitHub Release](https://img.shields.io/github/release/NLDCSC/nldcsc.svg?style=flat)]()
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+
+[![codecov](https://codecov.io/gh/NLDCSC/nldcsc/graph/badge.svg?token=QSHW4B6ADR)](https://codecov.io/gh/NLDCSC/nldcsc)
+![pypi](https://github.com/NLDCSC/nldcsc/actions/workflows/package_to_pypi.yaml/badge.svg)
+![pytest](https://github.com/NLDCSC/nldcsc/actions/workflows/tox_tests.yaml/badge.svg)
+
 This package contains generic re-usable code.
 
 Install the full package:
