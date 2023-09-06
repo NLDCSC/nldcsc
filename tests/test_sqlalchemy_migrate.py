@@ -10,7 +10,6 @@ from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
 
 @pytest.fixture
 def sql_migrate_object():
-
     fsm = FlaskSqlMigrate(
         app_ref="migrate_app",
         cwd=os.path.join(os.path.dirname(os.path.realpath(__file__)), "applications"),
@@ -34,7 +33,6 @@ def client(app):
 
 class TestSqlMigrator:
     def test_import(self):
-
         fsm = FlaskSqlMigrate()
 
         assert isinstance(fsm, FlaskSqlMigrate)
