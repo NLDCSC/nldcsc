@@ -55,6 +55,7 @@ class TestGeneric:
         os.environ["BOOL_ENV_TRUE"] = "True"
         os.environ["BOOL_ENV_FALSE"] = "False"
         os.environ["BOOL_ENV_ERROR"] = "Blerf"
+        os.environ["BOOL_ENV_DICT"] = '{"key1": "value1", "key2": "value2"}'
 
         env_bool = getenv_bool("BOOL_ENV_TRUE", "False")
         env_bool_false = getenv_bool("BOOL_ENV_FALSE", "False")
@@ -70,6 +71,9 @@ class TestGeneric:
 
         with pytest.raises(ValueError):
             getenv_bool("BOOL_ENV_ERROR", "False")
+
+        with pytest.raises(ValueError):
+            getenv_bool("BOOL_ENV_DICT", "False")
 
     def test_str_to_bool(self):
         choices = {"yes", "true", "1"}
