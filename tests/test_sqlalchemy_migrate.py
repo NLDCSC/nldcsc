@@ -1,7 +1,10 @@
+import logging
 import os.path
 from shutil import rmtree
 
 import pytest
+
+from tests.helpers.capture_logging import catch_logs, records_to_tuples
 
 
 @pytest.fixture
@@ -36,9 +39,23 @@ class TestSqlMigrator:
         fsm = FlaskSqlMigrate()
 
         assert isinstance(fsm, FlaskSqlMigrate)
+
+        logger_name = "nldcsc.sql_migrations.flask_sql_migrate"
+        logger = logging.getLogger(logger_name)
+        logger.propagate = True
+
         # test for 'Error: Could not locate a Flask application.'
-        fsm.db_init()
-        # assert 'Error: Could not locate a Flask application.' in caplog.text
+        with catch_logs(level=logging.INFO, logger=logger) as handler:
+            fsm.db_init()
+            assert records_to_tuples(handler.records) == [
+                (
+                    logger_name,
+                    logging.ERROR,
+                    "Error: Could not locate a Flask application. Use the 'flask --app' "
+                    "option, 'FLASK_APP' environment variable, or a 'wsgi.py' or 'app.py' "
+                    "file in the current directory.",
+                )
+            ]
 
     def test_migration_run(self, sql_migrate_object):
         sql_migrate_object.db_init()
@@ -80,7 +97,7 @@ class TestSqlMigrator:
 
         assert res.data == b'[{"user":"user1"},{"user":"user2"}]\n'
 
-        # cleanup... should be handled more elegantly...
+        # cleanup... should be handled more elegantly... somehow...
         rmtree(
             os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
