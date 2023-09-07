@@ -1,20 +1,10 @@
-from logging.handlers import SysLogHandler, SYSLOG_UDP_PORT
+import datetime
 import re
 import socket
 import sys
+from collections import OrderedDict
+from logging.handlers import SysLogHandler, SYSLOG_UDP_PORT
 from syslog import LOG_USER
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    OrderedDict = dict
-
-try:
-    import codecs
-except ImportError:
-    codecs = None
-
-import datetime
 
 NILVALUE = "-"
 
