@@ -108,17 +108,17 @@ class FullSysLogHandler(SysLogHandler):
             newvals = []
             for itemkey, itemvalue in value:
                 itemkey = (
-                    itemkey.encode("ascii", "replace")
-                    .replace('"', "")
+                    itemkey.replace('"', "")
                     .replace(" ", "")
                     .replace("]", "")
                     .replace("=", "")[:32]
+                    # .encode("ascii", "replace")
                 )
                 itemvalue = (
-                    itemvalue.encode("utf8", "replace")
-                    .replace("\\", "\\\\")
+                    itemvalue.replace("\\", "\\\\")
                     .replace('"', '\\"')
                     .replace("]", "\\]")
+                    # .encode("utf8", "replace")
                 )
                 newvals.append('%s="%s"' % (itemkey, itemvalue))
 
@@ -133,11 +133,10 @@ class FullSysLogHandler(SysLogHandler):
             else:
                 newkey = key
                 newkey = (
-                    newkey.encode("ascii", "replace")
-                    .replace('"', "")
+                    newkey.replace('"', "")
                     .replace(" ", "")
                     .replace("]", "")
-                    .replace("=", "")[:32]
+                    .replace("=", "")[:32]  #.encode("ascii", "replace")
                 )
 
             if newkey != key:

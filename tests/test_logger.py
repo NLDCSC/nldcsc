@@ -1,5 +1,6 @@
 import logging
 import os
+from collections import OrderedDict
 
 import mock
 from mock.mock import patch, PropertyMock
@@ -80,4 +81,8 @@ class TestLogger:
         logger = logging.getLogger("test_syslog_emit")
         with patch.object(logger.handlers[2], "socktype", socket.SOCK_DGRAM):
             logger.info("Info test")
+            sys_socket.assert_called()
+
+        with patch.object(logger.handlers[2], "structured_data", {"data": {"k": "v", "k2": "v2"}}):
+            logger.info("Info structured data")
             sys_socket.assert_called()
