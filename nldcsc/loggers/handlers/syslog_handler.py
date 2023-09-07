@@ -136,7 +136,7 @@ class FullSysLogHandler(SysLogHandler):
                     newkey.replace('"', "")
                     .replace(" ", "")
                     .replace("]", "")
-                    .replace("=", "")[:32]  #.encode("ascii", "replace")
+                    .replace("=", "")[:32]  # .encode("ascii", "replace")
                 )
 
             if newkey != key:
