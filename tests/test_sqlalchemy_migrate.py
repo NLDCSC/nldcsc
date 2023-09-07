@@ -33,6 +33,9 @@ def client(app):
 
 class TestSqlMigrator:
     def test_import(self):
+        # needs to be set to True in order to properly check the error response message (without ansi color codes)
+        os.environ["GELF_SYSLOG"] = "True"
+
         fsm = FlaskSqlMigrate()
 
         assert isinstance(fsm, FlaskSqlMigrate)
@@ -41,7 +44,7 @@ class TestSqlMigrator:
         logger = logging.getLogger(logger_name)
         logger.propagate = True
 
-        # test for 'Error: Could not locate a Flask application.'
+        # test for 'Error: Could not locate a Flask application... etc etc'
         with catch_logs(level=logging.INFO, logger=logger) as handler:
             fsm.db_init()
             assert records_to_tuples(handler.records) == [

@@ -32,29 +32,31 @@ class TestLogger:
             raise
 
     def test_handler_types(self):
+        os.environ["GELF_SYSLOG"] = "True"
+
         from nldcsc.loggers.app_logger import AppLogger
         from logging.handlers import RotatingFileHandler
         from nldcsc.loggers.handlers.gelf_handler import DCSCGelfUDPHandler
 
         logging.setLoggerClass(AppLogger)
 
-        logger = logging.getLogger("TEST")
+        logger = logging.getLogger("test_handler_types")
 
         assert len(logger.handlers) == 3
         assert isinstance(logger.handlers[0], logging.StreamHandler)
         assert isinstance(logger.handlers[1], RotatingFileHandler)
         assert isinstance(logger.handlers[2], DCSCGelfUDPHandler)
 
-    def test_syslog_hander(self):
+    def test_syslog_handler(self):
+        os.environ["GELF_SYSLOG"] = "False"
+
         from nldcsc.loggers.app_logger import AppLogger
         from logging.handlers import RotatingFileHandler
         from nldcsc.loggers.handlers.syslog_handler import FullSysLogHandler
 
-        os.environ["GELF_SYSLOG"] = "False"
-
         logging.setLoggerClass(AppLogger)
 
-        logger = logging.getLogger("TEST")
+        logger = logging.getLogger("test_syslog_handler")
 
         assert len(logger.handlers) == 3
         assert isinstance(logger.handlers[0], logging.StreamHandler)
