@@ -69,7 +69,6 @@ class TestLogger:
 
     @mock.patch("nldcsc.loggers.handlers.syslog_handler.socket.socket.sendto")
     def test_syslog_emit(self, sys_socket):
-
         os.environ["GELF_SYSLOG"] = "False"
         import socket
 
