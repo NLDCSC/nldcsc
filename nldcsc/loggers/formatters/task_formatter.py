@@ -7,13 +7,13 @@ class DCSCTaskFormatter(logging.Formatter):
         try:
             from celery._state import get_current_task
 
-            self.get_current_task = get_current_task
+            self.get_current_task = get_current_task  # pragma: no cover
         except ImportError:
             self.get_current_task = lambda: None
 
     def format(self, record):
         task = self.get_current_task()
-        if task and task.request:
+        if task and task.request:  # pragma: no cover
             record.__dict__.update(
                 task_id=task.request.id,
                 task_name=task.name,
