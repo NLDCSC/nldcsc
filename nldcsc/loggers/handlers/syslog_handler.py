@@ -166,7 +166,7 @@ class FullSysLogHandler(SysLogHandler):
         msg = " ".join((header, sd, msg, "\000")).encode("utf-8")
 
         # This section copied from logging.SyslogHandler
-        try:
+        try:  # pragma: no cover
             if self.unixsocket:
                 try:
                     self.socket.send(msg)

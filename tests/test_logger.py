@@ -1,9 +1,8 @@
 import logging
 import os
-from collections import OrderedDict
 
 import mock
-from mock.mock import patch, PropertyMock
+from mock.mock import patch
 
 from tests.helpers.capture_logging import catch_logs, records_to_tuples
 
@@ -89,3 +88,9 @@ class TestLogger:
             with patch.object(logger.handlers[2], "enterprise_id", 1):
                 logger.info("Info structured data")
                 sys_socket.assert_called()
+
+        with patch.object(
+            logger.handlers[2], "structured_data", {"meta": {"k": "v", "k2": "v2"}}
+        ):
+            logger.info("Info structured data id")
+            sys_socket.assert_called()
