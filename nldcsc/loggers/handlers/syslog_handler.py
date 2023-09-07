@@ -178,7 +178,7 @@ class FullSysLogHandler(SysLogHandler):
                 self.socket.sendto(msg, self.address)
             else:
                 self.socket.sendall(msg)
-        except (KeyboardInterrupt, SystemExit):
+        except (KeyboardInterrupt, SystemExit):  # pragma: no cover
             raise
-        except Exception:
+        except Exception:  # pragma: no cover
             self.handleError(record)

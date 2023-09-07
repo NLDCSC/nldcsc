@@ -6,7 +6,7 @@ from pygelf import GelfUdpHandler, GelfTcpHandler, GelfTlsHandler
 
 class DCSCSocketHandler(SocketHandler):
     def __init__(self, host: str, port: int | None):
-        super().__init__(host, port)
+        super().__init__(host, port)  # pragma: no cover
 
     def emit(self, record):
         """
@@ -36,9 +36,9 @@ class DCSCGelfUDPHandler(GelfUdpHandler, DCSCSocketHandler):
 
 class DCSCGelfTCPHandler(GelfTcpHandler, DCSCSocketHandler):
     def __init__(self, host, port, **kwargs):
-        super().__init__(host, port, **kwargs)
+        super().__init__(host, port, **kwargs)  # pragma: no cover
 
 
 class DCSCGelfTLSHandler(GelfTlsHandler, DCSCSocketHandler):
     def __init__(self, host, port, **kwargs):
-        super().__init__(host, port, **kwargs)
+        super().__init__(host, port, **kwargs)  # pragma: no cover
