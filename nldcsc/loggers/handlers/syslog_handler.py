@@ -1,7 +1,6 @@
 import datetime
 import re
 import socket
-import sys
 from collections import OrderedDict
 from logging.handlers import SysLogHandler, SYSLOG_UDP_PORT
 from syslog import LOG_USER

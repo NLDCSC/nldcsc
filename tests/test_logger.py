@@ -1,5 +1,9 @@
-import os
 import logging
+import os
+
+import mock
+from mock.mock import patch, PropertyMock
+
 from tests.helpers.capture_logging import catch_logs, records_to_tuples
 
 
@@ -62,3 +66,18 @@ class TestLogger:
         assert isinstance(logger.handlers[0], logging.StreamHandler)
         assert isinstance(logger.handlers[1], RotatingFileHandler)
         assert isinstance(logger.handlers[2], FullSysLogHandler)
+
+    @mock.patch("nldcsc.loggers.handlers.syslog_handler.socket.socket.sendto")
+    def test_syslog_emit(self, sys_socket):
+
+        os.environ["GELF_SYSLOG"] = "False"
+        import socket
+
+        from nldcsc.loggers.app_logger import AppLogger
+
+        logging.setLoggerClass(AppLogger)
+
+        logger = logging.getLogger("test_syslog_emit")
+        with patch.object(logger.handlers[2], "socktype", socket.SOCK_DGRAM):
+            logger.info("Info test")
+            sys_socket.assert_called()
