@@ -25,7 +25,7 @@ class DCSCSocketHandler(SocketHandler):
         try:
             s = self.makePickle(record)
             self.send(s)
-        except Exception:
+        except Exception:  # pragma: no cover
             self.handleError(record)
 
 
