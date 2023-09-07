@@ -86,5 +86,6 @@ class TestLogger:
         with patch.object(
             logger.handlers[2], "structured_data", {"data": {"k": "v", "k2": "v2"}}
         ):
-            logger.info("Info structured data")
-            sys_socket.assert_called()
+            with patch.object(logger.handlers[2], "enterprise_id", 1):
+                logger.info("Info structured data")
+                sys_socket.assert_called()
