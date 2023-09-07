@@ -1,10 +1,11 @@
+import os
+import logging
 from tests.helpers.capture_logging import catch_logs, records_to_tuples
 
 
 class TestLogger:
     def test_logger_import(self):
         try:
-            import logging
             from nldcsc.loggers.app_logger import AppLogger
 
             logging.setLoggerClass(AppLogger)
@@ -31,7 +32,6 @@ class TestLogger:
             raise
 
     def test_handler_types(self):
-        import logging
         from nldcsc.loggers.app_logger import AppLogger
         from logging.handlers import RotatingFileHandler
         from nldcsc.loggers.handlers.gelf_handler import DCSCGelfUDPHandler
@@ -44,3 +44,19 @@ class TestLogger:
         assert isinstance(logger.handlers[0], logging.StreamHandler)
         assert isinstance(logger.handlers[1], RotatingFileHandler)
         assert isinstance(logger.handlers[2], DCSCGelfUDPHandler)
+
+    def test_syslog_hander(self):
+        from nldcsc.loggers.app_logger import AppLogger
+        from logging.handlers import RotatingFileHandler
+        from nldcsc.loggers.handlers.syslog_handler import FullSysLogHandler
+
+        os.environ["GELF_SYSLOG"] = "False"
+
+        logging.setLoggerClass(AppLogger)
+
+        logger = logging.getLogger("TEST")
+
+        assert len(logger.handlers) == 3
+        assert isinstance(logger.handlers[0], logging.StreamHandler)
+        assert isinstance(logger.handlers[1], RotatingFileHandler)
+        assert isinstance(logger.handlers[2], FullSysLogHandler)
