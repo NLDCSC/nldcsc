@@ -16,19 +16,17 @@ SYSLOG_VERSION = 1
 
 
 class FullSysLogHandler(SysLogHandler):
-    """An RFC 5425-complaint Syslog Handler for the python logging framework"""
-
     def __init__(
         self,
-        address=("localhost", SYSLOG_UDP_PORT),
-        facility=LOG_USER,
-        socktype=socket.SOCK_DGRAM,
-        hostname=None,
-        appname=None,
-        procid=None,
-        msgid=None,
-        structured_data=OrderedDict(),
-        enterprise_id=None,
+        appname: str,
+        address: tuple = ("localhost", SYSLOG_UDP_PORT),
+        facility: str = LOG_USER,
+        socktype: str = socket.SOCK_DGRAM,
+        hostname: str = None,
+        procid: int = None,
+        msgid: int = None,
+        structured_data: OrderedDict = OrderedDict(),
+        enterprise_id: int = None,
     ):
         super().__init__(address, facility, socktype)
 
@@ -42,14 +40,13 @@ class FullSysLogHandler(SysLogHandler):
         if self.hostname is None:
             self.hostname = socket.gethostname()
 
-        if self.appname is None:
-            self.appname = sys.argv[0]
-
         if self.procid is None:
             self.procid = NILVALUE
 
         if self.msgid is None:
             self.msgid = NILVALUE
+
+    """An RFC 5425-complaint Syslog Handler for the python logging framework"""
 
     def get_hostname(self, record):
         return getattr(record, "hostname", self.hostname)
