@@ -1,8 +1,1 @@
--r modules/auth.txt
--r modules/flask_managers.txt
--r modules/flask_plugins.txt
--r modules/http_apis.txt
--r modules/loggers.txt
--r modules/sql_migrations.txt
-
 setuptools>=68.1.0
