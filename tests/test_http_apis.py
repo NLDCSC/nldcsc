@@ -16,7 +16,7 @@ def http_api():
 
 @pytest.fixture
 def http_path_api():
-    ha = HttpApi(baseurl="http://localhost:8000", user_agent="HTTP_API", api_path="api")
+    ha = HttpApi(baseurl="http://localhost:8000", user_agent="HTTP_API", api_path="api", verify=True)
 
     yield ha
 
