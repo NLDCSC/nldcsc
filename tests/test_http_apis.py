@@ -66,7 +66,6 @@ def http_path_api():
 
 class TestHttpApis:
     def test_headers(self, http_api):
-
         assert http_api.headers == {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -98,7 +97,6 @@ class TestHttpApis:
         }
 
     def test_paths(self, http_path_api, http_api):
-
         assert http_path_api.baseurl == "http://localhost:8000"
 
         assert http_path_api.api_path == "api"
@@ -110,7 +108,6 @@ class TestHttpApis:
         assert http_api._build_url("resource") == "http://localhost:8000/resource"
 
     def test_dummy_calls(self, http_api):
-
         with pytest.raises(requests.ConnectionError):
             http_api.get_dummy_endpoint()
 
@@ -127,7 +124,6 @@ class TestHttpApis:
             http_api.delete_dict_dummy()
 
     def test_session_calls(self, http_api):
-
         with requests_mock.Mocker() as m:
             m.get(
                 "http://localhost:8000/dummy", text='{"data": "data"}', status_code=200
