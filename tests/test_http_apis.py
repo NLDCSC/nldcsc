@@ -1,10 +1,18 @@
 import pytest
+import requests
+
 from nldcsc.http_apis.base_class.api_base_class import ApiBaseClass
 
 
 class HttpApi(ApiBaseClass):
     def __init__(self, baseurl: str, **kwargs):
         super().__init__(baseurl, **kwargs)
+
+    def get_dummy_endpoint(self):
+
+        resource = "dummy"
+
+        return self.call(self.methods.GET, resource=resource)
 
 
 @pytest.fixture
@@ -63,3 +71,8 @@ class TestHttpApis:
         assert http_path_api._build_url("resource") == "http://localhost:8000/api/resource"
 
         assert http_api._build_url("resource") == "http://localhost:8000/resource"
+
+    def test_calls(self, http_api):
+
+        with pytest.raises(requests.ConnectionError):
+            http_api.get_dummy_endpoint()
