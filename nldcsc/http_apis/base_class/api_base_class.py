@@ -119,7 +119,7 @@ class ApiBaseClass(object):
             return the_response
         except requests.exceptions.ConnectionError as err:
             raise requests.exceptions.ConnectionError(err)
-        except Exception as err:  # pragma: nocover
+        except Exception as err:
             raise Exception(err)
 
     def get_session(
@@ -171,7 +171,7 @@ class ApiBaseClass(object):
                 return result
         except requests.ConnectionError:
             raise
-        except Exception:  # pragma: nocover
+        except Exception:
             raise
 
     @property

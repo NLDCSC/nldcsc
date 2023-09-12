@@ -1,5 +1,9 @@
+from unittest.mock import patch
+
+import mock
 import pytest
 import requests
+import requests_mock
 
 from nldcsc.http_apis.base_class.api_base_class import ApiBaseClass
 
@@ -12,6 +16,13 @@ class HttpApi(ApiBaseClass):
         resource = "dummy"
 
         return self.call(self.methods.GET, resource=resource)
+
+    def get_dummy_response_endpoint(self):
+        resource = "dummy"
+
+        return self.call(
+            self.methods.GET, resource=resource, return_response_object=True
+        )
 
     def post_str_dummy(self):
         resource = "dummy"
@@ -110,7 +121,75 @@ class TestHttpApis:
             http_api.post_str_dummy()
 
         with pytest.raises(requests.ConnectionError):
+            http_api.put_str_dummy()
+
+        with pytest.raises(requests.ConnectionError):
             http_api.patch_dict_dummy()
 
         with pytest.raises(requests.ConnectionError):
             http_api.delete_dict_dummy()
+
+    def test_session_calls(self, http_api):
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy", text='{"data": "data"}', status_code=200
+            )
+
+            d = http_api.get_dummy_endpoint()
+
+            assert d == {"data": "data"}
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy", text='{"data": "data"}', status_code=404
+            )
+
+            with pytest.raises(requests.ConnectionError):
+                d = http_api.get_dummy_endpoint()
+
+                assert d == {"data": "data"}
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy", text='{"data": "data"}', status_code=200
+            )
+
+            d = http_api.get_dummy_response_endpoint()
+
+            assert isinstance(d, requests.Response)
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy",
+                text="just string data",
+                status_code=200,
+                headers={"content-type": "text-plain"},
+            )
+
+            d = http_api.get_dummy_endpoint()
+
+            assert isinstance(d, requests.Response)
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy",
+                text="just string data",
+                status_code=200,
+                headers={"content-type": "text/plain"},
+            )
+
+            d = http_api.get_dummy_endpoint()
+
+            assert isinstance(d, str)
+            assert d == "just string data"
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy",
+                text="just string data",
+                status_code=200,
+            )
+
+            with pytest.raises(Exception):
+                http_api.get_dummy_endpoint()
