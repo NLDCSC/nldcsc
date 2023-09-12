@@ -9,6 +9,13 @@ class HttpApi(ApiBaseClass):
 
 @pytest.fixture
 def http_api():
+    ha = HttpApi(baseurl="http://localhost:8000", user_agent="HTTP_API")
+
+    yield ha
+
+
+@pytest.fixture
+def http_path_api():
     ha = HttpApi(baseurl="http://localhost:8000", user_agent="HTTP_API", api_path="api")
 
     yield ha
@@ -47,8 +54,12 @@ class TestHttpApis:
             "User-Agent": "HTTP_API",
         }
 
-    def test_paths(self, http_api):
+    def test_paths(self, http_path_api, http_api):
 
-        assert http_api.baseurl == "http://localhost:8000"
+        assert http_path_api.baseurl == "http://localhost:8000"
 
-        assert http_api.api_path == "api"
+        assert http_path_api.api_path == "api"
+
+        assert http_path_api._build_url("resource") == "http://localhost:8000/api/resource"
+
+        assert http_api._build_url("resource") == "http://localhost:8000/resource"
