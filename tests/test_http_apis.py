@@ -19,6 +19,12 @@ class HttpApi(ApiBaseClass):
 
         return self.call(self.methods.POST, resource=resource, data=data)
 
+    def put_str_dummy(self):
+        resource = "dummy"
+        data = "data"
+
+        return self.call(self.methods.PUT, resource=resource, data=data)
+
     def patch_dict_dummy(self):
         resource = "dummy"
         data = {"data": "data"}
