@@ -61,7 +61,7 @@ class ApiBaseClass(object):
         method: str,
         resource: str,
         session: requests.Session,
-        data: dict = None,
+        data: dict | str = None,
         timeout: int = 60,
         return_response_object=False,
     ) -> Response | str | Any:
