@@ -9,7 +9,7 @@ class HttpApi(ApiBaseClass):
 
 @pytest.fixture
 def http_api():
-    ha = HttpApi(baseurl="http://localhost:8000", user_agent="HTTP_API")
+    ha = HttpApi(baseurl="http://localhost:8000", user_agent="HTTP_API", api_path="api")
 
     yield ha
 
@@ -46,3 +46,9 @@ class TestHttpApis:
             "Content-Type": "application/json",
             "User-Agent": "HTTP_API",
         }
+
+    def test_paths(self, http_api):
+
+        assert http_api.baseurl == "http://localhost:8000"
+
+        assert http_api.api_path == "api"
