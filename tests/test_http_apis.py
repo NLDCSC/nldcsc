@@ -95,10 +95,16 @@ class TestHttpApis:
 
         assert http_api._build_url("resource") == "http://localhost:8000/resource"
 
-    def test_calls(self, http_api):
+    def test_dummy_calls(self, http_api):
 
         with pytest.raises(requests.ConnectionError):
             http_api.get_dummy_endpoint()
+
+        with pytest.raises(requests.ConnectionError):
             http_api.post_str_dummy()
+
+        with pytest.raises(requests.ConnectionError):
             http_api.patch_dict_dummy()
+
+        with pytest.raises(requests.ConnectionError):
             http_api.delete_dict_dummy()
