@@ -92,7 +92,9 @@ the different migrations. It has a CLI as well as an python class based API.
 
 Check the command line help
 ```
-python3 -m nldcsc.sql_migrations.flask_sql_migrate -h
+python3 -m nldcsc.sql_migrations.flask_sql_migrate -a /path/to/script_with_flask_app.py -i
+python3 -m nldcsc.sql_migrations.flask_sql_migrate -a /path/to/script_with_flask_app.py -m
+python3 -m nldcsc.sql_migrations.flask_sql_migrate -a /path/to/script_with_flask_app.py -u
 ```
 
 Or initiate the FlaskSqlMigrate as a class and initiate the migration 
