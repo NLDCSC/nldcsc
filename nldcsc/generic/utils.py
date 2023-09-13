@@ -1,6 +1,8 @@
 import ast
 import json
 import os
+import secrets
+import string
 from json import JSONDecodeError
 
 
@@ -51,3 +53,21 @@ def getenv_dict(name: str, default: dict = None):
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "1")
+
+
+def generate_random_password():
+    # define the alphabet
+    letters = string.ascii_letters
+    digits = string.digits
+
+    alphabet = letters + digits
+
+    # fix password length
+    pwd_length = 32
+
+    # generate a password string
+    pwd = ""
+    for i in range(pwd_length):
+        pwd += "".join(secrets.choice(alphabet))
+
+    return pwd
