@@ -3,7 +3,7 @@ from json import JSONDecodeError
 
 import pytest
 
-from nldcsc.generic.utils import getenv_dict, getenv_bool, getenv_list, str2bool
+from nldcsc.generic.utils import getenv_dict, getenv_bool, getenv_list, str2bool, generate_random_password
 
 
 class TestGeneric:
@@ -80,3 +80,7 @@ class TestGeneric:
 
         assert str2bool(choices.pop()) is True
         assert str2bool("false") is False
+
+    def test_random_password_generator(self):
+
+        assert len(generate_random_password()) == 32
