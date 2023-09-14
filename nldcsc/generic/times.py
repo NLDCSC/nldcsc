@@ -16,6 +16,7 @@ def timestringTOtimestamp(timestring):
     :rtype: int
     """
 
+
     date_time_formats = [
         "%d-%m-%Y",
         "%d-%m-%Y %H:%M",
@@ -27,8 +28,10 @@ def timestringTOtimestamp(timestring):
         "%Y-%m-%dT%H:%M:%S,%f",
         "%Y-%m-%dT%H:%M:%S.%fZ",
         "%Y-%m-%dT%H:%M:%S,%fZ",
+        "%Y-%m-%dT%H:%M:%S.%fZ%z",
+        "%Y-%m-%dT%H:%M:%S,%fZ%z",
+        "%Y-%m-%d %H:%M:%S.%f%z",
     ]
-
     match = False
 
     # try to match string formats to given string
@@ -109,5 +112,8 @@ def timestampTOcalendarattrs(timestamp):
 
 def timestringTOdatetimestring(timestring):
     timestamp = timestringTOtimestamp(timestring=timestring)
+
+    if timestamp is False:
+        return False
 
     return timestampTOdatetimestring(timestamp=timestamp)
