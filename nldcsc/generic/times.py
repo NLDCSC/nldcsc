@@ -16,7 +16,6 @@ def timestringTOtimestamp(timestring):
     :rtype: int
     """
 
-
     date_time_formats = [
         "%d-%m-%Y",
         "%d-%m-%Y %H:%M",
