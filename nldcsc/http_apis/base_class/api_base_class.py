@@ -82,10 +82,13 @@ class ApiBaseClass(object):
         }
 
         if data is not None:
-            if not isinstance(data, str):
-                data = json.dumps(data)
-
-            request_api_resource["data"] = data
+            if isinstance(data, str):
+                request_api_resource["data"] = data
+            else:
+                if method in [self.methods.DELETE, self.methods.GET]:
+                    request_api_resource["params"] = data
+                else:
+                    request_api_resource["json"] = data
 
         request_api_resource.update(self.kwargs)
 

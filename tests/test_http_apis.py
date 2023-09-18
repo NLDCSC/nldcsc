@@ -14,11 +14,22 @@ class HttpApi(ApiBaseClass):
 
         return self.call(self.methods.GET, resource=resource)
 
-    def get_dummy_response_endpoint(self):
+
+    def get_dummy_endpoint_url_param(self, data=None):
         resource = "dummy"
 
+        return self.call(self.methods.GET, resource=resource, data=data)
+
+
+    def get_dummy_response_endpoint(self):
+        resource = "dummy"
+        data = {"data": "data"}
+
         return self.call(
-            self.methods.GET, resource=resource, return_response_object=True
+            self.methods.GET,
+            resource=resource, 
+            return_response_object=True,
+            data=data
         )
 
     def post_str_dummy(self):
@@ -26,6 +37,7 @@ class HttpApi(ApiBaseClass):
         data = "data"
 
         return self.call(self.methods.POST, resource=resource, data=data)
+
 
     def put_str_dummy(self):
         resource = "dummy"
@@ -112,6 +124,9 @@ class TestHttpApis:
             http_api.get_dummy_endpoint()
 
         with pytest.raises(requests.ConnectionError):
+            http_api.get_dummy_endpoint_url_param()
+
+        with pytest.raises(requests.ConnectionError):
             http_api.post_str_dummy()
 
         with pytest.raises(requests.ConnectionError):
@@ -123,16 +138,8 @@ class TestHttpApis:
         with pytest.raises(requests.ConnectionError):
             http_api.delete_dict_dummy()
 
-    def test_session_calls(self, http_api):
-        with requests_mock.Mocker() as m:
-            m.get(
-                "http://localhost:8000/dummy", text='{"data": "data"}', status_code=200
-            )
-
-            d = http_api.get_dummy_endpoint()
-
-            assert d == {"data": "data"}
-
+    
+    def test_session_calls(self, http_api):        
         with requests_mock.Mocker() as m:
             m.get(
                 "http://localhost:8000/dummy", text='{"data": "data"}', status_code=404
@@ -142,6 +149,28 @@ class TestHttpApis:
                 d = http_api.get_dummy_endpoint()
 
                 assert d == {"data": "data"}
+        
+        
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy?id=1&id2=10", 
+                json={"id": "1", "id2": 10, "result": "success"},
+                status_code=200
+            )
+
+            d = http_api.get_dummy_endpoint_url_param(data={"id": 1, "id2": 10})
+
+            assert d == {"id": "1", "id2": 10, "result": "success"}
+
+        with requests_mock.Mocker() as m:
+            m.get(
+                "http://localhost:8000/dummy", text='{"data": "data"}', status_code=200
+            )
+
+            d = http_api.get_dummy_endpoint_url_param()
+
+            assert d == {"data": "data"}
+
 
         with requests_mock.Mocker() as m:
             m.get(
