@@ -35,7 +35,7 @@ class FlaskEsWrap(object):
         if self.elastic_kwargs is not None:
             self.kwargs.update(self.elastic_kwargs)
 
-        if self.elastic_connection_details is not None:
+        if len(self.elastic_connection_details) != 0:
             if self.elastic_user is not None and self.elastic_password is not None:
                 self._es = EsWrap(
                     connection_details=self.elastic_connection_details,
