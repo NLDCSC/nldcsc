@@ -2,4 +2,4 @@
 -r modules/flask_managers.txt
 -r modules/sql_migrations.txt
 
-requests==2.31.0
+requests~=2.31.0

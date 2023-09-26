@@ -1,5 +1,5 @@
-Flask-Migrate==4.0.4
-Flask_SQLAlchemy==3.0.5
+Flask-Migrate~=4.0.5
+Flask_SQLAlchemy~=3.1.1
 flask~=2.3.3
 
 -r loggers.txt

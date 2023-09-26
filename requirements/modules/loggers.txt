@@ -1,3 +1,3 @@
 gunicorn~=21.2.0
-ansicolors==1.1.8
+ansicolors~=1.1.8
 pygelf~=0.4.2
