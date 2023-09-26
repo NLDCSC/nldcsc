@@ -7,7 +7,6 @@ from itertools import chain
 from setuptools import setup, find_packages
 
 __NAME__ = "nldcsc"
-__VERSION__ = "0.0.1"
 
 # -*- Distribution Meta -*-
 
