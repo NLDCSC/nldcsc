@@ -42,7 +42,13 @@ def parse_dist_meta():
 # -*- Extras -*-
 
 MODULES = {
+    "auth",
+    "datatables",
+    "flask_managers",
+    "flask_plugins",
+    "http_apis",
     "loggers",
+    "sql_migrations",
 }
 
 # -*- Requirements -*-
