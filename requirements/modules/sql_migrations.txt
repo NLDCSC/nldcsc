@@ -4,4 +4,4 @@ flask~=2.3.3
 pymysql==1.1.0
 mysqlclient==2.1.1
 
--r modules/loggers.txt
+-r ./loggers.txt

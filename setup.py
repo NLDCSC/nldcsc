@@ -66,6 +66,11 @@ def _pip_requirement(req):
 
 
 def _reqs(*f):
+    if len(f) == 2:
+        if os.getcwd().endswith("modules") and f[0] == "modules":
+            f = [f[1]]
+        if not os.getcwd().endswith("modules") and f[0] == ".":
+            f = ("modules", f[1])
     return [
         _pip_requirement(r)
         for r in (
@@ -82,6 +87,8 @@ def reqs(*f):
     Example:
         reqs('default.txt')          # requirements/default.txt
         reqs('modules', 'redis.txt')  # requirements/modules/redis.txt
+        reqs('.', 'loggers.txt')  # requirements/modules/loggers.txt -> this is a reference in a requirements file
+        like -r ./loggers.txt
     Returns:
         List[str]: list of requirements specified in the file.
     """
@@ -119,7 +126,7 @@ def long_description():
 
 
 meta = parse_dist_meta()
-extras_require()
+
 setup(
     name=__NAME__,
     packages=find_packages(exclude=["tests", "test_data"]),
