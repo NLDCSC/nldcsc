@@ -1,1 +1,1 @@
--r flask_plugins.txt
+-r modules/flask_plugins.txt

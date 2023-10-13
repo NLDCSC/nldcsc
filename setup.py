@@ -119,7 +119,7 @@ def long_description():
 
 
 meta = parse_dist_meta()
-
+extras_require()
 setup(
     name=__NAME__,
     packages=find_packages(exclude=["tests", "test_data"]),
