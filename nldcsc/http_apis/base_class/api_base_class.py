@@ -153,7 +153,7 @@ class ApiBaseClass(object):
         data: dict = None,
         timeout: int = 60,
         return_response_object=False,
-    ) -> dict:
+    ) -> Response | str | Any:
         """
         Method for requesting free format api resources
 
