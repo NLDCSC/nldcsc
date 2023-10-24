@@ -1,11 +1,12 @@
 import logging
 import os.path
 from shutil import rmtree
+
 import mock
 import pytest
 
-from tests.helpers.capture_logging import catch_logs, records_to_tuples
 from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
+from tests.helpers.capture_logging import catch_logs, records_to_tuples
 
 
 @pytest.fixture

@@ -6,10 +6,9 @@ from logging.handlers import RotatingFileHandler
 import colors
 
 from nldcsc.generic.utils import getenv_bool, getenv_dict
+from nldcsc.loggers.formatters.task_formatter import DCSCTaskFormatter
 from nldcsc.loggers.handlers.gelf_handler import DCSCGelfUDPHandler
 from nldcsc.loggers.handlers.syslog_handler import FullSysLogHandler
-from nldcsc.loggers.formatters.task_formatter import DCSCTaskFormatter
-
 
 CRITICAL = 50
 FATAL = CRITICAL

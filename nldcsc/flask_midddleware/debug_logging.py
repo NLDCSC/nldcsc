@@ -1,29 +1,21 @@
-import logging
 import time
 from datetime import datetime
 
 import colors
-import rfc3339 as rfc3339
-from flask import g
-from flask_http_middleware import BaseHTTPMiddleware
+import rfc3339
+from flask import g, request, Flask
 
-from nldcsc.loggers.app_logger import AppLogger
-
-logging.setLoggerClass(AppLogger)
+from nldcsc.flask_midddleware.base import BaseHTTPMiddleware, Response
 
 
 class DebugLoggingMiddleware(BaseHTTPMiddleware):
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
-        super().__init__()
+    def __init__(self, app: Flask):
+        super().__init__(app=app)
 
-    def dispatch(self, request, call_next):
-        # before_request
+    def _before_request(self):
         g.start = time.time()
 
-        response = call_next(request)
-
-        # after_request
+    def _after_request(self, response: Response):
         now = time.time()
         duration = round(now - g.start, 2)
         dt = datetime.fromtimestamp(now)
