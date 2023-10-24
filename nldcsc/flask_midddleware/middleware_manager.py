@@ -41,7 +41,6 @@ class MiddlewareManager(object):
             )
 
     def init_app(self, app: Flask):
-
         for mw_entry in self.middleware_stack:
             rank, mw = mw_entry
             # init the middleware
