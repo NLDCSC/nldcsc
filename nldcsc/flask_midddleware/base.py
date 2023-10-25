@@ -18,7 +18,7 @@ class BaseHTTPMiddleware(ABC):
             return self._before_request()
 
         @app.after_request
-        def after_request(response: Response):
+        def after_request(response: Response) -> Response:
             return self._after_request(response)
 
     @abstractmethod
@@ -26,7 +26,7 @@ class BaseHTTPMiddleware(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _after_request(self, response: Response):
+    def _after_request(self, response: Response) -> Response:
         raise NotImplementedError
 
     def __repr__(self):
