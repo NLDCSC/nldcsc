@@ -14,22 +14,17 @@ class HttpApi(ApiBaseClass):
 
         return self.call(self.methods.GET, resource=resource)
 
-
     def get_dummy_endpoint_url_param(self, data=None):
         resource = "dummy"
 
         return self.call(self.methods.GET, resource=resource, data=data)
-
 
     def get_dummy_response_endpoint(self):
         resource = "dummy"
         data = {"data": "data"}
 
         return self.call(
-            self.methods.GET,
-            resource=resource, 
-            return_response_object=True,
-            data=data
+            self.methods.GET, resource=resource, return_response_object=True, data=data
         )
 
     def post_str_dummy(self):
@@ -37,7 +32,6 @@ class HttpApi(ApiBaseClass):
         data = "data"
 
         return self.call(self.methods.POST, resource=resource, data=data)
-
 
     def put_str_dummy(self):
         resource = "dummy"
@@ -55,7 +49,7 @@ class HttpApi(ApiBaseClass):
         resource = "dummy"
 
         return self.call(self.methods.DELETE, resource=resource)
-  
+
     def post_invalid_data_dummy(self):
         resource = "dummy"
         data = 1
@@ -65,11 +59,11 @@ class HttpApi(ApiBaseClass):
     def post_unserializable_data_dummy(self):
         class DummyClass:
             pass
+
         resource = "dummy"
         data = {"data": DummyClass()}
 
         return self.call(self.methods.POST, resource=resource, data=data)
-
 
 
 @pytest.fixture
@@ -153,8 +147,7 @@ class TestHttpApis:
         with pytest.raises(requests.ConnectionError):
             http_api.delete_dict_dummy()
 
-    
-    def test_session_calls(self, http_api):        
+    def test_session_calls(self, http_api):
         with requests_mock.Mocker() as m:
             m.get(
                 "http://localhost:8000/dummy", text='{"data": "data"}', status_code=404
@@ -164,13 +157,12 @@ class TestHttpApis:
                 d = http_api.get_dummy_endpoint()
 
                 assert d == {"data": "data"}
-        
-        
+
         with requests_mock.Mocker() as m:
             m.get(
-                "http://localhost:8000/dummy?id=1&id2=10", 
+                "http://localhost:8000/dummy?id=1&id2=10",
                 json={"id": "1", "id2": 10, "result": "success"},
-                status_code=200
+                status_code=200,
             )
 
             d = http_api.get_dummy_endpoint_url_param(data={"id": 1, "id2": 10})
@@ -185,7 +177,6 @@ class TestHttpApis:
             d = http_api.get_dummy_endpoint_url_param()
 
             assert d == {"data": "data"}
-
 
         with requests_mock.Mocker() as m:
             m.get(
@@ -233,7 +224,6 @@ class TestHttpApis:
         with pytest.raises(requests.ConnectionError):
             http_api.delete_dict_dummy()
 
-        
         with requests_mock.Mocker() as m:
             m.post(
                 "http://localhost:8000/dummy",
@@ -243,7 +233,7 @@ class TestHttpApis:
 
             with pytest.raises(TypeError):
                 http_api.post_invalid_data_dummy()
-        
+
         with requests_mock.Mocker() as m:
             m.post(
                 "http://localhost:8000/dummy",
@@ -253,5 +243,3 @@ class TestHttpApis:
 
             with pytest.raises(TypeError):
                 http_api.post_unserializable_data_dummy()
-
-

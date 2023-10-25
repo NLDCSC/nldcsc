@@ -83,21 +83,27 @@ class ApiBaseClass(object):
         }
 
         if data is not None:
-            if method in [self.methods.DELETE, self.methods.GET]:                    
+            if method in [self.methods.DELETE, self.methods.GET]:
                 if not isinstance(data, (list, dict, bytes)):
-                    raise TypeError(f"'data' type for {method} must be dict, bytes or a list of tuples.")
+                    raise TypeError(
+                        f"'data' type for {method} must be dict, bytes or a list of tuples."
+                    )
                 request_api_resource["params"] = data
             else:
                 if isinstance(data, dict):
                     try:
                         data = json.dumps(data)
                     except:
-                        raise TypeError("Dict provided to 'data' is not json serializable.")
+                        raise TypeError(
+                            "Dict provided to 'data' is not json serializable."
+                        )
                 elif not isinstance(data, (str, list, bytes, io.TextIOBase)):
-                    raise TypeError(f"'data' type for {method} must be str, dict, bytes, file-like or a list of tuples.")                
-                
+                    raise TypeError(
+                        f"'data' type for {method} must be str, dict, bytes, file-like or a list of tuples."
+                    )
+
                 request_api_resource["data"] = data
-                    
+
         request_api_resource.update(self.kwargs)
 
         try:
