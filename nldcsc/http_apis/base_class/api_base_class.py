@@ -1,5 +1,6 @@
 import json
 from collections import namedtuple
+import io
 from json import JSONDecodeError
 from typing import Any
 
@@ -61,7 +62,7 @@ class ApiBaseClass(object):
         method: str,
         resource: str,
         session: requests.Session,
-        data: dict | str = None,
+        data: dict | list | str | bytes | io.TextIOBase = None,
         timeout: int = 60,
         return_response_object=False,
     ) -> Response | str | Any:
@@ -82,11 +83,21 @@ class ApiBaseClass(object):
         }
 
         if data is not None:
-            if not isinstance(data, str):
-                data = json.dumps(data)
-
-            request_api_resource["data"] = data
-
+            if method in [self.methods.DELETE, self.methods.GET]:                    
+                if not isinstance(data, (list, dict, bytes)):
+                    raise TypeError(f"'data' type for {method} must be dict, bytes or a list of tuples.")
+                request_api_resource["params"] = data
+            else:
+                if isinstance(data, dict):
+                    try:
+                        data = json.dumps(data)
+                    except:
+                        raise TypeError("Dict provided to 'data' is not json serializable.")
+                elif not isinstance(data, (str, list, bytes, io.TextIOBase)):
+                    raise TypeError(f"'data' type for {method} must be str, dict, bytes, file-like or a list of tuples.")                
+                
+                request_api_resource["data"] = data
+                    
         request_api_resource.update(self.kwargs)
 
         try:
