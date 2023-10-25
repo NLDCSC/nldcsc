@@ -55,6 +55,21 @@ class HttpApi(ApiBaseClass):
         resource = "dummy"
 
         return self.call(self.methods.DELETE, resource=resource)
+  
+    def post_invalid_data_dummy(self):
+        resource = "dummy"
+        data = 1
+
+        return self.call(self.methods.POST, resource=resource, data=data)
+
+    def post_unserializable_data_dummy(self):
+        class DummyClass:
+            pass
+        resource = "dummy"
+        data = {"data": DummyClass()}
+
+        return self.call(self.methods.POST, resource=resource, data=data)
+
 
 
 @pytest.fixture
@@ -215,3 +230,28 @@ class TestHttpApis:
 
             with pytest.raises(Exception):
                 http_api.get_dummy_endpoint()
+        with pytest.raises(requests.ConnectionError):
+            http_api.delete_dict_dummy()
+
+        
+        with requests_mock.Mocker() as m:
+            m.post(
+                "http://localhost:8000/dummy",
+                text="just string data",
+                status_code=200,
+            )
+
+            with pytest.raises(TypeError):
+                http_api.post_invalid_data_dummy()
+        
+        with requests_mock.Mocker() as m:
+            m.post(
+                "http://localhost:8000/dummy",
+                text="just string data",
+                status_code=200,
+            )
+
+            with pytest.raises(TypeError):
+                http_api.post_unserializable_data_dummy()
+
+

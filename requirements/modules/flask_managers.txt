@@ -1,6 +1,7 @@
 gunicorn~=21.2.0
 flask~=2.3.3
 pyopenssl~=23.2.0
+Werkzeug==2.3.7
 
--r loggers.txt
--r sql_migrations.txt
+-r ./loggers.txt
+-r ./sql_migrations.txt

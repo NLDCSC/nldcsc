@@ -33,6 +33,7 @@ The following modules are available in the nldcsc package:
 * auth
 * datatables
 * flask_managers
+* flask_middleware
 * flask_plugins
 * http_apis
 * loggers

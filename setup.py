@@ -7,7 +7,6 @@ from itertools import chain
 from setuptools import setup, find_packages
 
 __NAME__ = "nldcsc"
-__VERSION__ = "0.0.1"
 
 # -*- Distribution Meta -*-
 
@@ -43,7 +42,14 @@ def parse_dist_meta():
 # -*- Extras -*-
 
 MODULES = {
+    "auth",
+    "datatables",
+    "flask_managers",
+    "flask_middleware",
+    "flask_plugins",
+    "http_apis",
     "loggers",
+    "sql_migrations",
 }
 
 # -*- Requirements -*-
@@ -61,6 +67,11 @@ def _pip_requirement(req):
 
 
 def _reqs(*f):
+    if len(f) == 2:
+        if os.getcwd().endswith("modules") and f[0] == "modules":
+            f = [f[1]]
+        if not os.getcwd().endswith("modules") and f[0] == ".":
+            f = ("modules", f[1])
     return [
         _pip_requirement(r)
         for r in (
@@ -77,6 +88,8 @@ def reqs(*f):
     Example:
         reqs('default.txt')          # requirements/default.txt
         reqs('modules', 'redis.txt')  # requirements/modules/redis.txt
+        reqs('.', 'loggers.txt')  # requirements/modules/loggers.txt -> this is a reference in a requirements file
+        like -r ./loggers.txt
     Returns:
         List[str]: list of requirements specified in the file.
     """
