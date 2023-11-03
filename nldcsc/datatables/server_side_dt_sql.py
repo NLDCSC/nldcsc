@@ -18,9 +18,11 @@ class SQLServerSideDataTable(ServerSideDataTable):
         backend: SQLAlchemy,
         target_model: str,
         model_mapping: dict,
+        additional_filters: list = [],
         **kwargs,
     ):
         self.target_model = target_model
+        self.additional_filters = additional_filters
 
         self.models = model_mapping
 
@@ -35,25 +37,32 @@ class SQLServerSideDataTable(ServerSideDataTable):
         else:
             self.sort = self.stringify_sort_list()
 
-        self.total = self.models[self.target_model].query.filter().count()
+        total_query = self.models[self.target_model].query
+        for query_filter in self.additional_filters:
+            total_query = total_query.filter(query_filter)
+        self.total = total_query.count()
 
         self.negate_filter, self.filtered = self.data_filter()
 
         self.fetch_results()
 
         if len(self.filtered) != 0:
+            filter_query = self.models[self.target_model].query
+            for query_filter in self.additional_filters:
+                filter_query = filter_query.filter(query_filter)
+            
+            
             if self.negate_filter:
-                self.total_filtered = (
-                    self.models[self.target_model]
-                    .query.filter(not_(or_(*self.filtered)))
-                    .count()
+                filter_query = (
+                    filter_query
+                    .filter(not_(or_(*self.filtered)))
                 )
             else:
-                self.total_filtered = (
-                    self.models[self.target_model]
-                    .query.filter(or_(*self.filtered))
-                    .count()
+                filter_query = (
+                    filter_query
+                    .filter(or_(*self.filtered))
                 )
+            self.total_filtered = filter_query.count()
         else:
             self.total_filtered = self.total
 
@@ -61,33 +70,23 @@ class SQLServerSideDataTable(ServerSideDataTable):
         """
         Method responsible for querying the backend and fetching the results from the database
         """
+        query = self.models[self.target_model].query
+
+        for query_filter in self.additional_filters:
+            query = query.filter(query_filter)
+
         if len(self.filtered) != 0:
             if self.negate_filter:
-                data_objects = (
-                    self.models[self.target_model]
-                    .query.filter(not_(or_(*self.filtered)))
-                    .order_by(text(self.sort))
-                    .offset(self.data_length.start)
-                    .limit(self.data_length.length)
-                    .all()
-                )
+                query = query.filter(not_(or_(*self.filtered)))
             else:
-                data_objects = (
-                    self.models[self.target_model]
-                    .query.filter(or_(*self.filtered))
-                    .order_by(text(self.sort))
-                    .offset(self.data_length.start)
-                    .limit(self.data_length.length)
-                    .all()
-                )
-        else:
-            data_objects = (
-                self.models[self.target_model]
-                .query.filter()
-                .order_by(text(self.sort))
-                .offset(self.data_length.start)
-                .limit(self.data_length.length)
-                .all()
+                query = query.filter(or_(*self.filtered))
+        
+        data_objects = (
+            query
+            .order_by(text(self.sort))
+            .offset(self.data_length.start)
+            .limit(self.data_length.length)
+            .all()
             )
 
         self.results = [x.to_data_dict() for x in data_objects]
