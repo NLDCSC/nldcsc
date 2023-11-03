@@ -50,18 +50,11 @@ class SQLServerSideDataTable(ServerSideDataTable):
             filter_query = self.models[self.target_model].query
             for query_filter in self.additional_filters:
                 filter_query = filter_query.filter(query_filter)
-            
-            
+
             if self.negate_filter:
-                filter_query = (
-                    filter_query
-                    .filter(not_(or_(*self.filtered)))
-                )
+                filter_query = filter_query.filter(not_(or_(*self.filtered)))
             else:
-                filter_query = (
-                    filter_query
-                    .filter(or_(*self.filtered))
-                )
+                filter_query = filter_query.filter(or_(*self.filtered))
             self.total_filtered = filter_query.count()
         else:
             self.total_filtered = self.total
@@ -80,14 +73,13 @@ class SQLServerSideDataTable(ServerSideDataTable):
                 query = query.filter(not_(or_(*self.filtered)))
             else:
                 query = query.filter(or_(*self.filtered))
-        
+
         data_objects = (
-            query
-            .order_by(text(self.sort))
+            query.order_by(text(self.sort))
             .offset(self.data_length.start)
             .limit(self.data_length.length)
             .all()
-            )
+        )
 
         self.results = [x.to_data_dict() for x in data_objects]
 
