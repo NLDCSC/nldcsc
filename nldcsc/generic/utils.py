@@ -27,7 +27,7 @@ def getenv_list(name: str, default: list = None):
 
     if not isinstance(raw, list):
         try:
-            the_list = json.loads(raw)
+            the_list = json.loads(raw.replace("\n", ""))
             return the_list
         except JSONDecodeError:
             raise
