@@ -1,2 +1,1 @@
 setuptools>=68.1.0
-itsdangerous==2.0.1  # pinning
