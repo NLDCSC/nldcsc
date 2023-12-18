@@ -41,7 +41,9 @@ class FlaskKafka(object):
             if self.producer.bootstrap_connected():
                 app.logger.info(f"Producer connected to KAFKA!!")
             else:
-                app.logger.critical(f"Connection to KAFKA failed!! Producer could not connect!")
+                app.logger.critical(
+                    f"Connection to KAFKA failed!! Producer could not connect!"
+                )
 
         else:
             app.logger.error(f"Connection to KAFKA failed!!, no producer set up...")
@@ -58,7 +60,9 @@ class FlaskKafka(object):
             if self.consumer.bootstrap_connected():
                 app.logger.info(f"Consumer connected to KAFKA!!")
             else:
-                app.logger.critical(f"Connection to KAFKA failed!! Consumer could not connect!")
+                app.logger.critical(
+                    f"Connection to KAFKA failed!! Consumer could not connect!"
+                )
 
         else:
             app.logger.error(f"Connection to KAFKA failed!!, no consumer set up...")
