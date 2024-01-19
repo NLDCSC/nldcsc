@@ -94,7 +94,10 @@ class FlaskAppManager(object):
                     if not os.path.exists(
                         os.path.join(self.app_working_dir, "INIT_COMPLETED")
                     ):
-                        fsm = FlaskSqlMigrate()
+                        fsm = FlaskSqlMigrate(
+                            cwd=self.app.instance_path.rstrip("/instance"),
+                            app_ref=self.app.import_name,
+                        )
 
                         if not os.path.exists(
                             os.path.join(self.app_working_dir, "migrations")
