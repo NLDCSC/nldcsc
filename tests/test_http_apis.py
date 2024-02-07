@@ -153,9 +153,10 @@ class TestHttpApis:
                 "http://localhost:8000/dummy", text='{"data": "data"}', status_code=404
             )
 
-            d = http_api.get_dummy_endpoint()
+            with pytest.raises(requests.ConnectionError):
+                d = http_api.get_dummy_endpoint()
 
-            assert isinstance(d, requests.Response)
+                assert d == {"data": "data"}
 
         with requests_mock.Mocker() as m:
             m.get(

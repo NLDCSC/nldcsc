@@ -140,8 +140,6 @@ class ApiBaseClass(object):
                         the_response = r
                 else:
                     the_response = r
-            except Exception:
-                the_response = r
 
             return the_response
         except requests.exceptions.ConnectionError as err:
