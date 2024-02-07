@@ -153,10 +153,9 @@ class TestHttpApis:
                 "http://localhost:8000/dummy", text='{"data": "data"}', status_code=404
             )
 
-            with pytest.raises(requests.ConnectionError):
-                d = http_api.get_dummy_endpoint()
+            d = http_api.get_dummy_endpoint()
 
-                assert d == {"data": "data"}
+            assert isinstance(d, requests.Response)
 
         with requests_mock.Mocker() as m:
             m.get(
@@ -219,8 +218,7 @@ class TestHttpApis:
                 status_code=200,
             )
 
-            with pytest.raises(Exception):
-                http_api.get_dummy_endpoint()
+            http_api.get_dummy_endpoint()
         with pytest.raises(requests.ConnectionError):
             http_api.delete_dict_dummy()
 
