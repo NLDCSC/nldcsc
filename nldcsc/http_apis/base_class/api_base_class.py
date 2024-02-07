@@ -127,11 +127,18 @@ class ApiBaseClass(object):
                         raise requests.exceptions.ConnectionError(the_response)
                     else:
                         the_response = json.loads(r.text)
-            except JSONDecodeError:
-                if r.headers["content-type"] == "text/plain":
-                    the_response = r.text
                 else:
                     the_response = r
+            except JSONDecodeError:
+                if "content-type" in r.headers:
+                    if r.headers["content-type"] == "text/plain":
+                        the_response = r.text
+                    else:
+                        the_response = r
+                else:
+                    the_response = r
+            except Exception:
+                the_response = r
 
             return the_response
         except requests.exceptions.ConnectionError as err:
