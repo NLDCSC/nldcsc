@@ -7,7 +7,9 @@ from nldcsc.generic.utils import getenv_dict
 
 
 class FlaskRedis(object):
-    def __init__(self, app=None, init_standalone: bool = False, redis_url: str = None, **kwargs):
+    def __init__(
+        self, app=None, init_standalone: bool = False, redis_url: str = None, **kwargs
+    ):
         if app and init_standalone:
             raise Exception("App must be None when 'init_standalone' is set to True")
 
