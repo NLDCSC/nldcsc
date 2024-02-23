@@ -7,7 +7,10 @@ from nldcsc.generic.utils import getenv_dict
 
 
 class FlaskRedis(object):
-    def __init__(self, app=None, redis_url: str = None, **kwargs):
+    def __init__(self, app=None, init_standalone: bool = False, redis_url: str = None, **kwargs):
+        if app and init_standalone:
+            raise Exception("App must be None when 'init_standalone' is set to True")
+
         self._redis_client = None
         self.kwargs = kwargs
         self.redis_url = (
@@ -19,7 +22,7 @@ class FlaskRedis(object):
         self.redis_cache_db = int(os.getenv("REDIS_CACHE_DB", 0))
         self.redis_kwargs = getenv_dict("REDIS_KWARGS", None)
 
-        if app is not None:
+        if app is not None or init_standalone:
             self.init_app(app)
 
     def init_app(self, app, **kwargs):
@@ -37,7 +40,8 @@ class FlaskRedis(object):
             **self.kwargs,
         )
 
-        app.redis_client = self
+        if app is not None:
+            app.redis_client = self
 
     def __repr__(self):
         return "<< FlaskRedis >>"
