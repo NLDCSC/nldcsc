@@ -6,7 +6,10 @@ from nldcsc.generic.utils import getenv_list, getenv_dict
 
 
 class FlaskEsWrap(object):
-    def __init__(self, app=None, ignore_app_init: bool = False, **kwargs):
+    def __init__(self, app=None, init_standalone: bool = False, **kwargs):
+        if app and init_standalone:
+            raise Exception("App must be None when 'ignore_app_init' is set to True")
+
         self._es = None
         self.kwargs = kwargs
 
@@ -26,7 +29,7 @@ class FlaskEsWrap(object):
         )
         self.elastic_kwargs = getenv_dict("ELASTIC_KWARGS", None)
 
-        if app is not None or ignore_app_init:
+        if app is not None or init_standalone:
             self.init_app(app)
         
 
