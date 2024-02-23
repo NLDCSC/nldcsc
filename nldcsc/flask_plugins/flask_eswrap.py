@@ -31,7 +31,6 @@ class FlaskEsWrap(object):
 
         if app is not None or init_standalone:
             self.init_app(app)
-        
 
     def init_app(self, app, **kwargs):
         self.kwargs.update(kwargs)
