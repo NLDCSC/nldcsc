@@ -57,7 +57,6 @@ class SSOConnection(object):
             self.app = None
 
     def init_app(self, app, prefix=None):
-
         self.app = app
 
         app.config.setdefault("SSO_CLIENT_ID", os.getenv("SSO_CLIENT_ID", "sso-client"))
