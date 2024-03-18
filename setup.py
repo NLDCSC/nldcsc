@@ -50,6 +50,7 @@ MODULES = {
     "http_apis",
     "loggers",
     "sql_migrations",
+    "sso",
 }
 
 # -*- Requirements -*-
