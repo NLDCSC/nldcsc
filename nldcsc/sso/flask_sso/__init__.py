@@ -208,11 +208,10 @@ class SSOConnection(object):
 
         return decorated
 
-    def logout(self, return_to=None):
+    def logout(self):
         """
         Request the browser to please forget the cookie we set, to clear the
         current session. Propagate logout to SSO provider.
-
         """
         try:
             endSessionEndpoint = self.app.config["SSO_ENDSESSION_ENDPOINT"]
