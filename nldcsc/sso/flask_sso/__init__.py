@@ -111,7 +111,7 @@ class SSOConnection(object):
         )
         self.app.config.setdefault(
             "SSO_TOKEN_ENDPOINT_AUTH_METHOD",
-            getenv_bool("SSO_TOKEN_ENDPOINT_AUTH_METHOD", "client_secret_post"),
+            os.getenv("SSO_TOKEN_ENDPOINT_AUTH_METHOD", "client_secret_post"),
         )
 
         self.oauth = OAuth(self.app)
