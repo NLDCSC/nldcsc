@@ -22,7 +22,7 @@ jobs:
           /usr/bin/git log --oneline --no-merges $(/usr/bin/git describe --tags --abbrev=0 ${{ github.ref }}^)..${{ github.ref }} >> ./commits.log
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: elgohr/Github-Release-Action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
