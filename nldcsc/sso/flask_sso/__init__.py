@@ -110,7 +110,8 @@ class SSOConnection(object):
             "SSO_USER_INFO_ENABLED", getenv_bool("SSO_USER_INFO_ENABLED", "True")
         )
         self.app.config.setdefault(
-            "SSO_TOKEN_ENDPOINT_AUTH_METHOD", getenv_bool("SSO_TOKEN_ENDPOINT_AUTH_METHOD", "client_secret_post")
+            "SSO_TOKEN_ENDPOINT_AUTH_METHOD",
+            getenv_bool("SSO_TOKEN_ENDPOINT_AUTH_METHOD", "client_secret_post"),
         )
 
         self.oauth = OAuth(self.app)
@@ -122,7 +123,9 @@ class SSOConnection(object):
             client_kwargs={
                 "scope": " ".join(self.app.config["SSO_SCOPES"]),
                 "code_challenge_method": self.app.config["SSO_CODE_CHALLENGE_METHOD"],
-                'token_endpoint_auth_method': self.app.config["SSO_TOKEN_ENDPOINT_AUTH_METHOD"],
+                "token_endpoint_auth_method": self.app.config[
+                    "SSO_TOKEN_ENDPOINT_AUTH_METHOD"
+                ],
             },
             update_token=self._update_token,
         )
