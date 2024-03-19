@@ -16,7 +16,7 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v4.1.1
     - name: Setup Python
       uses: actions/setup-python@master
       with:
