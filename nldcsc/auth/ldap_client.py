@@ -132,7 +132,7 @@ class LDAPClient(object):
         FIELDS = ["memberOf", "displayName"]
 
         query = f"uid={escape_filter_chars(self._username)}"
-        # Get LDAP connection with service account
+        # Get LDAP connection with account
         with self.ldap_connection() as ldap_connection:
             results = ldap_connection.search_s(
                 self.ldap_user_base, ldap.SCOPE_SUBTREE, query, attrlist=FIELDS
