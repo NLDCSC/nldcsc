@@ -50,6 +50,9 @@ class SSOConnection(object):
         self.logger = logging.getLogger(__name__)
 
         self.accept_token.register_token_validator(IntrospectTokenValidator())
+
+        self.oauth = None
+
         if app is not None:
             self.app = app
             self.init_app(app, prefix=prefix)
@@ -59,69 +62,74 @@ class SSOConnection(object):
     def init_app(self, app, prefix=None):
         self.app = app
 
-        app.config.setdefault("SSO_CLIENT_ID", os.getenv("SSO_CLIENT_ID", "sso-client"))
-        app.config.setdefault(
+        self.app.config.setdefault(
+            "SSO_CLIENT_ID", os.getenv("SSO_CLIENT_ID", "sso-client")
+        )
+        self.app.config.setdefault(
             "SSO_CLIENT_SECRET", os.getenv("SSO_CLIENT_SECRET", "secret!")
         )
-        app.config.setdefault("SSO_ISSUER", os.getenv("SSO_ISSUER", ""))
-        app.config.setdefault(
+        self.app.config.setdefault("SSO_ISSUER", os.getenv("SSO_ISSUER", ""))
+        self.app.config.setdefault(
             "SSO_DISCOVERY_URL",
             os.getenv(
                 "SSO_DISCOVERY_URL",
-                f"{app.config['SSO_ISSUER']}/.well-known/openid-configuration",
+                f"{self.app.config['SSO_ISSUER']}/.well-known/openid-configuration",
             ),
         )
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_USERINFO_ENDPOINT",
             os.getenv(
                 "SSO_USERINFO_ENDPOINT",
-                f"{app.config['SSO_ISSUER']}/protocol/openid-connect/userinfo",
+                f"{self.app.config['SSO_ISSUER']}/protocol/openid-connect/userinfo",
             ),
         )
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_ENDSESSION_ENDPOINT",
             os.getenv(
                 "SSO_ENDSESSION_ENDPOINT",
-                f"{app.config['SSO_ISSUER']}/protocol/openid-connect/logout",
+                f"{self.app.config['SSO_ISSUER']}/protocol/openid-connect/logout",
             ),
         )
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_SCOPES", getenv_list("SSO_SCOPES", ["openid", "profile", "email"])
         )
 
-        if "openid" not in app.config["SSO_SCOPES"]:
+        if "openid" not in self.app.config["SSO_SCOPES"]:
             raise ValueError('The value "openid" must be in the SSO_SCOPES')
 
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_CODE_CHALLENGE_METHOD", os.getenv("SSO_CODE_CHALLENGE_METHOD", "S256")
         )
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_OVERWRITE_REDIRECT_URI", os.getenv("SSO_OVERWRITE_REDIRECT_URI", None)
         )
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_CALLBACK_ENDPOINT", os.getenv("SSO_CALLBACK_ENDPOINT", None)
         )
-
-        app.config.setdefault(
+        self.app.config.setdefault(
             "SSO_USER_INFO_ENABLED", getenv_bool("SSO_USER_INFO_ENABLED", "True")
         )
+        self.app.config.setdefault(
+            "SSO_TOKEN_ENDPOINT_AUTH_METHOD", getenv_bool("SSO_TOKEN_ENDPOINT_AUTH_METHOD", "client_secret_post")
+        )
 
-        self.oauth = OAuth(app)
+        self.oauth = OAuth(self.app)
         self.oauth.register(
             name="sso",
-            client_id=app.config["SSO_CLIENT_ID"],
-            client_secret=app.config["SSO_CLIENT_SECRET"],
-            server_metadata_url=app.config["SSO_DISCOVERY_URL"],
+            client_id=self.app.config["SSO_CLIENT_ID"],
+            client_secret=self.app.config["SSO_CLIENT_SECRET"],
+            server_metadata_url=self.app.config["SSO_DISCOVERY_URL"],
             client_kwargs={
-                "scope": " ".join(app.config["SSO_SCOPES"]),
-                "code_challenge_method": app.config["SSO_CODE_CHALLENGE_METHOD"],
+                "scope": " ".join(self.app.config["SSO_SCOPES"]),
+                "code_challenge_method": self.app.config["SSO_CODE_CHALLENGE_METHOD"],
+                'token_endpoint_auth_method': self.app.config["SSO_TOKEN_ENDPOINT_AUTH_METHOD"],
             },
             update_token=self._update_token,
         )
 
-        app.register_blueprint(sso_auth, url_prefix=prefix)
+        self.app.register_blueprint(sso_auth, url_prefix=prefix)
 
-        app.before_request(self._before_request)
+        self.app.before_request(self._before_request)
 
     def _before_request(self):
         g._sso_auth = self.oauth.sso
@@ -156,7 +164,7 @@ class SSOConnection(object):
                 raise InvalidTokenError()
             return result
 
-    def _update_token(name, token, refresh_token=None, access_token=None):
+    def _update_token(name, token):
         session["sso_auth_token"] = g.sso_id_token = token
 
     @property
@@ -240,3 +248,6 @@ class SSOConnection(object):
             g.sso_id_token = None
         except TypeError:
             pass
+
+    def __repr__(self):
+        return f"<< SSOConnection >>"
