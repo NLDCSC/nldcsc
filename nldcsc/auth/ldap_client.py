@@ -83,6 +83,7 @@ class LDAPClient(object):
 
         try:
             ldap_connection.set_option(ldap.OPT_REFERRALS, 0)
+            ldap_connection.set_option(ldap.OPT_NETWORK_TIMEOUT, 2.0)
             ldap_connection.simple_bind_s(self.ldap_username, self._password)
             self.logger.info("Simple bind successful...")
 
