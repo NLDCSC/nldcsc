@@ -80,14 +80,14 @@ class SSOConnection(object):
             "SSO_USERINFO_ENDPOINT",
             os.getenv(
                 "SSO_USERINFO_ENDPOINT",
-                f"{self.app.config['SSO_ISSUER']}/protocol/openid-connect/userinfo",
+                self.get_config_setting("userinfo_endpoint"),
             ),
         )
         self.app.config.setdefault(
             "SSO_ENDSESSION_ENDPOINT",
             os.getenv(
                 "SSO_ENDSESSION_ENDPOINT",
-                f"{self.app.config['SSO_ISSUER']}/protocol/openid-connect/logout",
+                self.get_config_setting("end_session_endpoint"),
             ),
         )
         self.app.config.setdefault(
@@ -182,7 +182,8 @@ class SSOConnection(object):
             abort(401, "User was not authenticated")
         return session.get("sso_auth_profile", {})
 
-    def user_getfield(self, field: str):
+    @staticmethod
+    def user_getfield(field: str):
         """
         Request a single field of information about the user.
         """
@@ -192,11 +193,25 @@ class SSOConnection(object):
         else:
             return req_data
 
-    def get_access_token(self):
+    def get_config_setting(self, config_setting: str):
+
+        with requests.session() as session:
+            try:
+                req = session.get(self.app.config["SSO_DISCOVERY_URL"])
+                data = req.json()
+                ret_data = data[config_setting]
+            except Exception:
+                raise
+
+        return ret_data
+
+    @staticmethod
+    def get_access_token():
         """Method to return the current requests' access_token."""
         return session.get("sso_auth_token", {}).get("access_token")
 
-    def get_refresh_token(self):
+    @staticmethod
+    def get_refresh_token():
         """Method to return the current requests' refresh_token."""
         return session.get("sso_auth_token", {}).get("refresh_token")
 
