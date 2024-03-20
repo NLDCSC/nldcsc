@@ -64,7 +64,8 @@ class ApiBaseClass(object):
         session: requests.Session,
         data: dict | list | str | bytes | io.TextIOBase = None,
         timeout: int = 60,
-        return_response_object=False,
+        return_response_object: bool = False,
+        stream: bool = False,
     ) -> Response | str | Any:
         """
         Send a request
@@ -108,19 +109,19 @@ class ApiBaseClass(object):
 
         try:
             if method == self.methods.POST:
-                r = session.post(self._build_url(resource), **request_api_resource)
+                r = session.post(self._build_url(resource), stream=stream, **request_api_resource)
             elif method == self.methods.PUT:
-                r = session.put(self._build_url(resource), **request_api_resource)
+                r = session.put(self._build_url(resource), stream=stream, **request_api_resource)
             elif method == self.methods.PATCH:
-                r = session.patch(self._build_url(resource), **request_api_resource)
+                r = session.patch(self._build_url(resource), stream=stream, **request_api_resource)
             elif method == self.methods.DELETE:
-                r = session.delete(self._build_url(resource), **request_api_resource)
+                r = session.delete(self._build_url(resource), stream=stream, **request_api_resource)
             else:
-                r = session.get(self._build_url(resource), **request_api_resource)
+                r = session.get(self._build_url(resource), stream=stream, **request_api_resource)
 
             try:
                 if isinstance(r, Response):
-                    if return_response_object:
+                    if return_response_object or stream:
                         return r
                     if r.status_code >= 400:
                         if isinstance(r.text, str):
@@ -177,7 +178,8 @@ class ApiBaseClass(object):
         resource: str = None,
         data: dict = None,
         timeout: int = 60,
-        return_response_object=False,
+        return_response_object: bool = False,
+        stream: bool = False,
     ) -> Response | str | Any:
         """
         Method for requesting free format api resources
@@ -192,6 +194,7 @@ class ApiBaseClass(object):
                     data=data,
                     timeout=timeout,
                     return_response_object=return_response_object,
+                    stream=stream,
                 )
                 return result
         except requests.ConnectionError:
