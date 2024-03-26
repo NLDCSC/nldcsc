@@ -211,6 +211,17 @@ class SSOConnection(object):
         return session.get("sso_auth_token", {}).get("access_token")
 
     @staticmethod
+    def access_token_getfield(field: str):
+        """
+        Request a single field of information from the access token.
+        """
+        req_data = session.get("sso_auth_token", {}).get(field)
+        if req_data is None:
+            raise AttributeError(f"Could not retrieve {field} from sso_auth_token")
+        else:
+            return req_data
+
+    @staticmethod
     def get_refresh_token():
         """Method to return the current requests' refresh_token."""
         return session.get("sso_auth_token", {}).get("refresh_token")
