@@ -3,6 +3,7 @@ import os
 from functools import wraps
 from urllib.parse import quote_plus
 
+import jwt
 import requests
 from authlib.common.errors import AuthlibBaseError
 from authlib.integrations.base_client import InvalidTokenError
@@ -211,11 +212,15 @@ class SSOConnection(object):
         return session.get("sso_auth_token", {}).get("access_token")
 
     @staticmethod
-    def access_token_getfield(field: str):
+    def extract_jwt_payload(token: str):
+        return jwt.decode(token, options={"verify_signature": False})
+
+    def access_token_getfield(self, field: str):
         """
         Request a single field of information from the access token.
         """
-        req_data = session.get("sso_auth_token", {}).get(field)
+        access_token_payload = self.extract_jwt_payload(self.get_access_token())
+        req_data = access_token_payload.get(field)
         if req_data is None:
             raise AttributeError(f"Could not retrieve {field} from sso_auth_token")
         else:
