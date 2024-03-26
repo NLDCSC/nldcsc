@@ -195,7 +195,6 @@ class SSOConnection(object):
             return req_data
 
     def get_config_setting(self, config_setting: str):
-
         with requests.session() as session:
             try:
                 req = session.get(self.app.config["SSO_DISCOVERY_URL"])
