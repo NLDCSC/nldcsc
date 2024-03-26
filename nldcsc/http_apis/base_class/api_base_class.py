@@ -109,15 +109,25 @@ class ApiBaseClass(object):
 
         try:
             if method == self.methods.POST:
-                r = session.post(self._build_url(resource), stream=stream, **request_api_resource)
+                r = session.post(
+                    self._build_url(resource), stream=stream, **request_api_resource
+                )
             elif method == self.methods.PUT:
-                r = session.put(self._build_url(resource), stream=stream, **request_api_resource)
+                r = session.put(
+                    self._build_url(resource), stream=stream, **request_api_resource
+                )
             elif method == self.methods.PATCH:
-                r = session.patch(self._build_url(resource), stream=stream, **request_api_resource)
+                r = session.patch(
+                    self._build_url(resource), stream=stream, **request_api_resource
+                )
             elif method == self.methods.DELETE:
-                r = session.delete(self._build_url(resource), stream=stream, **request_api_resource)
+                r = session.delete(
+                    self._build_url(resource), stream=stream, **request_api_resource
+                )
             else:
-                r = session.get(self._build_url(resource), stream=stream, **request_api_resource)
+                r = session.get(
+                    self._build_url(resource), stream=stream, **request_api_resource
+                )
 
             try:
                 if isinstance(r, Response):
