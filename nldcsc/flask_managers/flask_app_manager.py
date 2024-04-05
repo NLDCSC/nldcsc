@@ -95,7 +95,7 @@ class FlaskAppManager(object):
                         os.path.join(self.app_working_dir, "INIT_COMPLETED")
                     ):
                         fsm = FlaskSqlMigrate(
-                            cwd=self.app.instance_path.rstrip("/instance"),
+                            cwd=self.app.instance_path.replace("/instance", ""),
                             app_ref=self.app.import_name,
                         )
 
