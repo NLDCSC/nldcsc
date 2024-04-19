@@ -35,7 +35,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
         if len(self.sort) == 0:
             self.sort = ""
         else:
-            self.sort = self.stringify_sort_list()
+            self.sort = self.create_sort_list()
 
         total_query = self.models[self.target_model].query
         for query_filter in self.additional_filters:
@@ -75,7 +75,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
                 query = query.filter(or_(*self.filtered))
 
         data_objects = (
-            query.order_by(text(self.sort))
+            query.order_by(*self.sort)
             .offset(self.data_length.start)
             .limit(self.data_length.length)
             .all()
@@ -83,13 +83,21 @@ class SQLServerSideDataTable(ServerSideDataTable):
 
         self.results = [x.to_data_dict() for x in data_objects]
 
-    def stringify_sort_list(self):
+    def create_sort_list(self):
         ret_list = []
 
         for each in self.sort:
-            ret_list.append(f"{each[0]} {each[1]}")
+            c = getattr(self.models[self.target_model], each[0], None)
 
-        return ",".join(ret_list)
+            if not c:
+                continue
+
+            if each[1] == "asc":
+                ret_list.append(c.asc())
+            elif each[1] == "desc":
+                ret_list.append(c.desc())
+
+        return ret_list
 
     def data_filter(self):
         """
