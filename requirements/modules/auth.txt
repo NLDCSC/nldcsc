@@ -1,1 +1,2 @@
 python-ldap>=3.4.3
+-r ./loggers.txt
