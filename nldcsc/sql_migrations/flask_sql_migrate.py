@@ -78,7 +78,7 @@ class FlaskSqlMigrate(object):
 
     def __parse_command_output(self, cmd_output: CompletedProcess) -> None:
         if cmd_output.returncode != 0:
-            self.logger.error(cmd_output.stdout.split("\n")[0])
+            self.logger.error(cmd_output.stdout)
         else:
             output_list = cmd_output.stdout.split("\n")
 
