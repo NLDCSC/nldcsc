@@ -54,7 +54,8 @@ class TestSqlMigrator:
                     logging.ERROR,
                     "Error: Could not locate a Flask application. Use the 'flask --app' "
                     "option, 'FLASK_APP' environment variable, or a 'wsgi.py' or 'app.py' "
-                    "file in the current directory.",
+                    "file in the current directory.\n\nUsage: flask [OPTIONS] COMMAND [ARGS]..."
+                    "\nTry 'flask --help' for help.\n\nError: No such command 'db'.\n",
                 )
             ]
 
