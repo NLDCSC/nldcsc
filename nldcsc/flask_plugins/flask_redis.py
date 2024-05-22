@@ -49,7 +49,7 @@ class FlaskRedis(object):
         return "<< FlaskRedis >>"
 
     @property
-    def redis_client(self):
+    def redis_client(self) -> redis.Redis:
         return self._redis_client
 
     @property
