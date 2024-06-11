@@ -48,6 +48,7 @@ MODULES = {
     "flask_middleware",
     "flask_plugins",
     "http_apis",
+    "httpx_apis",
     "loggers",
     "sql_migrations",
     "sso",

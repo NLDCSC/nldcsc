@@ -29,8 +29,7 @@ class ApiBaseClass(object):
         if "verify" not in kwargs:
             self.verify = False
         else:
-            self.verify = kwargs["verify"]
-            kwargs.pop("verify")
+            self.verify = kwargs.pop("verify")
 
         self.baseurl = baseurl
         self.api_path = api_path
@@ -46,7 +45,7 @@ class ApiBaseClass(object):
 
     def __repr__(self) -> str:
         """return a string representation of the obj GenericApi"""
-        return f"<< GenericApi:{self.baseurl} >>"
+        return f"<< ApiBaseClass:{self.baseurl} >>"
 
     def _build_url(self, resource: str) -> str:
         """
@@ -193,7 +192,6 @@ class ApiBaseClass(object):
     ) -> Response | str | Any:
         """
         Method for requesting free format api resources
-
         """
         try:
             with self.get_session() as session:
@@ -238,10 +236,12 @@ class ApiBaseClass(object):
         """
         Method to add a header and set it's value
         """
-
-        self.myheaders[field] = value
-
-        return self.myheaders
+        try:
+            self.myheaders[field] = value
+            return self.myheaders
+        except TypeError:
+            self.myheaders = {field: value}
+            return self.myheaders
 
     def del_header_field(self, field: str) -> dict:
         """
