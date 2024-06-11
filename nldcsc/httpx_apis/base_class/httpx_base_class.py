@@ -18,7 +18,6 @@ logging.setLoggerClass(AppLogger)
 
 
 class HttpxBaseClass(object):
-
     def __init__(
         self,
         baseurl: str,
