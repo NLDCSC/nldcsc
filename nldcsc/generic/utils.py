@@ -74,19 +74,16 @@ def generate_random_password():
     return pwd
 
 
-def reverse_from_named_tuple(n_tuple: collections.namedtuple, index: int) -> str:
-    if not isinstance(index, int):
-        raise TypeError(
-            "This method only works on named tuples that use integers as values to attributes"
-        )
+def reverse_from_named_tuple(n_tuple: collections.namedtuple, index: int | str) -> str:
+    n_list = [
+        x.lower()
+        for x in n_tuple.__dir__()
+        if not x.startswith("_") and x not in ["index", "count"]
+    ]
+
+    n_rev_types = {getattr(n_tuple, x.upper()): x for x in n_list}
 
     try:
-        return [
-            x
-            for x in n_tuple.__dir__()
-            if not x.startswith("_") and x not in ["index", "count"]
-        ][index]
-    except IndexError:
-        raise IndexError(
-            "Could not find the provided index number in the n_tuple variable"
-        )
+        return n_rev_types[index]
+    except KeyError:
+        raise KeyError(f"The requested index does not exist! Choices are {n_rev_types}")
