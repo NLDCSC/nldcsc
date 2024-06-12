@@ -1,9 +1,11 @@
+import re
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text, or_, not_
+from sqlalchemy import or_, and_
 
 from nldcsc.datatables.server_side_dt import ServerSideDataTable
 from nldcsc.generic.utils import str2bool
+from nldcsc.generic.times import timestringTOtimestamp
 
 
 class SQLServerSideDataTable(ServerSideDataTable):
@@ -19,10 +21,12 @@ class SQLServerSideDataTable(ServerSideDataTable):
         target_model: str,
         model_mapping: dict,
         additional_filters: list = [],
+        use_column_filters: bool = False,
         **kwargs,
     ):
         self.target_model = target_model
         self.additional_filters = additional_filters
+        self.use_column_filters = use_column_filters
 
         self.models = model_mapping
 
@@ -42,7 +46,21 @@ class SQLServerSideDataTable(ServerSideDataTable):
             total_query = total_query.filter(query_filter)
         self.total = total_query.count()
 
-        self.negate_filter, self.filtered = self.data_filter()
+        self.filtered = []
+
+        if self.use_column_filters:
+            column_filters = self.column_data_filter()
+            global_filters = self.data_filter()
+            if len(column_filters) != 0 and len(global_filters) != 0:
+                self.filtered.append(and_(*column_filters, or_(*global_filters)))
+            elif len(column_filters) != 0:
+                self.filtered.append(and_(*column_filters))
+            elif len(global_filters) != 0:
+                self.filtered.append(or_(*global_filters))
+        else:
+            global_filters = self.data_filter()
+            if len(global_filters) != 0:
+                self.filtered.append(or_(*global_filters))
 
         self.fetch_results()
 
@@ -51,10 +69,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
             for query_filter in self.additional_filters:
                 filter_query = filter_query.filter(query_filter)
 
-            if self.negate_filter:
-                filter_query = filter_query.filter(not_(or_(*self.filtered)))
-            else:
-                filter_query = filter_query.filter(or_(*self.filtered))
+            filter_query = filter_query.filter(*self.filtered)
             self.total_filtered = filter_query.count()
         else:
             self.total_filtered = self.total
@@ -69,10 +84,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
             query = query.filter(query_filter)
 
         if len(self.filtered) != 0:
-            if self.negate_filter:
-                query = query.filter(not_(or_(*self.filtered)))
-            else:
-                query = query.filter(or_(*self.filtered))
+            query = query.filter(*self.filtered)
 
         data_objects = (
             query.order_by(*self.sort)
@@ -99,31 +111,144 @@ class SQLServerSideDataTable(ServerSideDataTable):
 
         return ret_list
 
-    def data_filter(self):
+    def get_filter_args(
+        self, column: str, filter_val: str, is_regex: bool, check_date: bool = True
+    ) -> list:
         """
-        Method responsible for retrieving the filter values entered in the search box of the DataTables.
+        parses search values to valid search expressions for sqlalchemy.
 
-        :return: Prepared filter based on filterable columns and retrieved search value
-        :rtype: dict
+        when searching without regex the <>, >, < and ~ operators are supported.
+        where <> searches between two values, > searches for larger values, < searches for smaller values and ~ reverses the search operation.
+        If only ~ is searched it is treated as a NULL filter, meaning column must be holding value NULL.
+
+        when searching with regex only ~ is supported, reversing the search to a negate search.
+
+        Args:
+            column (str): str value representing the ORM column to filter on.
+            filter_val (str): value to search on.
+            is_regex (bool): if the search is a regex search or a regular search
+            check_date (bool, optional): will check if strings represent a date and convert it to a timestamp value. Defaults to True.
+
+        Returns:
+            list: _description_
+        """
+        filter_val = str(filter_val)
+
+        def is_date(value: str) -> int | str:
+            if not check_date:
+                return value
+
+            is_date = timestringTOtimestamp(value)
+
+            if is_date is not False:
+                return is_date
+
+            return value
+
+        filter_args = []
+
+        try:
+            col = getattr(self.models[self.target_model], column)
+        except AttributeError:
+            return filter_args
+
+        if is_regex:
+            try:
+                negate_search = False
+
+                if filter_val[0] == "~":
+                    filter_val = filter_val[1:]
+                    negate_search = True
+
+                re.compile(filter_val)
+
+                if negate_search:
+                    filter_args.append(~col.regexp_match(filter_val))
+                else:
+                    filter_args.append(col.regexp_match(filter_val))
+
+                return filter_args
+            except re.error:
+                if negate_search:
+                    filter_val = "~" + filter_val
+
+        if "<>" in filter_val:
+
+            start, end = filter_val.split("<>", 1)
+
+            start = is_date(start.strip())
+            end = is_date(end.strip())
+
+            filter_args.append(col > start)
+            filter_args.append(col < end)
+        elif filter_val[0] == ">":
+            filter_val = is_date(filter_val[1:].strip())
+            filter_args.append(col > filter_val)
+        elif filter_val[0] == "<":
+            filter_val = is_date(filter_val[1:].strip())
+            filter_args.append(col < filter_val)
+        elif filter_val[0] == "~":
+            if len(filter_val.strip()) == 1:
+                filter_args.append(col == None)  # noqa: E711
+            else:
+                filter_val = filter_val[1:].strip()
+                filter_args.append(~col.like(f"%{filter_val}%"))
+        else:
+            filter_args.append(col.like(f"%{filter_val}%"))
+
+        return filter_args
+
+    def data_filter(self) -> list:
+        """
+        method responsible for retrieving filter values based on the table wide search value for every supported column.
+
+        Returns:
+            list: list containing prepared filters.
         """
 
         search_val = self.request_values["search[value]"]
+        is_regex = str2bool(
+            self.request_values.get(key="search[regex]", default="false")
+        )
 
         search_args = []
-        negate_search = False
 
         if search_val != "" and search_val != "$" and search_val != "~":
-            # Negate search if string starts with ~
-            if search_val.lstrip()[0] == "~":
-                negate_search = True
-                search_val = search_val.lstrip()[1:]
+            for col in self.columns:
+                if str2bool(self.columns[col]["searchable"]):
+                    search_args.extend(
+                        self.get_filter_args(
+                            self.columns[col]["data"], search_val, is_regex
+                        )
+                    )
 
-            search_args = [
-                getattr(
-                    self.models[self.target_model], self.columns[col]["data"]
-                ).regexp_match(f"{search_val}")
-                for col in self.columns
-                if str2bool(self.columns[col]["searchable"])
-            ]
+        return search_args
 
-        return negate_search, search_args
+    def column_data_filter(self) -> list:
+        """
+        method responsible for retrieving filter values based on a per column based search value.
+
+        Returns:
+            list: list containing prepared filters.
+        """
+        search_args = []
+
+        for col in self.columns:
+            search_val_dict = self.columns[col].get(
+                "search", {"regex": "false", "value": ""}
+            )
+
+            if search_val_dict["value"] in ["", "$"]:
+                continue
+
+            search_val_dict["regex"] = str2bool(search_val_dict["regex"])
+
+            search_args.extend(
+                self.get_filter_args(
+                    self.columns[col]["data"],
+                    search_val_dict["value"],
+                    search_val_dict["regex"],
+                )
+            )
+
+        return search_args
