@@ -74,9 +74,9 @@ def generate_random_password():
     return pwd
 
 
-def reverse_from_named_tuple(n_tuple: collections.namedtuple, index: int | str) -> str:
+def reverse_from_named_tuple(n_tuple: collections.namedtuple, index: int | str, lowercase_output: bool = False) -> str:
     n_list = [
-        x.lower()
+        x.lower() if lowercase_output else x
         for x in n_tuple.__dir__()
         if not x.startswith("_") and x not in ["index", "count"]
     ]
