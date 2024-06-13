@@ -157,7 +157,8 @@ class SQLServerSideDataTable(ServerSideDataTable):
             return filter_args
 
         if custom_filter is not None:
-            return filter_args.extend(custom_filter(col, filter_val, is_regex))
+            filter_args.extend(custom_filter(col, filter_val, is_regex))
+            return filter_args
 
         if is_regex:
             try:
