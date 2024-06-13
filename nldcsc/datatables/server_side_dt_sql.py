@@ -22,11 +22,13 @@ class SQLServerSideDataTable(ServerSideDataTable):
         model_mapping: dict,
         additional_filters: list = [],
         use_column_filters: bool = False,
+        custom_column_filters: dict = {},
         **kwargs,
     ):
         self.target_model = target_model
         self.additional_filters = additional_filters
         self.use_column_filters = use_column_filters
+        self.custom_column_filters = custom_column_filters
 
         self.models = model_mapping
 
@@ -134,6 +136,8 @@ class SQLServerSideDataTable(ServerSideDataTable):
         """
         filter_val = str(filter_val)
 
+        custom_filter = self.custom_column_filters.get(column, None)
+
         def is_date(value: str) -> int | str:
             if not check_date:
                 return value
@@ -151,6 +155,9 @@ class SQLServerSideDataTable(ServerSideDataTable):
             col = getattr(self.models[self.target_model], column)
         except AttributeError:
             return filter_args
+
+        if custom_filter is not None:
+            return filter_args.extend(custom_filter(col, filter_val, is_regex))
 
         if is_regex:
             try:
