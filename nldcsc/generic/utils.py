@@ -1,4 +1,5 @@
 import ast
+import collections
 import json
 import os
 import secrets
@@ -71,3 +72,20 @@ def generate_random_password():
         pwd += "".join(secrets.choice(alphabet))
 
     return pwd
+
+
+def reverse_from_named_tuple(
+    n_tuple: collections.namedtuple, index: int | str, lowercase_output: bool = False
+) -> str:
+    n_list = [
+        x.lower() if lowercase_output else x
+        for x in n_tuple.__dir__()
+        if not x.startswith("_") and x not in ["index", "count"]
+    ]
+
+    n_rev_types = {getattr(n_tuple, x.upper()): x for x in n_list}
+
+    try:
+        return n_rev_types[index]
+    except KeyError:
+        raise KeyError(f"The requested index does not exist! Choices are {n_rev_types}")

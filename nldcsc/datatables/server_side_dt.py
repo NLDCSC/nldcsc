@@ -1,6 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from collections import namedtuple, defaultdict
+from werkzeug.datastructures import CombinedMultiDict
 
 
 class ServerSideDataTable(ABC):
@@ -10,7 +11,7 @@ class ServerSideDataTable(ABC):
     """
 
     def __init__(self, request, backend, **kwargs):
-        self.request_values = request.values
+        self.request_values: CombinedMultiDict = request.values
 
         self.backend = backend
 
@@ -131,13 +132,13 @@ class ServerSideDataTable(ABC):
                             check_col_match.group(3)
                         ] = self.request_values[each]
                 else:
-                    col[check_col_match.group(1)][
-                        check_col_match.group(2)
-                    ] = self.request_values[each]
+                    col[check_col_match.group(1)][check_col_match.group(2)] = (
+                        self.request_values[each]
+                    )
             if check_order_match:
-                order[check_order_match.group(1)][
-                    check_order_match.group(2)
-                ] = self.request_values[each]
+                order[check_order_match.group(1)][check_order_match.group(2)] = (
+                    self.request_values[each]
+                )
 
         return col, order
 
