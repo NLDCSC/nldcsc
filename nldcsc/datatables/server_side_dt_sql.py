@@ -181,7 +181,6 @@ class SQLServerSideDataTable(ServerSideDataTable):
                     filter_val = "~" + filter_val
 
         if "<>" in filter_val:
-
             start, end = filter_val.split("<>", 1)
 
             start = is_date(start.strip())
