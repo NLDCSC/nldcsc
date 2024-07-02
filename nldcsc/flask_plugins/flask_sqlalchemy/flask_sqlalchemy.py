@@ -1,6 +1,4 @@
-from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
-
 
 from .model_base import ModelBase
 
