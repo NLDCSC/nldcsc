@@ -125,6 +125,16 @@ class SQLServerSideDataTable(ServerSideDataTable):
 
         when searching with regex only ~ is supported, reversing the search to a negate search.
 
+        If a custom filter is given for a column that function will be called with the column, filter_val and is_regex.
+        If the custom filter can't filter the values it can raise a ValueError to proceed with the normal filters.
+        The custom filter should return a list of filters.
+            Example:
+                def my_custom_filter(col: InstrumentedAttribute, filter_val: str, is_regex: bool):
+                    if filter_val.startswith("A"):
+                        return [col != "A", col != "a"]
+                    else:
+                        raise ValueError
+
         Args:
             column (str): str value representing the ORM column to filter on.
             filter_val (str): value to search on.
@@ -132,7 +142,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
             check_date (bool, optional): will check if strings represent a date and convert it to a timestamp value. Defaults to True.
 
         Returns:
-            list: _description_
+            list: List of filter values
         """
         filter_val = str(filter_val)
 
@@ -157,8 +167,12 @@ class SQLServerSideDataTable(ServerSideDataTable):
             return filter_args
 
         if custom_filter is not None:
-            filter_args.extend(custom_filter(col, filter_val, is_regex))
-            return filter_args
+            try:
+                filter_args.extend(custom_filter(col, filter_val, is_regex))
+                return filter_args
+            except ValueError:
+                # If the custom filter throws a ValueError we apply the normal filters
+                pass
 
         if is_regex:
             try:
