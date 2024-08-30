@@ -142,8 +142,6 @@ class SqlMigrate(object):
         self.alembic_ctx_kwargs = kwargs
         self.alembic_ctx_kwargs["compare_type"] = compare_type
         self.alembic_ctx_kwargs["render_as_batch"] = render_as_batch
-        if app is not None and db is not None:
-            self.init_app(app, db, directory)
 
         self._dir_path = None
         self._current_config = None
@@ -151,6 +149,9 @@ class SqlMigrate(object):
         self._environment_context = None
         self._script_directory = None
         self._script_directory_context = None
+
+        if app is not None and db is not None:
+            self.init_app(app, db, directory)
 
     @property
     def environment_context(self) -> SqlEnvironmentContext:
