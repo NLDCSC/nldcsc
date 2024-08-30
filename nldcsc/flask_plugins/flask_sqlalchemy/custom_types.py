@@ -20,6 +20,6 @@ class char_UUID(types.TypeDecorator):
         return str(value).replace("-", "")
 
     def process_result_value(self, value: str | None, dialect: Dialect) -> Any | None:
-        uuid = UUID(value)
-
-        return str(uuid)
+        if value:
+            return str(UUID(hex=value))
+        return value
