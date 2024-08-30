@@ -14,6 +14,9 @@ class char_UUID(types.TypeDecorator):
     cache_ok = True
 
     def process_bind_param(self, value: Any | None, dialect: Dialect) -> Any:
+        if not value:
+            return value
+
         if isinstance(value, UUID):
             return value.hex
 
