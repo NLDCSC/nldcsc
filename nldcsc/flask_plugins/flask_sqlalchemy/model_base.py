@@ -1,5 +1,6 @@
 from sqlalchemy import JSON, TEXT, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, registry
+from .custom_types import char_UUID
 from .annotations import (
     str_16,
     str_30,
@@ -13,6 +14,8 @@ from .annotations import (
     list_json,
     dict_json,
     big_int_pk,
+    uuid,
+    uuid_pk,
 )
 
 
@@ -31,5 +34,7 @@ class ModelBase(DeclarativeBase):
             dict_json: JSON,
             list_json: JSON,
             big_int_pk: BigInteger,
+            uuid: char_UUID,
+            uuid_pk: char_UUID,
         },
     )

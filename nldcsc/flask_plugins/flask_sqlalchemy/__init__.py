@@ -13,4 +13,6 @@ from .annotations import (
     dict_json,  # noqa: F401
     int_pk,  # noqa: F401
     big_int_pk,  # noqa: F401
+    uuid_pk,  # noqa: F401
+    uuid,  # noqa: F401
 )
