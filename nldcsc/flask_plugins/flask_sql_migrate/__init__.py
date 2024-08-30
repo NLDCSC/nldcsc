@@ -151,9 +151,7 @@ class SqlMigrate(object):
 
         self._environment_context = None
         self._script_directory = None
-        self._script_directory_context = SqlScriptDirectoryContext(
-            self.db, schema_migrations_table
-        )
+        self._script_directory_context = None
 
     @property
     def environment_context(self) -> SqlEnvironmentContext:
@@ -319,6 +317,11 @@ class SqlMigrate(object):
             self.alembic_ctx_kwargs["render_as_batch"] = render_as_batch
         if not hasattr(app, "extensions"):
             app.extensions = {}
+
+        self._script_directory_context = SqlScriptDirectoryContext(
+            self.db, schema_migrations_table
+        )
+
         app.extensions["migrate"] = _MigrateConfig(
             self, self.db, **self.alembic_ctx_kwargs
         )
