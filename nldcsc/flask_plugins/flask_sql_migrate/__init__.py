@@ -23,9 +23,8 @@ from flask import current_app, g
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Row
 
-from SqlMigrate.fractured_alembic.runtime.migration import FracturedMigrationContext
+from .fractured_alembic.runtime.migration import FracturedMigrationContext
 from .config.constants import LOGGING_CONFIG, schema_migrations_table
-from .fractured_alembic.errors.context import ContextNotConfigured
 from .fractured_alembic.runtime.environment import SqlEnvironmentContext
 from .fractured_alembic.script.base import SqlScriptDirectory, SqlScriptDirectoryContext
 from .utils.helpers import timestamp_to_strf_string, exclude_optional_dict

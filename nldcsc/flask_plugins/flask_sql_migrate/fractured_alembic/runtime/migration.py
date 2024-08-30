@@ -21,7 +21,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import url as sqla_url
 from sqlalchemy.exc import OperationalError
 
-from SqlMigrate.config.constants import schema_migrations_table
+from ...config.constants import schema_migrations_table
 
 log = logging.getLogger(__name__)
 

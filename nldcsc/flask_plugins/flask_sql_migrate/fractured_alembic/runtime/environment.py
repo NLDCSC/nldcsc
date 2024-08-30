@@ -15,8 +15,8 @@ from alembic.runtime.environment import (
 from alembic.script import ScriptDirectory
 from sqlalchemy import Connection, URL, MetaData
 
-from SqlMigrate.fractured_alembic.errors.context import ContextNotConfigured
-from SqlMigrate.fractured_alembic.runtime.migration import FracturedMigrationContext
+from ...fractured_alembic.errors.context import ContextNotConfigured
+from ...fractured_alembic.runtime.migration import FracturedMigrationContext
 
 
 class SqlEnvironmentContext(EnvironmentContext):
