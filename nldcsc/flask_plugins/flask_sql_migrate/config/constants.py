@@ -1,4 +1,4 @@
-from sqlalchemy import Table, MetaData, Column, Integer, String
+from sqlalchemy import BigInteger, Table, MetaData, Column, Integer, String
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -41,7 +41,7 @@ schema_migrations_table = Table(
     schema_migrations,
     MetaData(),
     Column("id", Integer, primary_key=True),
-    Column("version_num", Integer),
+    Column("version_num", BigInteger),
     Column("name", String(256)),
     Column("duration", Integer),
     Column("migrated", Integer),
