@@ -591,6 +591,10 @@ class SqlMigrate(object):
             # or at the end of env.py run_migrations_online().
 
         scripts = [script for script in revision_context.generate_scripts()]
+
+        # set the script_directory back to None -> the property will create a new script_directory when requested.
+        self._script_directory = None
+
         if len(scripts) == 1:
             return scripts[0]
         else:

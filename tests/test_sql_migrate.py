@@ -46,7 +46,8 @@ def db_handle(app):
     with app.app_context():
         yield db
 
-        db.drop_all()
+        # The test app uses an in memory database. If we close the connection it gets removed.
+        db.engine.dispose()
 
 
 @pytest.fixture
