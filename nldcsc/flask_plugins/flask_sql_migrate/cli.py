@@ -194,6 +194,29 @@ def upgrade(sql, tag, x_arg, revision, max_lookback_days):
 
 @db.command()
 @click.option(
+    "--max-lookback-days",
+    "-D",
+    default=30,
+    help="Amount of days revisions can be older than the current revision",
+)
+@click.argument("revision", default="head")
+@with_appcontext
+def check(revision, max_lookback_days):
+    """Upgrade to a later version"""
+    table_list = current_app.extensions["migrate"].migrate.check(
+        revision=revision,
+        max_lookback_days=max_lookback_days,
+    )
+
+    click.echo("Missing migrations:")
+    if len(table_list) != 1:
+        click.echo(tabulate(table_list, headers="firstrow", tablefmt="fancy_grid"))
+    else:
+        click.echo("None")
+
+
+@db.command()
+@click.option(
     "--sql",
     is_flag=True,
     help="Don't emit SQL to database - dump to standard output instead",

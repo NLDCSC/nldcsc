@@ -1,10 +1,11 @@
 import argparse
+from contextlib import contextmanager
 import logging
 import os
 import shutil
 import sys
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass, field, fields
+from datetime import datetime, timedelta
 from functools import wraps
 from logging.config import dictConfig
 from typing import Optional, Dict, List
@@ -204,6 +205,38 @@ class SqlMigrate(object):
         """
         return self.environment_context.get_context()
 
+    @contextmanager
+    def _get_env_context(
+        self, ctx_opts: dict = None, ensure_migrations_table: bool = False
+    ):
+        with self.environment_context as env_context:
+            connectable = self.db.engine
+
+            if ctx_opts is None:
+                ctx_opts = {}
+
+            logger.debug(f"Received context opts {ctx_opts}")
+
+            with connectable.connect() as connection:
+                logger.debug(
+                    "Configuring migration context from environment context..."
+                )
+                env_context.configure(
+                    connection,
+                    self.db.metadata,
+                    **self.alembic_ctx_kwargs,
+                    **ctx_opts,
+                    include_object=self._include_this_object,
+                    process_revision_directives=self._process_revision_directives,
+                    target_metadata=self.db.metadata,
+                )
+
+                if ensure_migrations_table:
+                    self.migration_context._ensure_schema_migrations_table()
+
+                with env_context.begin_transaction():
+                    yield env_context
+
     @staticmethod
     def generate_rev_id():
         """
@@ -254,33 +287,10 @@ class SqlMigrate(object):
         Returns:
             None
         """
-        with self.environment_context as env_context:
-            connectable = self.db.engine
 
-            if ctx_opts is None:
-                ctx_opts = {}
-
-            logger.debug(f"Received context opts {ctx_opts}")
-
-            with connectable.connect() as connection:
-                logger.debug(
-                    "Configuring migration context from environment context..."
-                )
-                env_context.configure(
-                    connection,
-                    self.db.metadata,
-                    **self.alembic_ctx_kwargs,
-                    **ctx_opts,
-                    include_object=self._include_this_object,
-                    process_revision_directives=self._process_revision_directives,
-                    target_metadata=self.db.metadata,
-                )
-
-                self.migration_context._ensure_schema_migrations_table()
-
-                with env_context.begin_transaction():
-                    logger.debug("Running run_migrations in migration context...")
-                    env_context.run_migrations()
+        with self._get_env_context(ctx_opts, True) as env_context:
+            logger.debug("Running run_migrations in migration context...")
+            env_context.run_migrations()
 
     def init_app(
         self,
@@ -749,6 +759,50 @@ class SqlMigrate(object):
             }
         )
 
+    def check(self, revision: str = "head", max_lookback_days: int = 30):
+        logger.debug(f"Received parameters: {locals()}")
+
+        directory = current_app.extensions["migrate"].directory
+        current_app.extensions["migrate"].migrate.get_config(directory)
+
+        @dataclass
+        class Row:
+            rev: int
+            name: str
+            date: str = None
+            age: str = None
+
+            @property
+            def as_list(self):
+                if self.date is None:
+                    self.date = datetime.strptime(self.rev, "%Y%m%d%H%M%S")
+
+                age: timedelta = datetime.now() - self.date
+                hours = age.seconds // 3600
+                minutes = age.seconds // 60
+
+                if age.days:
+                    self.age = f"{age.days} day{'s' if age.days > 1 else ''}"
+                elif hours:
+                    self.age = f"{hours} hour{'s' if hours > 1 else ''}"
+                elif minutes:
+                    self.age = f"{minutes} minute{'s' if minutes > 1 else ''}"
+                else:
+                    self.seconds = (
+                        f"{age.seconds} second{'s' if age.seconds > 1 else ''}"
+                    )
+
+                return [self.rev, self.name, self.date, self.age]
+
+        data = [[f.name for f in fields(Row)]]
+
+        with self._get_env_context() as env_context:
+            for rev in self.script_directory._upgrade_revs(
+                "head", env_context.get_context().get_current_heads(), max_lookback_days
+            ):
+                data.append(Row(rev.revision.revision, rev.doc).as_list)
+        return data
+
     def drop(
         self,
     ) -> None:
@@ -767,26 +821,11 @@ class SqlMigrate(object):
 
         self.db.drop_all()
 
-        with self.environment_context as env_context:
-            connectable = self.db.engine
-
-            with connectable.connect() as connection:
-                logger.debug(
-                    "Configuring migration context from environment context..."
-                )
-                env_context.configure(
-                    connection,
-                    self.db.metadata,
-                    **self.alembic_ctx_kwargs,
-                    include_object=self._include_this_object,
-                    process_revision_directives=self._process_revision_directives,
-                    target_metadata=self.db.metadata,
-                )
-                with env_context.begin_transaction():
-                    logger.debug(
-                        f"Dropping migration tables; context configured: {self.migration_context}"
-                    )
-                    self.migration_context.drop_migrations_tables()
+        with self._get_env_context() as env_context:
+            logger.debug(
+                f"Dropping migration tables; context configured: {self.migration_context}"
+            )
+            self.migration_context.drop_migrations_tables()
 
         try:
             shutil.rmtree(current_app.extensions["migrate"].directory, True)
@@ -810,43 +849,26 @@ class SqlMigrate(object):
         directory = current_app.extensions["migrate"].directory
         current_app.extensions["migrate"].migrate.get_config(directory)
 
-        with self.environment_context as env_context:
-            connectable = self.db.engine
+        with self._get_env_context() as env_context:
+            migration_data = self.migration_context.get_full_migrations_table_content()
+            logger.debug(f"Got migration data: {migration_data}")
 
-            with connectable.connect() as connection:
-                logger.debug(
-                    "Configuring migration context from environment context..."
-                )
-                env_context.configure(
-                    connection,
-                    self.db.metadata,
-                    **self.alembic_ctx_kwargs,
-                    include_object=self._include_this_object,
-                    process_revision_directives=self._process_revision_directives,
-                    target_metadata=self.db.metadata,
-                )
-                with env_context.begin_transaction():
-                    migration_data = (
-                        self.migration_context.get_full_migrations_table_content()
-                    )
-                    logger.debug(f"Got migration data: {migration_data}")
+            if include_table_headers:
+                table_data = [
+                    [
+                        x.name.title()
+                        for x in self.migration_context._schema_migrations_table.columns._all_columns
+                    ]
+                ]
+            else:
+                table_data = []
 
-                    if include_table_headers:
-                        table_data = [
-                            [
-                                x.name.title()
-                                for x in self.migration_context._schema_migrations_table.columns._all_columns
-                            ]
-                        ]
-                    else:
-                        table_data = []
-
-                    migration_rows = []
-                    for each in migration_data:
-                        data = SchemaMigrationRow()
-                        data.fill_from_row(each)
-                        migration_rows.append(data.get_as_list)
-                    table_data.extend(migration_rows)
+            migration_rows = []
+            for each in migration_data:
+                data = SchemaMigrationRow()
+                data.fill_from_row(each)
+                migration_rows.append(data.get_as_list)
+            table_data.extend(migration_rows)
 
         return table_data
 
