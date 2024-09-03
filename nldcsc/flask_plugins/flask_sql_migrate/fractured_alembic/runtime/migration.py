@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import time
 from typing import Any, Tuple, Optional, Dict, Union
@@ -63,6 +64,16 @@ class FracturedHeadMaintainer(HeadMaintainer):
             return
 
         head, *o = self.heads
+
+        try:
+            datetime.strptime(head, "%Y%m%d%H%M%S")
+        except ValueError:
+            if self.context.is_sync:
+                self._update_version(head, step.revision.revision)
+                return
+            else:
+                raise util.CommandError("Invalid revision to update!")
+
         if step.is_upgrade:
             if step.revision.revision > head:
                 log.debug(f"Head update from {head} to {step.revision.revision}")
@@ -99,6 +110,7 @@ class FracturedMigrationContext(MigrationContext):
         opts: Dict[str, Any],
         environment_context: Optional[EnvironmentContext] = None,
     ):
+        self.is_sync = opts.pop("is_sync", False)
         super().__init__(dialect, connection, opts, environment_context)
 
         self._schema_migrations_table = schema_migrations_table
@@ -219,9 +231,18 @@ class FracturedMigrationContext(MigrationContext):
                     )
                 duration = time.time() - start_time
 
-                head_maintainer.update_migration_table(
-                    step, int(step.insert_version_num), name=step.doc, duration=duration
-                )
+                try:
+                    head_maintainer.update_migration_table(
+                        step,
+                        int(step.insert_version_num),
+                        name=step.doc,
+                        duration=duration,
+                    )
+                except ValueError:
+                    if self.is_sync:
+                        pass
+                    else:
+                        raise util.CommandError("Invalid revision to update!")
 
         if self.as_sql and not head_maintainer.heads:
             assert self.connection is not None

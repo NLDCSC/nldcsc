@@ -13,6 +13,7 @@ from alembic.script import ScriptDirectory
 from alembic.util import sqla_compat
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Table
+from sqlalchemy.exc import OperationalError
 
 logger = logging.getLogger(__name__)
 
@@ -144,12 +145,16 @@ class SqlScriptDirectory(ScriptDirectory):
                         logger.debug(f"The revision {revision.revision} is unsupported")
                         continue
 
-                    entry = connection.execute(
-                        self.context.table.select().filter(
-                            self.context.table.c[self.context.revision_column]
-                            == revision.revision
-                        )
-                    ).fetchone()
+                    try:
+                        entry = connection.execute(
+                            self.context.table.select().filter(
+                                self.context.table.c[self.context.revision_column]
+                                == revision.revision
+                            )
+                        ).fetchone()
+                    except OperationalError:
+                        # no table exists yet
+                        entry = None
 
                     # the revision should depend on nothing
                     revision._normalized_resolved_dependencies = ()
@@ -160,14 +165,44 @@ class SqlScriptDirectory(ScriptDirectory):
                             f"Found revision {revision.revision} not present in db!"
                         )
 
+                self.missing_migrations = sorted(
+                    self.missing_migrations, key=lambda r: int(r.revision)
+                )
+
     def consume_missing_queue(self) -> Generator[str, None, None]:
         try:
             yield self.missing_migrations.popleft()
         except IndexError:
             raise StopIteration
 
+    def _sync_revs(self, current_rev):
+        def can_sync(rev):
+            try:
+                datetime.strptime(rev, "%Y%m%d%H%M%S")
+            except ValueError:
+                return True
+            return False
+
+        if isinstance(current_rev, tuple) and current_rev:
+            current_rev, *o = current_rev
+
+        if current_rev:
+            if not can_sync(current_rev):
+                raise util.CommandError("Can't sync with new migrations applied!")
+
+        migrations = []
+
+        for rev in super()._upgrade_revs("head", (current_rev,)):
+            if can_sync(rev.revision.revision):
+                migrations.append(rev)
+
+        return migrations
+
     def _upgrade_revs(
-        self, destination: str, current_rev: str | tuple[str], max_lookback_days: int
+        self,
+        destination: str,
+        current_rev: str | tuple[str],
+        max_lookback_days: int,
     ) -> List[RevisionStep]:
 
         if isinstance(current_rev, tuple) and current_rev:

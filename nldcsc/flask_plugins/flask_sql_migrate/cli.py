@@ -179,9 +179,15 @@ def migrate(message, sql, head, splice, branch_label, version_path):
     default=30,
     help="Amount of days revisions can be older than the current revision",
 )
+@click.option(
+    "--sync",
+    "-s",
+    is_flag=True,
+    help="Sync the old formatted migration files to the DB. Only available if no newly formatted migrations have been migrated.",
+)
 @click.argument("revision", default="head")
 @with_appcontext
-def upgrade(sql, tag, x_arg, revision, max_lookback_days):
+def upgrade(sql, tag, x_arg, revision, max_lookback_days, sync):
     """Upgrade to a later version"""
     current_app.extensions["migrate"].migrate.upgrade(
         revision=revision,
@@ -189,6 +195,7 @@ def upgrade(sql, tag, x_arg, revision, max_lookback_days):
         tag=tag,
         x_arg=x_arg,
         max_lookback_days=max_lookback_days,
+        sync=sync,
     )
 
 
@@ -199,13 +206,18 @@ def upgrade(sql, tag, x_arg, revision, max_lookback_days):
     default=30,
     help="Amount of days revisions can be older than the current revision",
 )
+@click.option(
+    "--sync",
+    "-s",
+    is_flag=True,
+    help="Sync the old formatted migration files to the DB. Only available if no newly formatted migrations have been migrated.",
+)
 @click.argument("revision", default="head")
 @with_appcontext
-def check(revision, max_lookback_days):
+def check(revision, max_lookback_days, sync):
     """Upgrade to a later version"""
     table_list = current_app.extensions["migrate"].migrate.check(
-        revision=revision,
-        max_lookback_days=max_lookback_days,
+        revision=revision, max_lookback_days=max_lookback_days, sync=sync
     )
 
     click.echo("Missing migrations:")

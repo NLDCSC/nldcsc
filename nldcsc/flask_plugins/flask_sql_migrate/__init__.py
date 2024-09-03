@@ -2,9 +2,10 @@ import argparse
 from contextlib import contextmanager
 import logging
 import os
+import re
 import shutil
 import sys
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from functools import wraps
 from logging.config import dictConfig
@@ -12,6 +13,7 @@ from typing import Optional, Dict, List
 
 from alembic import __version__ as __alembic_version__
 from alembic import util
+from alembic.migration import RevisionStep
 from alembic.autogenerate import RevisionContext
 from alembic.config import Config as AlembicConfig
 from alembic.runtime.environment import ProcessRevisionDirectiveFn
@@ -673,6 +675,7 @@ class SqlMigrate(object):
         tag: Optional[str] = None,
         x_arg=None,
         max_lookback_days: int = 30,
+        sync: bool = False,
     ) -> None:
         """
 
@@ -701,12 +704,26 @@ class SqlMigrate(object):
             starting_rev, revision = revision.split(":", 2)
 
         def upgrade(rev, context):
-            return self.script_directory._upgrade_revs(revision, rev, max_lookback_days)
+            revs = []
+
+            if sync:
+                revs.extend(self.script_directory._sync_revs(rev))
+
+            new_revs = self.script_directory._upgrade_revs(
+                revision, (), max_lookback_days
+            )
+
+            if not new_revs:
+                self.revision()
+            revs.extend(new_revs)
+
+            return revs
 
         self.execute_migration(
             ctx_opts={
                 "fn": upgrade,
                 "as_sql": sql,
+                "is_sync": sync,
                 "starting_rev": starting_rev,
                 "destination_rev": revision,
                 "tag": tag,
@@ -759,7 +776,9 @@ class SqlMigrate(object):
             }
         )
 
-    def check(self, revision: str = "head", max_lookback_days: int = 30):
+    def check(
+        self, revision: str = "head", max_lookback_days: int = 30, sync: bool = False
+    ):
         logger.debug(f"Received parameters: {locals()}")
 
         directory = current_app.extensions["migrate"].directory
@@ -767,40 +786,66 @@ class SqlMigrate(object):
 
         @dataclass
         class Row:
-            rev: int
-            name: str
-            date: str = None
-            age: str = None
+            rev: RevisionStep
 
             @property
             def as_list(self):
-                if self.date is None:
-                    self.date = datetime.strptime(self.rev, "%Y%m%d%H%M%S")
+                revision = self.rev.revision.revision
+                name = self.rev.doc
 
-                age: timedelta = datetime.now() - self.date
+                try:
+                    date = datetime.strptime(revision, "%Y%m%d%H%M%S")
+                except ValueError:
+                    try:
+                        date = datetime.strptime(
+                            re.search(
+                                "\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}",
+                                self.rev.revision.longdoc,
+                            ).group(),
+                            "%Y-%m-%d %H:%M:%S",
+                        )
+                    except (AttributeError, ValueError):
+                        return [revision, name, None, None]
+
+                age: timedelta = datetime.now() - date
                 hours = age.seconds // 3600
                 minutes = age.seconds // 60
 
                 if age.days:
-                    self.age = f"{age.days} day{'s' if age.days > 1 else ''}"
+                    age = f"{age.days} day{'s' if age.days > 1 else ''}"
                 elif hours:
-                    self.age = f"{hours} hour{'s' if hours > 1 else ''}"
+                    age = f"{hours} hour{'s' if hours > 1 else ''}"
                 elif minutes:
-                    self.age = f"{minutes} minute{'s' if minutes > 1 else ''}"
+                    age = f"{minutes} minute{'s' if minutes > 1 else ''}"
                 else:
-                    self.seconds = (
-                        f"{age.seconds} second{'s' if age.seconds > 1 else ''}"
-                    )
+                    age = f"{age.seconds} second{'s' if age.seconds > 1 else ''}"
 
-                return [self.rev, self.name, self.date, self.age]
+                return [revision, name, date, age]
 
-        data = [[f.name for f in fields(Row)]]
+        data = [["rev", "name", "date", "age"]]
 
         with self._get_env_context() as env_context:
-            for rev in self.script_directory._upgrade_revs(
-                "head", env_context.get_context().get_current_heads(), max_lookback_days
-            ):
-                data.append(Row(rev.revision.revision, rev.doc).as_list)
+            if sync:
+                revs = self.script_directory._sync_revs(
+                    env_context.get_context().get_current_heads()
+                )
+
+                revs.extend(
+                    self.script_directory._upgrade_revs(
+                        "head",
+                        (),
+                        max_lookback_days,
+                    )
+                )
+            else:
+                revs = self.script_directory._upgrade_revs(
+                    "head",
+                    env_context.get_context().get_current_heads(),
+                    max_lookback_days,
+                )
+
+            for rev in revs:
+                data.append(Row(rev).as_list)
         return data
 
     def drop(
