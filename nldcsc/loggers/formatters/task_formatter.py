@@ -12,6 +12,7 @@ class DCSCTaskFormatter(logging.Formatter):
             self.get_current_task = lambda: None
 
     def format(self, record):
+        # noinspection PyNoneFunctionAssignment
         task = self.get_current_task()
         if task and task.request:  # pragma: no cover
             record.__dict__.update(
