@@ -21,6 +21,7 @@ from nldcsc.sso.flask_sso.sso_views import sso_auth
 __all__ = ["SSOConnection"]
 
 
+# noinspection PyProtectedMember
 class IntrospectTokenValidator(BaseIntrospectTokenValidator):
     """Validates a token using introspection."""
 
@@ -40,6 +41,7 @@ class IntrospectTokenValidator(BaseIntrospectTokenValidator):
         return response.json()
 
 
+# noinspection PyProtectedMember
 class SSOConnection(object):
     accept_token = ResourceProtector()
 
@@ -168,7 +170,8 @@ class SSOConnection(object):
                 raise InvalidTokenError()
             return result
 
-    def _update_token(name, token, refresh_token=None, access_token=None):
+    @staticmethod
+    def _update_token(token, refresh_token=None, access_token=None):
         session["sso_auth_token"] = g.sso_id_token = token
 
     @property
