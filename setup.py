@@ -57,8 +57,8 @@ MODULES = {
 # -*- Requirements -*-
 
 
-def _strip_comments(l):
-    return l.split("#", 1)[0].strip()
+def _strip_comments(l_line):
+    return l_line.split("#", 1)[0].strip()
 
 
 def _pip_requirement(req):

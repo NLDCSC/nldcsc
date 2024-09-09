@@ -8,6 +8,7 @@ class DCSCSocketHandler(SocketHandler):
     def __init__(self, host: str, port: int | None):
         super().__init__(host, port)  # pragma: no cover
 
+    # noinspection PyBroadException
     def emit(self, record):
         """
         Emit a record.
@@ -29,16 +30,19 @@ class DCSCSocketHandler(SocketHandler):
             self.handleError(record)
 
 
+# noinspection PyArgumentListInspection
 class DCSCGelfUDPHandler(GelfUdpHandler, DCSCSocketHandler):
     def __init__(self, host, port, **kwargs):
         super().__init__(host, port, **kwargs)
 
 
+# noinspection PyArgumentListInspection
 class DCSCGelfTCPHandler(GelfTcpHandler, DCSCSocketHandler):
     def __init__(self, host, port, **kwargs):
         super().__init__(host, port, **kwargs)  # pragma: no cover
 
 
+# noinspection PyArgumentListInspection
 class DCSCGelfTLSHandler(GelfTlsHandler, DCSCSocketHandler):
     def __init__(self, host, port, **kwargs):
         super().__init__(host, port, **kwargs)  # pragma: no cover

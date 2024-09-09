@@ -4,6 +4,7 @@ import socket
 from collections import OrderedDict
 from logging.handlers import SysLogHandler, SYSLOG_UDP_PORT
 from syslog import LOG_USER
+from typing import Tuple
 
 NILVALUE = "-"
 
@@ -18,7 +19,7 @@ class FullSysLogHandler(SysLogHandler):
     def __init__(
         self,
         appname: str,
-        address: tuple[str, int] = ("localhost", SYSLOG_UDP_PORT),
+        address: Tuple[str, int] = ("localhost", SYSLOG_UDP_PORT),
         facility: int = LOG_USER,
         socktype: socket.SocketKind = socket.SOCK_DGRAM,
         hostname: str = None,

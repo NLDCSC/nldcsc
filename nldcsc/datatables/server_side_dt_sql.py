@@ -20,11 +20,18 @@ class SQLServerSideDataTable(ServerSideDataTable):
         backend: SQLAlchemy,
         target_model: str,
         model_mapping: dict,
-        additional_filters: list = [],
+        additional_filters: list = None,
         use_column_filters: bool = False,
-        custom_column_filters: dict = {},
+        custom_column_filters: dict = None,
         **kwargs,
     ):
+
+        if additional_filters is None:
+            additional_filters = []
+
+        if custom_column_filters is None:
+            custom_column_filters = {}
+
         self.target_model = target_model
         self.additional_filters = additional_filters
         self.use_column_filters = use_column_filters
@@ -120,8 +127,9 @@ class SQLServerSideDataTable(ServerSideDataTable):
         parses search values to valid search expressions for sqlalchemy.
 
         when searching without regex the <>, >, < and ~ operators are supported.
-        where <> searches between two values, > searches for larger values, < searches for smaller values and ~ reverses the search operation.
-        If only ~ is searched it is treated as a NULL filter, meaning column must be holding value NULL.
+        where <> searches between two values, > searches for larger values, < searches for smaller values and ~
+        reverses the search operation. If only ~ is searched it is treated as a NULL filter, meaning column must
+        be holding value NULL.
 
         when searching with regex only ~ is supported, reversing the search to a negate search.
 
@@ -139,7 +147,8 @@ class SQLServerSideDataTable(ServerSideDataTable):
             column (str): str value representing the ORM column to filter on.
             filter_val (str): value to search on.
             is_regex (bool): if the search is a regex search or a regular search
-            check_date (bool, optional): will check if strings represent a date and convert it to a timestamp value. Defaults to True.
+            check_date (bool, optional): will check if strings represent a date and convert it to a timestamp value.
+            Defaults to True.
 
         Returns:
             list: List of filter values
@@ -168,6 +177,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
 
         if custom_filter is not None:
             try:
+                # noinspection PyCallingNonCallable
                 filter_args.extend(custom_filter(col, filter_val, is_regex))
                 return filter_args
             except ValueError:
