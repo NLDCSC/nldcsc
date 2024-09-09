@@ -19,7 +19,7 @@ class FullSysLogHandler(SysLogHandler):
     def __init__(
         self,
         appname: str,
-        address: Tuple[str, int] = ("localhost", SYSLOG_UDP_PORT),
+        address: tuple[str, int] = ("localhost", SYSLOG_UDP_PORT),
         facility: int = LOG_USER,
         socktype: socket.SocketKind = socket.SOCK_DGRAM,
         hostname: str = None,
