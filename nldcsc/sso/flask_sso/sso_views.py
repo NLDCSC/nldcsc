@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 sso_auth = Blueprint("sso_auth", __name__)
 
 
+# noinspection PyProtectedMember
 @sso_auth.route("/sso_login")
 def sso_login():
     if current_app.config["SSO_OVERWRITE_REDIRECT_URI"]:
@@ -34,6 +35,7 @@ def sso_login():
     return g._sso_auth.authorize_redirect(redirect_uri)
 
 
+# noinspection PyProtectedMember
 @sso_auth.route("/sso_authorize")
 def sso_authorize():
     try:
@@ -54,6 +56,7 @@ def sso_authorize():
     return redirect(return_to)
 
 
+# noinspection PyProtectedMember
 @sso_auth.route("/sso_logout")
 def sso_logout():
     """

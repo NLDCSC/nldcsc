@@ -88,6 +88,8 @@ def timestampTOdatetimestring(timestamp, vis=False):
 
     :param timestamp: unix timestamp
     :type timestamp: int
+    :param vis: if True will return full date time string with timezones
+    :type vis: bool
     :return: date time object
     :rtype: datetime.datetime (format: '%d-%m-%YT%H:%M:%SZ')
     """

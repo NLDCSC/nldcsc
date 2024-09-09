@@ -21,6 +21,7 @@ from nldcsc.sso.flask_sso.sso_views import sso_auth
 __all__ = ["SSOConnection"]
 
 
+# noinspection PyProtectedMember
 class IntrospectTokenValidator(BaseIntrospectTokenValidator):
     """Validates a token using introspection."""
 
@@ -40,6 +41,7 @@ class IntrospectTokenValidator(BaseIntrospectTokenValidator):
         return response.json()
 
 
+# noinspection PyProtectedMember
 class SSOConnection(object):
     accept_token = ResourceProtector()
 
