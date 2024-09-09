@@ -170,7 +170,8 @@ class SSOConnection(object):
                 raise InvalidTokenError()
             return result
 
-    def _update_token(name, token, refresh_token=None, access_token=None):
+    @staticmethod
+    def _update_token(token, refresh_token=None, access_token=None):
         session["sso_auth_token"] = g.sso_id_token = token
 
     @property
