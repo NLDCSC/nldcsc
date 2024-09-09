@@ -112,7 +112,7 @@ class LDAPClient(object):
 
     def validate_credentials(self) -> bool:
         try:
-            with self.ldap_connection() as ldap_connection:
+            with self.ldap_connection():
                 self.logger.info("Connection to LDAP server successful!!!")
                 pass
         except ldap.INVALID_CREDENTIALS:
