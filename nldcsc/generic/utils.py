@@ -68,7 +68,7 @@ def generate_random_password():
 
     # generate a password string
     pwd = ""
-    for i in range(pwd_length):
+    for _ in range(pwd_length):
         pwd += "".join(secrets.choice(alphabet))
 
     return pwd
