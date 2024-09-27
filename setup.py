@@ -50,6 +50,7 @@ MODULES = {
     "http_apis",
     "httpx_apis",
     "loggers",
+    "plugins",
     "sql_migrations",
     "sso",
 }
@@ -78,7 +79,9 @@ def _reqs(*f):
         _pip_requirement(r)
         for r in (
             _strip_comments(l)
-            for l in open(os.path.join(os.getcwd(), "requirements", *f)).readlines()
+            for l in open(
+                os.path.join(os.getcwd(), "requirements", *f)
+            ).readlines()
         )
         if r
     ]
