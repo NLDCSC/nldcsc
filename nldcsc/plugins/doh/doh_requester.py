@@ -69,9 +69,7 @@ class DOHRequester(HttpxBaseClass):
         if dns_type == q_types.PTR:
             domains = [self._convert_to_reverse_format(x) for x in domains]
 
-        resources = [
-            f"dns-query?name={each}&type={dns_type}" for each in domains
-        ]
+        resources = [f"dns-query?name={each}&type={dns_type}" for each in domains]
         data = await self.a_call(self.methods.GET, resources=resources)
         return data
 
@@ -107,9 +105,7 @@ class DOHRequester(HttpxBaseClass):
                         pass
 
             if qtype == q_types.PTR and not query_all_types:
-                domain_list = [
-                    self._convert_to_reverse_format(x) for x in domain_list
-                ]
+                domain_list = [self._convert_to_reverse_format(x) for x in domain_list]
 
             for domain in domain_list:
                 if query_all_types:
