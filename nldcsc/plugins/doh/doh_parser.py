@@ -55,6 +55,7 @@ def reverse_pointer_ip(ptr_address: str) -> str | None:
     return None
 
 
+# noinspection PyClassHasNoInitInspection
 @dataclass_json
 @dataclass
 class QuestionData:
@@ -69,6 +70,7 @@ class QuestionData:
         return reverse_from_named_tuple(q_types, self.type)
 
 
+# noinspection PyClassHasNoInitInspection
 @dataclass_json
 @dataclass
 class AnswerData:
@@ -82,6 +84,7 @@ class AnswerData:
         return reverse_from_named_tuple(q_types, self.type)
 
 
+# noinspection PyClassHasNoInitInspection
 @dataclass_json
 @dataclass
 class Request:
@@ -122,9 +125,7 @@ class Request:
         if self.Status == status_types.NOERROR:
             if self.Answer is not None and len(self.Answer) > 0:
                 return [
-                    x.data
-                    for x in self.Answer
-                    if x.type in [q_types.A, q_types.AAAA]
+                    x.data for x in self.Answer if x.type in [q_types.A, q_types.AAAA]
                 ]
 
         return []
@@ -183,9 +184,7 @@ class DohParser(object):
                             a_list = [AnswerData(**x) for x in data["Answer"]]
                             data["Answer"] = a_list
                         if "Authority" in data:
-                            a_list = [
-                                AnswerData(**x) for x in data["Authority"]
-                            ]
+                            a_list = [AnswerData(**x) for x in data["Authority"]]
                             data["Authority"] = a_list
 
                         r_list.append(Request(**data))
@@ -197,9 +196,7 @@ class DohParser(object):
                     )
                     continue
                 except UnicodeDecodeError:
-                    self.logger.warning(
-                        f"Couldn't decode response: {response.content}"
-                    )
+                    self.logger.warning(f"Couldn't decode response: {response.content}")
                     continue
                 except ValueError:
                     self.logger.warning(
