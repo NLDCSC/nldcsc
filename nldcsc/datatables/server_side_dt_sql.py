@@ -25,7 +25,6 @@ class SQLServerSideDataTable(ServerSideDataTable):
         custom_column_filters: dict = None,
         **kwargs,
     ):
-
         if additional_filters is None:
             additional_filters = []
 
@@ -205,7 +204,6 @@ class SQLServerSideDataTable(ServerSideDataTable):
                     filter_val = "~" + filter_val
 
         if "<>" in filter_val:
-
             start, end = filter_val.split("<>", 1)
 
             start = is_date(start.strip())

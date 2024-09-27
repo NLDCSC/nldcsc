@@ -213,7 +213,6 @@ class DohParser(object):
     async def request_and_parse(
         self, workload: dict[int | str, List[str]]
     ) -> dict[str, List[dict[str, str | int | List[dict[str, str | int]]]]]:
-
         query_data = await self.make_requests(workload=workload)
 
         # forward dns queries
