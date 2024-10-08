@@ -1,5 +1,6 @@
-nldcsc[httpx_apis]>=0.2.40
-nldcsc[loggers]>=0.2.40
 dataclasses-json>=0.6.7
 netaddr>=1.3.0
 httpx>=0.27.0
+
+-r ./loggers.txt
+-r ./httpx_apis.txt
