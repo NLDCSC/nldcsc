@@ -212,15 +212,22 @@ def upgrade(sql, tag, x_arg, revision, max_lookback_days, sync):
     is_flag=True,
     help="Sync the old formatted migration files to the DB. Only available if no newly formatted migrations have been migrated.",
 )
-@click.argument("revision", default="head")
+@click.argument("revision", default=-1)
 @with_appcontext
 def check(revision, max_lookback_days, sync):
     """Upgrade to a later version"""
+    if revision == -1:
+        revision = None
+
     table_list = current_app.extensions["migrate"].migrate.check(
         revision=revision, max_lookback_days=max_lookback_days, sync=sync
     )
 
-    click.echo("Missing migrations:")
+    if revision is None:
+        click.echo("Missing migrations:")
+    else:
+        click.echo(f"Migration steps for {revision}:")
+
     if len(table_list) != 1:
         click.echo(tabulate(table_list, headers="firstrow", tablefmt="fancy_grid"))
     else:

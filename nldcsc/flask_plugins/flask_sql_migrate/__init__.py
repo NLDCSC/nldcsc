@@ -12,7 +12,8 @@ from logging.config import dictConfig
 from typing import Optional, Dict, List
 
 from alembic import __version__ as __alembic_version__
-from alembic import util
+from alembic import util, migration
+from alembic.operations import Operations, BatchOperations
 from alembic.migration import RevisionStep
 from alembic.autogenerate import RevisionContext
 from alembic.config import Config as AlembicConfig
@@ -25,6 +26,12 @@ from flask import Flask
 from flask import current_app, g
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Row
+from sqlalchemy.schema import ColumnCollectionConstraint
+from sqlalchemy.sql.schema import Column
+
+from .fractured_alembic.runtime.op_shell import (
+    create_shell,
+)
 
 from .fractured_alembic.runtime.migration import FracturedMigrationContext
 from .config.constants import LOGGING_CONFIG, schema_migrations_table
@@ -776,8 +783,9 @@ class SqlMigrate(object):
             }
         )
 
+    @catch_errors
     def check(
-        self, revision: str = "head", max_lookback_days: int = 30, sync: bool = False
+        self, revision: str = None, max_lookback_days: int = 30, sync: bool = False
     ):
         logger.debug(f"Received parameters: {locals()}")
 
@@ -822,31 +830,90 @@ class SqlMigrate(object):
 
                 return [revision, name, date, age]
 
-        data = [["rev", "name", "date", "age"]]
+        @dataclass
+        class IRow:
+            instruction: object
+            op: object
+            args: tuple
 
-        with self._get_env_context() as env_context:
-            if sync:
-                revs = self.script_directory._sync_revs(
-                    env_context.get_context().get_current_heads()
+            @property
+            def as_list(self):
+                operation = (
+                    self.instruction.__name__.removesuffix("_class")
+                    .replace("_", " ")
+                    .capitalize()
                 )
 
-                revs.extend(
-                    self.script_directory._upgrade_revs(
+                first_arg = self.args[0]
+
+                if isinstance(self.op, BatchOperations):
+                    first_arg = f"{self.op.impl.table_name}:{first_arg}"
+
+                extra_args = []
+
+                if len(self.args) > 1:
+                    for i in range(1, len(self.args)):
+                        if isinstance(self.args[i], ColumnCollectionConstraint):
+                            try:
+                                extra_args.append(
+                                    f"{type(self.args[i]).__name__}, {','.join(self.args[i].columns)}"
+                                )
+                                continue
+                            except Exception:
+                                pass
+                        extra_args.append(str(self.args[i]))
+
+                extra_args = "\n".join(extra_args)
+
+                return [operation, first_arg, extra_args]
+
+        if revision is not None:
+            steps = [["Operation", "Argument", "Further arguments"]]
+
+            def cb(cls, operation, *args, **kwargs):
+                steps.append(IRow(cls, operation, args).as_list)
+
+            create_shell(None, cb)
+
+            with self._get_env_context() as env_context:
+                with Operations.context(env_context._migration_context):
+
+                    step = migration.MigrationStep.upgrade_from_script(
+                        self.script_directory.revision_map,
+                        self.script_directory.get_revision(str(revision)),
+                    )
+
+                    step.migration_fn()
+
+            return steps
+
+        else:
+            data = [["rev", "name", "date", "age"]]
+
+            with self._get_env_context() as env_context:
+                if sync:
+                    revs = self.script_directory._sync_revs(
+                        env_context.get_context().get_current_heads()
+                    )
+
+                    revs.extend(
+                        self.script_directory._upgrade_revs(
+                            "head",
+                            (),
+                            max_lookback_days,
+                        )
+                    )
+                else:
+                    revs = self.script_directory._upgrade_revs(
                         "head",
-                        (),
+                        env_context.get_context().get_current_heads(),
                         max_lookback_days,
                     )
-                )
-            else:
-                revs = self.script_directory._upgrade_revs(
-                    "head",
-                    env_context.get_context().get_current_heads(),
-                    max_lookback_days,
-                )
 
-            for rev in revs:
-                data.append(Row(rev).as_list)
-        return data
+                for rev in revs:
+                    data.append(Row(rev).as_list)
+
+            return data
 
     def drop(
         self,
