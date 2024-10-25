@@ -86,9 +86,7 @@ class GeoIp(ApiBaseClass):
                 raise
 
         if country_code2 is not None:
-            resource = resource.replace(
-                "<<COUNTRY_CODE2>>", country_code2.lower()
-            )
+            resource = resource.replace("<<COUNTRY_CODE2>>", country_code2.lower())
 
         image_url_resource = (
             self._build_url(resource)
@@ -189,9 +187,7 @@ class GeoIpPaid(GeoIp):
         # validate IP addresses
         for ip in ip_address_list:
             if not self.is_valid_ip(ip):
-                raise AttributeError(
-                    f"Wrong IP address format found in list: {ip}"
-                )
+                raise AttributeError(f"Wrong IP address format found in list: {ip}")
         if len(ip_address_list) > 50:
             raise TooManyIPAddressesException(
                 f"The IP address list length is {len(ip_address_list)}, which exceeds the maximum allowed limit of 50. "
