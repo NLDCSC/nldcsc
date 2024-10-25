@@ -184,7 +184,7 @@ class GeoIpPaid(GeoIp):
         :return: List of Geo Ip Information
         :rtype: List[dict]
         """
-        # validate IP address
+        # validate IP addresses
         for ip in ip_address_list:
             if not self.is_valid_ip(ip):
                 raise AttributeError(
