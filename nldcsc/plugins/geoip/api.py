@@ -183,6 +183,8 @@ class GeoIpPaid(GeoIp):
         :type ip_address_list: List[str]
         :return: List of Geo Ip Information
         :rtype: List[dict]
+        :raises: AttributeError: If any ip is invalid
+        :raises: TooManyIPAddressesException: If the number of provided ips is more than 50
         """
         # validate IP addresses
         for ip in ip_address_list:
