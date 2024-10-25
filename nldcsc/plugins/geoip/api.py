@@ -1,13 +1,14 @@
+import aiohttp
 import asyncio
 import json
 import logging
 import os
 
-import aiohttp
 from netaddr import IPAddress
 from netaddr.core import AddrFormatError
 from nldcsc.http_apis.base_class.api_base_class import ApiBaseClass
 from nldcsc.loggers.app_logger import AppLogger
+from typing import List
 
 logging.setLoggerClass(AppLogger)
 
@@ -149,3 +150,52 @@ class GeoIp(ApiBaseClass):
                     return_exceptions=True,
                 )
                 return results
+
+
+class TooManyIPAddressesException(Exception):
+    """Exception raised when the IP address list exceeds the maximum limit."""
+
+    pass
+
+
+class GeoIpPaid(GeoIp):
+    def __init__(
+        self,
+        baseurl: str = "https://api.ipgeolocation.io",
+        api_path: str = "ipgeo-bulk",
+        proxies: dict = None,
+        user_agent: str = "Certex",
+        **kwargs,
+    ):
+        super().__init__(
+            baseurl=baseurl,
+            api_path=api_path,
+            proxies=proxies,
+            user_agent=user_agent,
+            **kwargs,
+        )
+
+    def get_geo_for_ip_bulk(self, ip_address_list: List[str]):
+        """
+        Method for retrieving multiple ip addresses (max 50 at once)
+
+        :param ip_address_list: Ip address list to retrieve geo info for
+        :type ip_address_list: List[str]
+        :return: List of Geo Ip Information
+        :rtype: List[dict]
+        """
+        # validate IP address
+        for ip in ip_address_list:
+            if not self.is_valid_ip(ip):
+                raise AttributeError(
+                    f"Wrong IP address format found in list: {ip}"
+                )
+        if len(ip_address_list) > 50:
+            raise TooManyIPAddressesException(
+                f"The IP address list length is {len(ip_address_list)}, which exceeds the maximum allowed limit of 50. "
+                "Please provide a list with 50 or fewer IP addresses."
+            )
+        resource = f"?apiKey={self.api_key}"
+        data = {"ips": ip_address_list}
+
+        return self.call("POST", resource=resource, data=data)
