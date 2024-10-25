@@ -7,7 +7,7 @@ from nldcsc.plugins.geoip.api import GeoIp
 
 class GeoIpTest:
     def test_is_valid_ip(self):
-        os.environ["IPGEOLOCATION_ENABLE"] = True
+        os.environ["IPGEOLOCATION_ENABLE"] = "True"
         os.environ["IPGEOLOCATION_API_KEY"] = "tests"
         gi = GeoIp()
 
