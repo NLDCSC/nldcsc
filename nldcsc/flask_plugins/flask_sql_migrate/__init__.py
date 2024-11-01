@@ -877,7 +877,6 @@ class SqlMigrate(object):
 
             with self._get_env_context() as env_context:
                 with Operations.context(env_context._migration_context):
-
                     step = migration.MigrationStep.upgrade_from_script(
                         self.script_directory.revision_map,
                         self.script_directory.get_revision(str(revision)),

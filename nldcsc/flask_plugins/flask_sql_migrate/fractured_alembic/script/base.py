@@ -204,7 +204,6 @@ class SqlScriptDirectory(ScriptDirectory):
         current_rev: str | tuple[str],
         max_lookback_days: int,
     ) -> List[RevisionStep]:
-
         if isinstance(current_rev, tuple) and current_rev:
             current_rev, *o = current_rev
 
