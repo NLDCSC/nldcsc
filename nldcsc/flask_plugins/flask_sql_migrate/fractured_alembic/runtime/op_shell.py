@@ -5,7 +5,6 @@ from alembic.operations import ops
 def get_shell_obj(
     name: str, attr: str, cb: callable, reverse_obj: object = None, batch: bool = False
 ):
-
     if batch and attr.startswith("batch_"):
         batch_alt = attr
         attr = attr.removeprefix("batch_")
@@ -17,7 +16,8 @@ def get_shell_obj(
         def _classmethod(cls, operations, *args, **kwargs):
             cb(cls, operations, *args, **kwargs)
 
-    def __init__(self, *args, **kwargs): ...
+    def __init__(self, *args, **kwargs):
+        ...
 
     def reverse(*args, **kwargs):
         if reverse_obj is not None:
