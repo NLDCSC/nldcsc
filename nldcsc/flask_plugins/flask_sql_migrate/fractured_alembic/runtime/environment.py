@@ -53,7 +53,6 @@ class SqlEnvironmentContext(EnvironmentContext):
         on_version_apply: Optional[OnVersionApplyFn] = None,
         **kw: Any,
     ) -> None:
-
         opts = self.context_opts
         if transactional_ddl is not None:
             opts["transactional_ddl"] = transactional_ddl

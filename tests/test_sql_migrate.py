@@ -63,7 +63,6 @@ def sql_migrate(app):
 
 class TestSqlMigrate:
     def test_happy_migration_run(self, sql_migrate, test_dir):
-
         assert not os.path.exists(
             os.path.join(test_dir, sql_migrate.directory)
         ), "Migration directory should not exist!"
