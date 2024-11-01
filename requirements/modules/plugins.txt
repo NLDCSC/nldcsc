@@ -1,0 +1,7 @@
+dataclasses-json>=0.6.7
+netaddr>=1.3.0
+httpx>=0.27.0
+aiohttp>=3.10.9
+
+-r ./loggers.txt
+-r ./httpx_apis.txt

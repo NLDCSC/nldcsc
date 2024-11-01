@@ -1,4 +1,5 @@
 -r modules/loggers.txt
+-r modules/plugins.txt
 -r modules/flask_managers.txt
 -r modules/sql_migrations.txt
 -r modules/flask_plugins.txt

@@ -80,9 +80,12 @@ class AppLogger(logging.Logger):
                     _application_name=os.getenv("APP_NAME", "YADA"),
                     include_extra_fields=True,
                     debug=True,
-                    **getenv_dict("GELF_SYSLOG_ADDITIONAL_FIELDS", None)
-                    if getenv_dict("GELF_SYSLOG_ADDITIONAL_FIELDS", None) is not None
-                    else {}
+                    **(
+                        getenv_dict("GELF_SYSLOG_ADDITIONAL_FIELDS", None)
+                        if getenv_dict("GELF_SYSLOG_ADDITIONAL_FIELDS", None)
+                        is not None
+                        else {}
+                    )
                 )
             else:
                 syslog = FullSysLogHandler(

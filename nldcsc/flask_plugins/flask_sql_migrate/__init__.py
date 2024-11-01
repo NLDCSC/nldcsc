@@ -807,7 +807,7 @@ class SqlMigrate(object):
                     try:
                         date = datetime.strptime(
                             re.search(
-                                "\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}",
+                                r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}",
                                 self.rev.revision.longdoc,
                             ).group(),
                             "%Y-%m-%d %H:%M:%S",

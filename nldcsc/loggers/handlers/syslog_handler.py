@@ -4,6 +4,7 @@ import socket
 from collections import OrderedDict
 from logging.handlers import SysLogHandler, SYSLOG_UDP_PORT
 from syslog import LOG_USER
+from typing import Tuple
 
 NILVALUE = "-"
 
@@ -18,15 +19,18 @@ class FullSysLogHandler(SysLogHandler):
     def __init__(
         self,
         appname: str,
-        address: tuple = ("localhost", SYSLOG_UDP_PORT),
-        facility: str = LOG_USER,
-        socktype: str = socket.SOCK_DGRAM,
+        address: Tuple[str, int] = ("localhost", SYSLOG_UDP_PORT),
+        facility: int = LOG_USER,
+        socktype: socket.SocketKind = socket.SOCK_DGRAM,
         hostname: str = None,
         procid: int = None,
         msgid: int = None,
-        structured_data: OrderedDict = OrderedDict(),
+        structured_data: OrderedDict = None,
         enterprise_id: int = None,
     ):
+        if structured_data is None:
+            structured_data = OrderedDict()
+
         super().__init__(address, facility, socktype)
 
         self.hostname, self.appname, self.procid = hostname, appname, procid
@@ -166,6 +170,7 @@ class FullSysLogHandler(SysLogHandler):
         msg = " ".join((header, sd, msg, "\000")).encode("utf-8")
 
         # This section copied from logging.SyslogHandler
+        # noinspection PyBroadException
         try:  # pragma: no cover
             if self.unixsocket:
                 try:

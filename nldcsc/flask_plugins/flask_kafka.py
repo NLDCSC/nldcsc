@@ -36,8 +36,8 @@ class FlaskKafka(object):
         if self.create_producer:
             self._producer = KafkaProducer(
                 bootstrap_servers=self.kafka_url,
-                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-                key_serializer=lambda k: json.dumps(k).encode("utf-8"),
+                key_serializer=lambda k: k.encode("ascii"),
+                value_serializer=lambda v: json.dumps(v).encode("ascii"),
                 **self.kwargs,
             )
 
@@ -56,8 +56,8 @@ class FlaskKafka(object):
         if self.create_consumer:
             self._consumer = KafkaConsumer(
                 bootstrap_servers=self.kafka_url,
-                value_deserializer=lambda v: json.dumps(v).encode("utf-8"),
-                key_deserializer=lambda k: json.dumps(k).encode("utf-8"),
+                key_deserializer=lambda k: k.decode("ascii"),
+                value_deserializer=lambda v: json.loads(v.decode("ascii")),
                 auto_offset_reset="earliest",
                 **self.kwargs,
             )

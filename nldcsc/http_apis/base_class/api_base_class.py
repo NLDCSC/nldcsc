@@ -93,7 +93,7 @@ class ApiBaseClass(object):
                 if isinstance(data, dict):
                     try:
                         data = json.dumps(data)
-                    except:
+                    except Exception:
                         raise TypeError(
                             "Dict provided to 'data' is not json serializable."
                         )
