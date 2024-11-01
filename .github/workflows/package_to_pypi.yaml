@@ -8,6 +8,7 @@ on:
 
 jobs:
   release:
+    permissions: write-all
     name: Create Release
     runs-on: ubuntu-latest
     steps:
@@ -22,7 +23,7 @@ jobs:
           /usr/bin/git log --oneline --no-merges $(/usr/bin/git describe --tags --abbrev=0 ${{ github.ref }}^)..${{ github.ref }} >> ./commits.log
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2.0.2
+        uses: softprops/action-gh-release@v2.0.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
