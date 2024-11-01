@@ -7,6 +7,7 @@ on:
 
 jobs:
   linter_name:
+    permissions: write-all
     name: runner / black
     runs-on: ubuntu-latest
     steps:
