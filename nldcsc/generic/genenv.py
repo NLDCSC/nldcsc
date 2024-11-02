@@ -2,6 +2,8 @@ import ast
 import sys
 from pathlib import Path
 
+from nldcsc.generic.utils import getenv_list
+
 
 class GenEnv:
 
@@ -54,40 +56,67 @@ class GenEnv:
             nodes = ast.parse(fh.read(), self.config_path, "exec")
 
         for node in nodes.body:
-            # Optionally: `and node.name == "Config"`
             if isinstance(node, ast.ClassDef):
                 previous_line_end = None
                 for obj in node.body:
                     if isinstance(obj, ast.Assign):
-                        if isinstance(obj.value, ast.Call):
-                            # environ.get or getenv
-                            function_name = obj.value.func.attr
-                            if function_name not in ["getenv", "get"]:
-                                print(
-                                    f"Skipping line {obj.lineno} with unknown function {function_name}."
-                                )
+                        try:
+                            env_key, default_value = self.process_node(obj=obj)
+                            if env_key is None:
                                 continue
-                            env_key = obj.value.args[0].value
-                            # Note that the default value of dotenv for an empty .env (`A=`) is '' and not None.
-                            default_value = (
-                                obj.value.args[1].value
-                                if len(obj.value.args) == 2
-                                else None
+                            next_line = (
+                                previous_line_end is None
+                                or obj.lineno == previous_line_end + 1
                             )
-                        elif (
-                            isinstance(obj.value, ast.Subscript)
-                            and obj.value.value.attr == "environ"
-                        ):
-                            # environ[]
-                            env_key = obj.value.slice.value
-                            default_value = False
-                        else:
-                            print(f"Failed to parse line {obj.lineno} - skipping.")
-                            continue
+                            previous_line_end = obj.end_lineno
+                            yield env_key, default_value, next_line
+                        except Exception as e:
+                            print(
+                                f"Failed to process assignment on line {obj.lineno}:", e
+                            )
 
-                        next_line = (
-                            previous_line_end is None
-                            or obj.lineno == previous_line_end + 1
-                        )
-                        previous_line_end = obj.end_lineno
-                        yield env_key, default_value, next_line
+    def process_node(self, obj: ast.Assign):
+        # Optionally: `and node.name == "Config"`
+        if isinstance(obj.value, ast.Call):
+            # os.environ.get or os.getenv
+            function_node = obj.value.func
+            function_name = (
+                function_node.attr
+                if hasattr(function_node, "attr")
+                else function_node.id
+            )
+            if function_name not in [
+                "getenv",
+                "get",
+                "getenv_bool",
+                "getenv_list",
+                "getenv_dict",
+            ]:
+                print(
+                    f"Skipping line {obj.lineno} with unknown function {function_name}."
+                )
+                return None, None
+            env_key = obj.value.args[0].value
+            # Note that the default value of dotenv for an empty .env (`A=`) is '' and not None.
+            if not self.keep_defaults or len(obj.value.args) == 1:
+                # Skip default value processing.
+                default_value = None
+            else:
+                # Process default value, can be of different types.
+                default_value_node = obj.value.args[1]
+                if not isinstance(default_value_node, ast.Constant):
+                    print(
+                        f"Can't insert default for {env_key} on {obj.lineno} - leaving blank."
+                    )
+                    default_value = ""
+                else:
+                    default_value = default_value_node.value
+        elif isinstance(obj.value, ast.Subscript) and obj.value.value.attr == "environ":
+            # environ[]
+            env_key = obj.value.slice.value
+            default_value = False
+        else:
+            print(f"Failed to parse line {obj.lineno} - skipping.")
+            return None, None
+
+        return env_key, default_value
