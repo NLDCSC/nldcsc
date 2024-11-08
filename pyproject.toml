@@ -1,3 +1,92 @@
+[tool.poetry]
+name = "NLDCSC"
+version = "0.2.48"
+description = "Package with general devops code"
+readme = "README.md"
+repository = "https://github.com/NLDCSC/nldcsc"
+authors = ["NLDCSC <NLDCSC@invalid.com>"]
+license = "GNU General Public License v3.0"
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+setuptools = ">=68.1.0"
+
+
+[tool.poetry.urls]
+"Code" = "https://github.com/NLDCSC/nldcsc"
+
+[tool.poetry.group.flask_plugins.dependencies]
+eswrap = ">=0.5.0"
+redis = ">=4.6.0"
+kafka-python = ">=2.0.2"
+elasticsearch = ">=8.7.0"
+flask = ">=2.3.3"
+sqlalchemy = ">=2.0.21"
+flask-sqlalchemy = ">=3.1.1"
+flask-migrate = ">=4.0.5"
+werkzeug = ">=2.3.7"
+alembic = "1.13.2"
+click = "8.1.7"
+tabulate = "0.9.0"
+dataclasses-json = ">=0.6.7"
+
+
+[tool.poetry.group.http_apis.dependencies]
+requests = ">=2.31.0"
+
+
+[tool.poetry.group.httpx_apis.dependencies]
+httpx = ">=0.27.0"
+
+
+[tool.poetry.group.loggers.dependencies]
+gunicorn = ">=21.2.0"
+ansicolors = ">=1.1.8"
+pygelf = ">=0.4.2"
+
+
+[tool.poetry.group.sso.dependencies]
+authlib = ">=1.3.0"
+flask = ">=2.3.3"
+pyjwt = ">=2.8.0"
+
+
+[tool.poetry.group.plugins.dependencies]
+gunicorn = ">=21.2.0"
+ansicolors = ">=1.1.8"
+pygelf = ">=0.4.2"
+dataclasses-json = ">=0.6.7"
+netaddr = ">=1.3.0"
+httpx = ">=0.27.0"
+aiohttp = ">=3.10.9"
+
+
+[tool.poetry.group.sql_migrations.dependencies]
+gunicorn = ">=21.2.0"
+ansicolors = ">=1.1.8"
+pygelf = ">=0.4.2"
+flask-migrate = ">=4.0.5"
+flask-sqlalchemy = ">=3.1.1"
+flask = ">=2.3.3"
+pymysql = ">=1.1.0"
+mysqlclient = ">=2.1.1"
+
+[build-system]
+requires = ["setuptools >= 61.0", "poetry == 1.8.4"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry.extras]
+test = ["pandas"]
+
 [tool.bandit]
 exclude_dirs = ["tests"]
 tests = []
