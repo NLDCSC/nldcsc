@@ -23,13 +23,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-dev libldap2-dev libsasl2-dev libssl-dev libmariadb-dev-compat libmariadb-dev
         pip install pytest
         pip install pytest-cov
         pip install poetry
         poetry install --no-interaction --no-ansi
     - name: Generate coverage report
       run: |
-        pytest --cov=./ --cov-report=xml --cov-config=tox.ini
+        poetry run python pytest --cov=./ --cov-report=xml --cov-config=tox.ini
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
