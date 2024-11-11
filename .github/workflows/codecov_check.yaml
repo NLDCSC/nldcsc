@@ -25,8 +25,8 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-cov
-        pip install -r ./requirements/test.txt
-        pip install -r ./requirements/test-ci-default.txt
+        pip install poetry
+        poetry install --no-interaction --no-ansi
     - name: Generate coverage report
       run: |
         pytest --cov=./ --cov-report=xml --cov-config=tox.ini
