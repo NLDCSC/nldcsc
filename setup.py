@@ -60,7 +60,7 @@ def long_description(readme_path: Path):
         str: Content of the readme file.
     """
     try:
-        return codecs.open(readme_path.as_uri(), "r", "utf-8").read()
+        return codecs.open(readme_path.name, "r", "utf-8").read()
     except OSError:
         return "Long description error: Missing README.md file"
 
@@ -154,6 +154,12 @@ def generate_meta():
         "include_package_data": True,
         "project_urls": poetry.package.custom_urls,
         "classifiers": poetry.package.classifiers,
+        "entry_points": {
+            "console_scripts": [
+                "nldcsc = nldcsc.cli:cli"
+            ]
+            
+        }
     }
 
 

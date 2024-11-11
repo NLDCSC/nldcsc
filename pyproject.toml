@@ -16,8 +16,10 @@ classifiers=[
     "Operating System :: OS Independent",
 ]
 
+
 [tool.poetry.urls]
 "Code" = "https://github.com/NLDCSC/nldcsc"
+
 
 [tool.nldcsc.group.dependencies]
 auth = ["loggers"]
@@ -26,10 +28,12 @@ flask_managers = ["loggers", "sql_migrations"]
 flask_middleware = ["flask_managers"]
 plugins = ["loggers", "httpx_apis"]
 sql_migrations = ["loggers"]
+flask_plugins = ["sql_migrate"]
 
 
 [tool.poetry.group.auth.dependencies]
 python-ldap = ">=3.4.3"
+click = "8.1.7"
 
 
 [tool.poetry.group.flask_managers.dependencies]
@@ -54,10 +58,6 @@ sqlalchemy = ">=2.0.21"
 flask-sqlalchemy = ">=3.1.1"
 flask-migrate = ">=4.0.5"
 werkzeug = ">=2.3.7"
-alembic = "1.13.2"
-click = "8.1.7"
-tabulate = "0.9.0"
-dataclasses-json = ">=0.6.7"
 
 
 [tool.poetry.group.http_apis.dependencies]
@@ -93,6 +93,13 @@ mysqlclient = ">=2.1.1"
 authlib = ">=1.3.0"
 flask = ">=2.3.3"
 pyjwt = ">=2.8.0"
+
+
+[tool.poetry.group.sql_migrate.dependencies]
+sqlalchemy = ">=2.0.21"
+alembic = "1.13.2"
+tabulate = "0.9.0"
+dataclasses-json = ">=0.6.7"
 
 [tool.poetry.dependencies]
 python = "^3.10"

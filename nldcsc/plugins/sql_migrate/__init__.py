@@ -22,22 +22,20 @@ from alembic.script.revision import _RevIdType
 from alembic.util import CommandError
 from dataclasses_json import dataclass_json
 from dataclasses_json import config as json_config
-from flask import Flask
-from flask import current_app, g
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Engine, MetaData
 from sqlalchemy import Row
 from sqlalchemy.schema import ColumnCollectionConstraint
 from sqlalchemy.sql.schema import Column
 
-from nldcsc.plugins.sql_migrate.fractured_alembic.runtime.op_shell import (
+from .fractured_alembic.runtime.op_shell import (
     create_shell,
 )
 
-from nldcsc.plugins.sql_migrate.fractured_alembic.runtime.migration import FracturedMigrationContext
-from nldcsc.plugins.sql_migrate.config.constants import LOGGING_CONFIG, schema_migrations_table
-from nldcsc.plugins.sql_migrate.fractured_alembic.runtime.environment import SqlEnvironmentContext
-from nldcsc.plugins.sql_migrate.fractured_alembic.script.base import SqlScriptDirectory, SqlScriptDirectoryContext
-from nldcsc.plugins.sql_migrate.utils.helpers import timestamp_to_strf_string, exclude_optional_dict
+from .fractured_alembic.runtime.migration import FracturedMigrationContext
+from .config.constants import LOGGING_CONFIG, schema_migrations_table
+from .fractured_alembic.runtime.environment import SqlEnvironmentContext
+from .fractured_alembic.script.base import SqlScriptDirectory, SqlScriptDirectoryContext
+from .utils.helpers import timestamp_to_strf_string, exclude_optional_dict
 
 dictConfig(LOGGING_CONFIG)
 
@@ -94,7 +92,7 @@ def catch_errors(f):
 
 
 class _MigrateConfig(object):
-    def __init__(self, migrate: "SqlMigrate", db: SQLAlchemy, **kwargs):
+    def __init__(self, migrate: "SqlMigrate", db: Engine, **kwargs):
         self.migrate = migrate
         self.db = db
         self.directory = migrate.directory
@@ -125,8 +123,8 @@ class Config(AlembicConfig):
 class SqlMigrate(object):
     def __init__(
         self,
-        app: Flask = None,
-        db: SQLAlchemy = None,
+        db: Engine = None,
+        metadata: MetaData = None,
         directory: str = "migrations",
         command: str = "db",
         compare_type: bool = True,
@@ -148,6 +146,7 @@ class SqlMigrate(object):
         self.configure_callbacks = []
         self.db = db
         self.command = command
+        self.metadata = metadata
         self.directory = str(directory)
         self.alembic_ctx_kwargs = kwargs
         self.alembic_ctx_kwargs["compare_type"] = compare_type
@@ -160,8 +159,8 @@ class SqlMigrate(object):
         self._script_directory = None
         self._script_directory_context = None
 
-        if app is not None and db is not None:
-            self.init_app(app, db, directory)
+        if db is not None:
+            self.init_app(db, directory)
 
     @property
     def environment_context(self) -> SqlEnvironmentContext:
@@ -232,12 +231,12 @@ class SqlMigrate(object):
                 )
                 env_context.configure(
                     connection,
-                    self.db.metadata,
+                    self.metadata,
                     **self.alembic_ctx_kwargs,
                     **ctx_opts,
                     include_object=self._include_this_object,
                     process_revision_directives=self._process_revision_directives,
-                    target_metadata=self.db.metadata,
+                    target_metadata=self.metadata,
                 )
 
                 if ensure_migrations_table:
@@ -303,8 +302,7 @@ class SqlMigrate(object):
 
     def init_app(
         self,
-        app: Flask,
-        db: SQLAlchemy = None,
+        db: Engine = None,
         directory: str = None,
         command: str = None,
         compare_type: bool = None,
@@ -334,25 +332,15 @@ class SqlMigrate(object):
             self.alembic_ctx_kwargs["compare_type"] = compare_type
         if render_as_batch is not None:
             self.alembic_ctx_kwargs["render_as_batch"] = render_as_batch
-        if not hasattr(app, "extensions"):
-            app.extensions = {}
 
         self._script_directory_context = SqlScriptDirectoryContext(
             self.db, schema_migrations_table
-        )
-
-        app.extensions["migrate"] = _MigrateConfig(
-            self, self.db, **self.alembic_ctx_kwargs
         )
 
         try:
             self.get_config()
         except RuntimeError:
             pass
-
-        from .cli import db as db_cli_group
-
-        app.cli.add_command(db_cli_group, name=self.command)
 
     def configure(self, f):
         """
@@ -404,8 +392,6 @@ class SqlMigrate(object):
             setattr(config.cmd_opts, opt, True)
         if not hasattr(config.cmd_opts, "x"):
             setattr(config.cmd_opts, "x", [])
-            for x in getattr(g, "x_arg", []):
-                config.cmd_opts.x.append(x)
             if x_arg is not None:
                 if isinstance(x_arg, list) or isinstance(x_arg, tuple):
                     for x in x_arg:
@@ -435,16 +421,14 @@ class SqlMigrate(object):
         logger.debug(f"Received parameters: {locals()}")
 
         if directory is None:
-            directory = current_app.extensions["migrate"].directory
+            directory = self.directory
         template_directory = None
         if template is not None and ("/" in template or "\\" in template):
             template_directory, template = os.path.split(template)
         config = Config(template_directory=template_directory)
         config.set_main_option("script_location", directory)
         config.config_file_name = os.path.join(directory, "alembic.ini")
-        config = self._current_config = current_app.extensions[
-            "migrate"
-        ].migrate.call_configure_callbacks(config)
+        config = self._current_config = self.call_configure_callbacks(config)
         if multidb and template is None:
             template = "flask-multidb"
         elif template is None:
@@ -543,12 +527,7 @@ class SqlMigrate(object):
             rev_id = SqlMigrate.generate_rev_id()
 
         opts = ["autogenerate"] if autogenerate else None
-        directory = current_app.extensions["migrate"].directory
-        config = (
-            current_app.extensions["migrate"].migrate.get_config(directory, opts=opts)
-            if config is None
-            else config
-        )
+        config = self.get_config(self.directory, opts=opts)
 
         command_args = dict(
             message=message,
@@ -655,10 +634,7 @@ class SqlMigrate(object):
         """
         logger.debug(f"Received parameters: {locals()}")
 
-        directory = current_app.extensions["migrate"].directory
-        config = current_app.extensions["migrate"].migrate.get_config(
-            directory, opts=["autogenerate"], x_arg=x_arg
-        )
+        config = self.get_config(self.directory, opts=["autogenerate"], x_arg=x_arg)
 
         return self.revision(
             config=config,
@@ -699,9 +675,8 @@ class SqlMigrate(object):
         """
         logger.debug(f"Received parameters: {locals()}")
 
-        directory = current_app.extensions["migrate"].directory
-        current_app.extensions["migrate"].migrate.get_config(
-            directory, x_arg=x_arg
+        self.get_config(
+            self.directory, x_arg=x_arg
         )  # This makes sure that self.current_config has the latest values...
 
         starting_rev = None
@@ -759,9 +734,8 @@ class SqlMigrate(object):
         """
         logger.debug(f"Received parameters: {locals()}")
 
-        directory = current_app.extensions["migrate"].directory
-        current_app.extensions["migrate"].migrate.get_config(
-            directory, x_arg=x_arg
+        self.get_config(
+            self.directory, x_arg=x_arg
         )  # This makes sure that self.current_config has the latest values...
 
         starting_rev = None
@@ -789,8 +763,9 @@ class SqlMigrate(object):
     ):
         logger.debug(f"Received parameters: {locals()}")
 
-        directory = current_app.extensions["migrate"].directory
-        current_app.extensions["migrate"].migrate.get_config(directory)
+        self.get_config(
+            self.directory
+        )  # This makes sure that self.current_config has the latest values...
 
         @dataclass
         class Row:
@@ -924,9 +899,9 @@ class SqlMigrate(object):
             None
         """
         logger.debug(f"Received parameters: {locals()}")
-
-        directory = current_app.extensions["migrate"].directory
-        current_app.extensions["migrate"].migrate.get_config(directory)
+        self.get_config(
+            self.directory,
+        )  # This makes sure that self.current_config has the latest values...
 
         logger.info("Dropping all tables and migration directory...")
 
@@ -939,7 +914,7 @@ class SqlMigrate(object):
             self.migration_context.drop_migrations_tables()
 
         try:
-            shutil.rmtree(current_app.extensions["migrate"].directory, True)
+            shutil.rmtree(self.directory, True)
         except Exception:
             logger.error("Failed to drop migration directory.")
 
@@ -957,8 +932,9 @@ class SqlMigrate(object):
         """
         logger.debug(f"Received parameters: {locals()}")
 
-        directory = current_app.extensions["migrate"].directory
-        current_app.extensions["migrate"].migrate.get_config(directory)
+        self.get_config(
+            self.directory,
+        )  # This makes sure that self.current_config has the latest values...
 
         with self._get_env_context() as env_context:
             migration_data = self.migration_context.get_full_migrations_table_content()
