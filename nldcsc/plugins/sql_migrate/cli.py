@@ -1,3 +1,5 @@
+import os
+import sys
 import click
 from importlib import util
 
@@ -33,12 +35,21 @@ def db(ctx, version, debug, config):
         sql_migrate.set_logger_debug_format()
 
     try:
+        package = os.path.dirname(os.getcwd())
+
+        if "__init__.py" in os.listdir(package):
+            click.echo("Please run from the root of your project.")
+            exit(1)
+
+        sys.path.insert(0, os.getcwd())
         
-        spec = util.spec_from_file_location("sql_migrate_migrate_config", config)
+        spec= util.spec_from_file_location("sql_migrate_migrate_config", config)
         c = util.module_from_spec(spec)
         spec.loader.exec_module(c)
-    except (AttributeError, FileNotFoundError):
-        click.echo("Config file not found.")
+
+        sys.path.pop(0)
+    except (AttributeError, FileNotFoundError) as e:
+        click.echo(f"Config file not found -> {e}")
         exit(1)
 
     if not hasattr(c, "db") or not hasattr(c, "metadata"):
