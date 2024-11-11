@@ -2,6 +2,7 @@ import os
 import sys
 import click
 from importlib import util
+import pkgutil
 
 from nldcsc.plugins.sql_migrate import SqlMigrate
 
@@ -35,21 +36,22 @@ def db(ctx, version, debug, config):
         sql_migrate.set_logger_debug_format()
 
     try:
-        package = os.path.dirname(os.getcwd())
+        package = os.path.dirname(os.path.abspath(config))
 
-        if "__init__.py" in os.listdir(package):
-            click.echo("Please run from the root of your project.")
-            exit(1)
-
-        sys.path.insert(0, os.getcwd())
+        while "__init__.py" in os.listdir(package):
+            package = os.path.dirname(package)
+            config = os.path.relpath(os.path.abspath(config), package)
         
+        os.chdir(package)
+
+        sys.path.insert(0, package)
         spec= util.spec_from_file_location("sql_migrate_migrate_config", config)
         c = util.module_from_spec(spec)
         spec.loader.exec_module(c)
 
         sys.path.pop(0)
-    except (AttributeError, FileNotFoundError) as e:
-        click.echo(f"Config file not found -> {e}")
+    except (AttributeError, FileNotFoundError, ModuleNotFoundError) as e:
+        click.echo(f"Config file not found -> {e}, try running from the project root.")
         exit(1)
 
     if not hasattr(c, "db") or not hasattr(c, "metadata"):
