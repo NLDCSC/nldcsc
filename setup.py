@@ -41,7 +41,11 @@ def reqs(deps: list[Dependency]):
     Returns:
         list[str]: list of properly formatted requirement strings.
     """
-    return [f"{dep.complete_name}{dep.constraint}" for dep in deps]
+
+    return [
+        f"{dep.complete_name}{'' if any(c in str(dep.constraint) for c in '>=<') else '=='}{dep.constraint}"
+        for dep in deps
+    ]
 
 
 # -*- Long Description -*-
