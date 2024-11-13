@@ -26,9 +26,12 @@ auth = ["loggers"]
 datatables = ["flask_plugins"]
 flask_managers = ["loggers", "sql_migrations"]
 flask_middleware = ["flask_managers"]
-plugins = ["loggers", "httpx_apis"]
+plugins = ["plugin_doh", "plugin_geo_ip", "plugin_sql_migrate", "plugin_redis"]
+custom_types = ["custom_type_sqlalchemy"]
 sql_migrations = ["loggers"]
-flask_plugins = ["sql_migrate"]
+flask_plugins = ["plugin_sql_migrate", "custom_type_sqlalchemy", "plugin_redis"]
+plugin_doh = ["httpx_apis", "loggers"]
+plugin_geo_ip = ["httpx_apis", "loggers"]
 
 
 [tool.poetry.group.auth.dependencies]
@@ -50,7 +53,6 @@ rfc3339 = ">=6.2"
 
 [tool.poetry.group.flask_plugins.dependencies]
 eswrap = ">=0.5.0"
-redis = ">=4.6.0"
 kafka-python = ">=2.0.2"
 elasticsearch = ">=8.7.0"
 flask = ">=2.3.3"
@@ -95,7 +97,7 @@ flask = ">=2.3.3"
 pyjwt = ">=2.8.0"
 
 
-[tool.poetry.group.sql_migrate.dependencies]
+[tool.poetry.group.plugin_sql_migrate.dependencies]
 sqlalchemy = ">=2.0.21"
 alembic = "1.13.2"
 tabulate = "0.9.0"
@@ -110,6 +112,14 @@ pytest-cov = "^6.0.0"
 pytest-env = "^1.1.5"
 mock = "^5.1.0"
 requests-mock = "^1.12.1"
+
+
+[tool.poetry.group.custom_type_sqlalchemy.dependencies]
+sqlalchemy = ">=2.0.21"
+
+
+[tool.poetry.group.plugin_redis.dependencies]
+redis = ">=4.6.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
