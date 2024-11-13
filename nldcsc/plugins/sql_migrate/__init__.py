@@ -905,7 +905,7 @@ class SqlMigrate(object):
 
         logger.info("Dropping all tables and migration directory...")
 
-        self.db.drop_all()
+        self.metadata.drop_all(self.db)
 
         with self._get_env_context() as env_context:
             logger.debug(

@@ -30,10 +30,10 @@ def db(ctx, version, debug, config):
     """Perform database migrations."""
     
     if version:
-        sql_migrate.get_version(True)
+        SqlMigrate.get_version(True)
         exit(0)
     if debug:
-        sql_migrate.set_logger_debug_format()
+        SqlMigrate.set_logger_debug_format()
 
     try:
         package = os.path.dirname(os.path.abspath(config))
