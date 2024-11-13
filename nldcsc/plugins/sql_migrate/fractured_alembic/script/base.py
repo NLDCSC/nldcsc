@@ -13,7 +13,7 @@ from alembic.script import ScriptDirectory
 from alembic.util import sqla_compat
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Table
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DatabaseError
 
 logger = logging.getLogger(__name__)
 
@@ -152,7 +152,7 @@ class SqlScriptDirectory(ScriptDirectory):
                                 == revision.revision
                             )
                         ).fetchone()
-                    except OperationalError:
+                    except DatabaseError:
                         # no table exists yet
                         entry = None
 
