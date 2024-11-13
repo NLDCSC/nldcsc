@@ -134,7 +134,7 @@ or if you rather install all the plugins:
 pip install nldcsc[plugins]
 ```
 
-#### plugin_sql_migrate
+#### plugin-sql-migrate
 
 The sql_migrate plugin serves as a wrapper around alembic but replaces the naming convention of migration files to support multiple branches of development. To make use of this plugin the CLI can be used.
 
@@ -153,7 +153,7 @@ from my_awesome_project.db import get_engine
 from my_awesome_project.models.base import ModelBase
 
 #This should be a SQLAlchemy engine object.
-engine = get_engine()
+db = get_engine()
 
 #This should be the modelbase class metadata
 metadata = ModelBase.metadata
@@ -192,8 +192,8 @@ my_awesome_group = ["my_logging_group"]
 Using this example the following extras exist with the correct dependencies:
 ```
 pip install nldcsc[all]
-pip install nldcsc[my_awesome_extra]
-pip install nldcsc[my_awesome_group]
-pip install nldcsc[my_other_group]
-pip install nldcsc[my_logging_group]
+pip install nldcsc[my-awesome-extra]
+pip install nldcsc[my-awesome-group]
+pip install nldcsc[my-other-group]
+pip install nldcsc[my-logging-group]
 ```
