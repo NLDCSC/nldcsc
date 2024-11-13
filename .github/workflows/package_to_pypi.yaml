@@ -43,14 +43,11 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-dev libldap2-dev libsasl2-dev libssl-dev libmariadb-dev-compat libmariadb-dev
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-        pip install .[all]
+        pip install build
     - name: Build
       run: |
-        python setup.py sdist bdist_wheel
+        python -m build
     - name: upload dists
       uses: actions/upload-artifact@v4
       with:
