@@ -89,3 +89,7 @@ def reverse_from_named_tuple(
         return n_rev_types[index]
     except KeyError:
         raise KeyError(f"The requested index does not exist! Choices are {n_rev_types}")
+
+
+def exclude_optional_dict(value):
+    return value is None or not value

@@ -8,7 +8,7 @@ from dataclasses_json import config as json_config
 from dataclasses_json import dataclass_json
 from httpx import Response
 from netaddr.ip import IPAddress
-from nldcsc.generic.utils import reverse_from_named_tuple
+from nldcsc.generic.utils import exclude_optional_dict, reverse_from_named_tuple
 from nldcsc.loggers.app_logger import AppLogger
 
 from nldcsc.plugins.doh.doh_requester import DOHRequester, q_types
@@ -19,10 +19,6 @@ status_types = collections.namedtuple(
     "status_types",
     ["NOERROR", "FORMERR", "SERVFAIL", "NXDOMAIN", "NOTIMP", "REFUSED"],
 )(0, 1, 2, 3, 4, 5)
-
-
-def exclude_optional_dict(value):
-    return value is None or not value
 
 
 def reverse_pointer_ip(ptr_address: str) -> str | None:

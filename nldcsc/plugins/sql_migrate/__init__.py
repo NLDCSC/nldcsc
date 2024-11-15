@@ -25,7 +25,8 @@ from dataclasses_json import config as json_config
 from sqlalchemy import Engine, MetaData
 from sqlalchemy import Row
 from sqlalchemy.schema import ColumnCollectionConstraint
-from sqlalchemy.sql.schema import Column
+
+from nldcsc.generic.utils import exclude_optional_dict
 
 from .fractured_alembic.runtime.op_shell import (
     create_shell,
@@ -35,7 +36,7 @@ from .fractured_alembic.runtime.migration import FracturedMigrationContext
 from .config.constants import LOGGING_CONFIG, schema_migrations_table
 from .fractured_alembic.runtime.environment import SqlEnvironmentContext
 from .fractured_alembic.script.base import SqlScriptDirectory, SqlScriptDirectoryContext
-from .utils.helpers import timestamp_to_strf_string, exclude_optional_dict
+from .utils.helpers import timestamp_to_strf_string
 
 dictConfig(LOGGING_CONFIG)
 
