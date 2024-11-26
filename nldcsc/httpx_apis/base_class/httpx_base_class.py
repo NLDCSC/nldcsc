@@ -242,6 +242,7 @@ class HttpxBaseClass(object):
         timeout: int = 60,
         stream: bool = False,
         generic_request: bool = False,
+        **kwargs,
     ) -> Response | str | Any:
         """
         Method for requesting free format api resources
@@ -278,6 +279,7 @@ class HttpxBaseClass(object):
                                     data=data,
                                     timeout=timeout,
                                     generic_request=generic_request,
+                                    **kwargs,
                                 )
                             )
                     else:
@@ -289,6 +291,7 @@ class HttpxBaseClass(object):
                             data=data,
                             timeout=timeout,
                             generic_request=generic_request,
+                            **kwargs,
                         )
                     return results
         except HTTPError:
@@ -347,14 +350,12 @@ class HttpxBaseClass(object):
         data: dict | bytes = None,
         timeout: int = 60,
         generic_request: bool = False,
+        **kwargs,
     ) -> Response | str | Any:
         """
         Send a request
         """
-        request_api_resource = {
-            "headers": self.myheaders,
-            "timeout": timeout,
-        }
+        request_api_resource = {"headers": self.myheaders, "timeout": timeout, **kwargs}
 
         if data is not None:
             if method in [self.methods.DELETE, self.methods.GET]:
