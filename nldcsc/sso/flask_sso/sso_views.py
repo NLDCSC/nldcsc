@@ -70,24 +70,29 @@ def sso_logout():
         # propagate logout to sso
         endSessionEndpoint = current_app.config["SSO_ENDSESSION_ENDPOINT"]
 
-        headers = {
-            "Authorization": f"Bearer {g._sso_auth.get_access_token()}",
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
+        try:
 
-        data = {
-            "client_id": current_app.config["SSO_CLIENT_ID"],
-            "client_secret": current_app.config["SSO_CLIENT_SECRET"],
-            "refresh_token": g._sso_auth.get_refresh_token(),
-        }
+            headers = {
+                "Authorization": f"Bearer {g._sso_auth.get_access_token()}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
 
-        with requests.session() as req_session:
-            req_session.post(
-                endSessionEndpoint,
-                data=data,
-                headers=headers,
-                verify=False,
-            )
+            data = {
+                "client_id": current_app.config["SSO_CLIENT_ID"],
+                "client_secret": current_app.config["SSO_CLIENT_SECRET"],
+                "refresh_token": g._sso_auth.get_refresh_token(),
+            }
+
+            with requests.session() as req_session:
+                # noinspection RequestsNoVerify
+                req_session.post(
+                    endSessionEndpoint,
+                    data=data,
+                    headers=headers,
+                    verify=False,
+                )
+        except AttributeError as err:
+            logger.warning(f"Could not get specific attribute: {err}")
 
     session.pop("sso_auth_token", None)
     session.pop("sso_auth_profile", None)
