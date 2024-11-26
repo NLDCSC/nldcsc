@@ -11,8 +11,8 @@ from alembic.config import MessagingOptions
 from alembic.migration import RevisionStep
 from alembic.script import ScriptDirectory
 from alembic.util import sqla_compat
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Table
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import DatabaseError
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class SqlScriptDirectoryContext:
-    db: SQLAlchemy
+    db: Session
     table: Table
     revision_column: Optional[str] = "version_num"
 
