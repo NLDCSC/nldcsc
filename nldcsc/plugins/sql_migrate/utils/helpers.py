@@ -14,7 +14,3 @@ def timestamp_to_strf_string(timestamp: int) -> str:
     value = datetime.utcfromtimestamp(timestamp)
 
     return value.strftime("%Y-%m-%d %H:%M:%S")
-
-
-def exclude_optional_dict(value):
-    return value is None or not value

@@ -1,8 +1,0 @@
-gunicorn>=21.2.0
-flask>=2.3.3
-pyopenssl>=23.2.0
-Werkzeug>=2.3.7
-Flask-Socketio>=5.3.6
-
--r ./loggers.txt
--r ./sql_migrations.txt
