@@ -105,7 +105,6 @@ class ApiBaseClass(object):
                             raise TypeError(
                                 "Dict provided to list in 'data' is not json serializable."
                             )
-
                 elif not isinstance(data, (str, list, bytes, io.TextIOBase)):
                     raise TypeError(
                         f"'data' type for {method} must be str, dict, bytes, file-like or a list of tuples."
