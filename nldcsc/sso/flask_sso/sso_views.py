@@ -71,7 +71,6 @@ def sso_logout():
         endSessionEndpoint = current_app.config["SSO_ENDSESSION_ENDPOINT"]
 
         try:
-
             headers = {
                 "Authorization": f"Bearer {g._sso_auth.get_access_token()}",
                 "Content-Type": "application/x-www-form-urlencoded",
