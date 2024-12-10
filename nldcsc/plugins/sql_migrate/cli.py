@@ -20,18 +20,19 @@ from nldcsc.plugins.sql_migrate import SqlMigrate
     is_flag=True,
     help="Set logging output to DEBUG",
 )
-@click.option(
-    "--config",
-    help="Path to the sqlmigrate config",
-    required=True
-)
+@click.option("--config", help="Path to the sqlmigrate config", required=False)
 @click.pass_context
-def db(ctx, version, debug, config):
+def db(ctx, version, debug, config=None):
     """Perform database migrations."""
-    
+
     if version:
         SqlMigrate.get_version(True)
         exit(0)
+
+    if not config:
+        click.echo("Please provide a config file!")
+        exit(1)
+
     if debug:
         SqlMigrate.set_logger_debug_format()
 
@@ -41,11 +42,11 @@ def db(ctx, version, debug, config):
         while "__init__.py" in os.listdir(package):
             package = os.path.dirname(package)
             config = os.path.relpath(os.path.abspath(config), package)
-        
+
         os.chdir(package)
 
         sys.path.insert(0, package)
-        spec= util.spec_from_file_location("sql_migrate_migrate_config", config)
+        spec = util.spec_from_file_location("sql_migrate_migrate_config", config)
         c = util.module_from_spec(spec)
         spec.loader.exec_module(c)
 
@@ -59,7 +60,7 @@ def db(ctx, version, debug, config):
         exit(1)
 
     sql_migrate = SqlMigrate(c.db, c.metadata)
-    
+
     ctx.ensure_object(SqlMigrate)
     ctx.obj = sql_migrate
 
@@ -92,9 +93,7 @@ def list_templates(ctx):
 @click.pass_context
 def init(ctx, directory, template, package):
     """Creates a new migration repository."""
-    ctx.obj.init(
-        directory=directory, template=template, package=package
-    )
+    ctx.obj.init(directory=directory, template=template, package=package)
 
 
 @db.command()
@@ -295,9 +294,7 @@ def check(ctx, revision, max_lookback_days, sync):
 @click.pass_context
 def downgrade(ctx, sql, tag, x_arg, revision):
     """Downgrade to a earlier version"""
-    ctx.obj.downgrade(
-        revision=revision, sql=sql, tag=tag, x_arg=x_arg
-    )
+    ctx.obj.downgrade(revision=revision, sql=sql, tag=tag, x_arg=x_arg)
 
 
 @db.command()
