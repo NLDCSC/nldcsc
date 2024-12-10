@@ -696,8 +696,6 @@ class SqlMigrate(object):
                 revision, (), max_lookback_days
             )
 
-            if not new_revs:
-                self.revision()
             revs.extend(new_revs)
 
             return revs
