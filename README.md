@@ -165,7 +165,7 @@ Custom types is a collection of custom types or objects that can be used with ot
 
 #### custom_type_sqlalchemy
 
-This is a collection of types to be used together with sqlalchemy.
+This is a collection of types to be used together with sqlalchemy. If these types are to be used make sure to inherit from the ModelBase within the NLDCSC package. As the types get mapped to their SQL equivalents there.
 
 ## Adding modules and/or groups
 
