@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.3"
+version = "0.3.4"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -28,7 +28,7 @@ flask_managers = ["loggers", "sql_migrations"]
 flask_middleware = ["flask_managers"]
 plugins = ["plugin_doh", "plugin_geo_ip", "plugin_sql_migrate", "plugin_redis", "plugin_whoisxml"]
 custom_types = ["custom_type_sqlalchemy"]
-sql_migrations = ["loggers"]
+sql_migrations = ["mysql", "loggers"]
 flask_plugins = ["plugin_sql_migrate", "custom_type_sqlalchemy", "plugin_redis"]
 plugin_doh = ["httpx_apis", "loggers"]
 plugin_geo_ip = ["httpx_apis", "loggers"]
@@ -89,13 +89,15 @@ aiohttp = ">=3.10.9"
 [tool.poetry.group.plugin_whoisxml.dependencies]
 dataclasses-json = ">=0.6.7"
 
+[tool.poetry.group.mysql.dependencies]
+pymysql = ">=1.1.0"
+mysqlclient = ">=2.1.1"
+
 
 [tool.poetry.group.sql_migrations.dependencies]
 flask-migrate = ">=4.0.5"
 flask-sqlalchemy = ">=3.1.1"
 flask = ">=2.3.3"
-pymysql = ">=1.1.0"
-mysqlclient = ">=2.1.1"
 
 
 [tool.poetry.group.sso.dependencies]
