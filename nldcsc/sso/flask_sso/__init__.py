@@ -14,7 +14,7 @@ from authlib.oauth2.rfc7662 import (
     IntrospectTokenValidator as BaseIntrospectTokenValidator,
 )
 from flask import abort, g, redirect, request, session, url_for
-from nldcsc.generic.utils import getenv_bool, getenv_list
+from nldcsc.generic.utils import getenv_bool, getenv_list, getenv_dict
 
 from nldcsc.sso.flask_sso.sso_views import sso_auth
 
@@ -78,6 +78,9 @@ class SSOConnection(object):
                 "SSO_DISCOVERY_URL",
                 f"{self.app.config['SSO_ISSUER']}/.well-known/openid-configuration",
             ),
+        )
+        self.app.config.setdefault(
+            "SSO_DISCOVERY_KWARGS", getenv_dict("SSO_DISCOVERY_KWARGS", None)
         )
         self.app.config.setdefault(
             "SSO_USERINFO_ENDPOINT",
@@ -200,7 +203,10 @@ class SSOConnection(object):
     def get_config_setting(self, config_setting: str):
         with requests.session() as session:
             try:
-                req = session.get(self.app.config["SSO_DISCOVERY_URL"])
+                req = session.get(
+                    self.app.config["SSO_DISCOVERY_URL"],
+                    **self.app.config["SSO_DISCOVERY_KWARGS"],
+                )
                 data = req.json()
                 ret_data = data[config_setting]
             except Exception:
@@ -272,6 +278,7 @@ class SSOConnection(object):
             }
 
             with requests.session() as req_session:
+                # noinspection RequestsNoVerify
                 req_session.post(
                     endSessionEndpoint,
                     data=data,
