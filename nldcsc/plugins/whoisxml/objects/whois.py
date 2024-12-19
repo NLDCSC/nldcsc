@@ -24,17 +24,20 @@ class OrganisationDetails:
 
 @dataclass_json
 @dataclass
-class Registrant(OrganisationDetails): ...
+class Registrant(OrganisationDetails):
+    ...
 
 
 @dataclass_json
 @dataclass
-class AdministrativeContact(OrganisationDetails): ...
+class AdministrativeContact(OrganisationDetails):
+    ...
 
 
 @dataclass_json
 @dataclass
-class TechnicalContact(OrganisationDetails): ...
+class TechnicalContact(OrganisationDetails):
+    ...
 
 
 @dataclass_json
