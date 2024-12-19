@@ -154,12 +154,7 @@ def generate_meta():
         "include_package_data": True,
         "project_urls": poetry.package.custom_urls,
         "classifiers": poetry.package.classifiers,
-        "entry_points": {
-            "console_scripts": [
-                "nldcsc = nldcsc.cli:cli"
-            ]
-            
-        }
+        "entry_points": {"console_scripts": ["nldcsc = nldcsc.cli:cli"]},
     }
 
 
