@@ -10,12 +10,15 @@ from nldcsc.plugins.sql_migrate import Config, SqlMigrate as _SqlMigrate
 
 dictConfig(LOGGING_CONFIG)
 
+
 class _MigrateConfig(object):
     def __init__(self, migrate: "SqlMigrate", db: SQLAlchemy, **kwargs):
         self.migrate = migrate
         self.db = db
         self.directory = migrate.directory
         self.configure_args = kwargs
+
+
 class SqlMigrate(_SqlMigrate):
     def __init__(
         self,
@@ -42,7 +45,13 @@ class SqlMigrate(_SqlMigrate):
 
         self.sql_alchemy = db
 
-        super().__init__(directory=directory, command=command, compare_type=compare_type, render_as_batch=render_as_batch, **kwargs)
+        super().__init__(
+            directory=directory,
+            command=command,
+            compare_type=compare_type,
+            render_as_batch=render_as_batch,
+            **kwargs,
+        )
 
         if app is not None and self.sql_alchemy is not None:
             self.init_app(app, self.sql_alchemy, directory)
@@ -72,14 +81,16 @@ class SqlMigrate(_SqlMigrate):
         Returns:
 
         """
-        
+
         self.sql_alchemy = db or self.sql_alchemy
         self.metadata = self.sql_alchemy.metadata
 
         with app.app_context():
             self.db = self.sql_alchemy.engine
 
-        super().init_app(self.db, directory, command, compare_type, render_as_batch, **kwargs)
+        super().init_app(
+            self.db, directory, command, compare_type, render_as_batch, **kwargs
+        )
 
         if not hasattr(app, "extensions"):
             app.extensions = {}
@@ -91,7 +102,6 @@ class SqlMigrate(_SqlMigrate):
         from .cli import db as db_cli_group
 
         app.cli.add_command(db_cli_group, name=self.command)
-
 
     def get_config(self, directory=None, x_arg=None, opts=None) -> Config:
         """
@@ -107,8 +117,8 @@ class SqlMigrate(_SqlMigrate):
         """
 
         if x_arg is not None:
-            if isinstance(x_arg, list):
-                x_arg = [x_arg]
+            if not isinstance(x_arg, list):
+                x_arg = list(x_arg)
             x_arg.extend(getattr(g, "x_arg", []))
         else:
             x_arg = getattr(g, "x_arg", [])
