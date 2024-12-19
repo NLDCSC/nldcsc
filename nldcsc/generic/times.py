@@ -21,6 +21,8 @@ def timestringTOtimestamp(timestring):
         "%d-%m-%Y %H:%M",
         "%Y-%m-%d %H:%M:%S",
         "%H:%M:%S %d-%m-%Y",
+        "%Y-%m-%d",
+        "%Y-%m-%d %H:%M:%S UTC",
         "%Y-%m-%dT%H:%M:%S",
         "%Y-%m-%dT%H:%M:%SZ",
         "%Y-%m-%dT%H:%M:%S.%f",
