@@ -9,10 +9,16 @@ from nldcsc.generic.times import timestringTOtimestamp
 @dataclass_json
 @dataclass
 class OrganisationDetails:
+    name: Optional[str] = None
     organization: Optional[str] = None
+    street1: Optional[str] = None
+    city: Optional[str] = None
     state: Optional[str] = None
+    postalCode: Optional[str] = None
     country: Optional[str] = None
     countryCode: Optional[str] = None
+    email: Optional[str] = None
+    telephone: Optional[str] = None
     rawText: Optional[str] = None
 
 
