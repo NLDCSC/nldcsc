@@ -7,9 +7,7 @@ from nldcsc.generic.utils import getenv_dict
 
 
 class RedisWrapper(object):
-    def __init__(
-        self, redis_url: str = None, auto_connect : bool = True, **kwargs
-    ):
+    def __init__(self, redis_url: str = None, auto_connect: bool = True, **kwargs):
         self._redis_client = None
         self.kwargs = kwargs
         self.redis_url = (
@@ -26,7 +24,6 @@ class RedisWrapper(object):
 
         if auto_connect:
             self.connect()
-        
 
     def connect(self):
         parsed_url = urlparse(self.redis_url)
