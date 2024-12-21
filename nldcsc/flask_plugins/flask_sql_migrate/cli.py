@@ -185,9 +185,14 @@ def migrate(message, sql, head, splice, branch_label, version_path):
     is_flag=True,
     help="Sync the old formatted migration files to the DB. Only available if no newly formatted migrations have been migrated.",
 )
+@click.option(
+    "--fix-head",
+    is_flag=True,
+    help="Fix the head if it is not in sync with the current directory",
+)
 @click.argument("revision", default="head")
 @with_appcontext
-def upgrade(sql, tag, x_arg, revision, max_lookback_days, sync):
+def upgrade(sql, tag, x_arg, revision, max_lookback_days, sync, fix_head):
     """Upgrade to a later version"""
     current_app.extensions["migrate"].migrate.upgrade(
         revision=revision,
@@ -196,6 +201,7 @@ def upgrade(sql, tag, x_arg, revision, max_lookback_days, sync):
         x_arg=x_arg,
         max_lookback_days=max_lookback_days,
         sync=sync,
+        fix_head=fix_head,
     )
 
 

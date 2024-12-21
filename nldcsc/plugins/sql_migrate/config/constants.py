@@ -30,8 +30,8 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
             "propagate": False,
         },
-        "alembic": {"handlers": ["default"], "level": "INFO", "propagate": False},
-        "SqlMigrate": {"handlers": ["default"], "level": "INFO", "propagate": False},
+        "alembic": {"handlers": ["default"], "level": "WARNING", "propagate": False},
+        "nldcsc": {"handlers": ["default"], "level": "INFO", "propagate": False},
     },
 }
 

@@ -83,11 +83,15 @@ class SchemaMigrationRow:
 def catch_errors(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
+        logger.debug(f"Running {f.__name__}")
         try:
-            return f(*args, **kwargs)
+            r = f(*args, **kwargs)
         except (CommandError, RuntimeError) as exc:
             logger.error("Error: " + str(exc))
             sys.exit(1)
+        else:
+            logger.debug(f"Success running {f.__name__}")
+            return r
 
     return wrapped
 
@@ -238,6 +242,7 @@ class SqlMigrate(object):
                     include_object=self._include_this_object,
                     process_revision_directives=self._process_revision_directives,
                     target_metadata=self.metadata,
+                    script_directory=self.script_directory,
                 )
 
                 if ensure_migrations_table:
@@ -660,6 +665,7 @@ class SqlMigrate(object):
         x_arg=None,
         max_lookback_days: int = 30,
         sync: bool = False,
+        fix_head: bool = False,
     ) -> None:
         """
 
@@ -679,6 +685,9 @@ class SqlMigrate(object):
         self.get_config(
             self.directory, x_arg=x_arg
         )  # This makes sure that self.current_config has the latest values...
+
+        if revision != "head" and fix_head:
+            raise util.CommandError("Can't fix head if not upgrading to head!")
 
         starting_rev = None
         if ":" in revision:
@@ -708,6 +717,7 @@ class SqlMigrate(object):
                 "starting_rev": starting_rev,
                 "destination_rev": revision,
                 "tag": tag,
+                "fix_head": fix_head,
             }
         )
 

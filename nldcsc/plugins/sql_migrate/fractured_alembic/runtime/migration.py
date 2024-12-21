@@ -22,6 +22,8 @@ from sqlalchemy import (
 from sqlalchemy.engine import url as sqla_url
 from sqlalchemy.exc import OperationalError
 
+from nldcsc.plugins.sql_migrate.fractured_alembic.script.base import SqlScriptDirectory
+
 from ...config.constants import schema_migrations_table
 
 log = logging.getLogger(__name__)
@@ -30,6 +32,16 @@ log = logging.getLogger(__name__)
 class FracturedHeadMaintainer(HeadMaintainer):
     def __init__(self, context: "FracturedMigrationContext", heads: Any) -> None:
         super().__init__(context, heads)
+
+    def stamp(self, revs):
+        self.context.impl._exec(self.context._version.delete())
+
+        for rev in revs:
+            self.context.impl._exec(
+                self.context._version.insert().values(
+                    version_num=literal_column("'%s'" % rev)
+                )
+            )
 
     def update_migration_table(
         self, step: RevisionStep | StampStep, version: int, name: str, duration: int
@@ -58,40 +70,6 @@ class FracturedHeadMaintainer(HeadMaintainer):
             )
         )
 
-    def update_to_step(self, step: RevisionStep | StampStep) -> None:
-        if not self.heads:
-            self._insert_version(step.revision.revision)
-            return
-
-        head, *o = self.heads
-
-        try:
-            datetime.strptime(head, "%Y%m%d%H%M%S")
-        except ValueError:
-            if self.context.is_sync:
-                self._update_version(head, step.revision.revision)
-                return
-            else:
-                raise util.CommandError("Invalid revision to update!")
-
-        if step.is_upgrade:
-            if step.revision.revision > head:
-                log.debug(f"Head update from {head} to {step.revision.revision}")
-                self._update_version(head, step.revision.revision)
-        else:
-            # this function call is a call to the SqlScriptDirectory.get_down_revision.
-            down_revision = self.context.script.get_down_revision(
-                step.revision.revision
-            )
-
-            if down_revision is None:
-                log.debug(f"Head update from {head} to None")
-                self._delete_version(step.revision.revision)
-
-            elif down_revision < head:
-                log.debug(f"Head update from {head} to {down_revision}")
-                self._update_version(head, down_revision)
-
     def __repr__(self):
         return f"<< {self.__class__.__name__ } >>"
 
@@ -111,8 +89,10 @@ class FracturedMigrationContext(MigrationContext):
         environment_context: Optional[EnvironmentContext] = None,
     ):
         self.is_sync = opts.pop("is_sync", False)
+        self.fix_head = opts.pop("fix_head", False)
         super().__init__(dialect, connection, opts, environment_context)
 
+        self._script_directory: SqlScriptDirectory = opts.get("script_directory")
         self._schema_migrations_table = schema_migrations_table
 
     def _ensure_schema_migrations_table(self, purge: bool = False):
@@ -243,6 +223,10 @@ class FracturedMigrationContext(MigrationContext):
                         pass
                     else:
                         raise util.CommandError("Invalid revision to update!")
+
+        if self.fix_head:
+            with self.begin_transaction(_per_migration=True):
+                head_maintainer.stamp(self._script_directory.get_heads())
 
         if self.as_sql and not head_maintainer.heads:
             assert self.connection is not None

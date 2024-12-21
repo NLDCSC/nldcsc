@@ -51,6 +51,8 @@ class SqlEnvironmentContext(EnvironmentContext):
         sqlalchemy_module_prefix: str = "sa.",
         user_module_prefix: Optional[str] = None,
         on_version_apply: Optional[OnVersionApplyFn] = None,
+        script_directroy: Optional[ScriptDirectory] = None,
+        fix_head: Optional[bool] = False,
         **kw: Any,
     ) -> None:
         opts = self.context_opts
@@ -80,6 +82,8 @@ class SqlEnvironmentContext(EnvironmentContext):
         opts["literal_binds"] = literal_binds
         opts["process_revision_directives"] = process_revision_directives
         opts["on_version_apply"] = util.to_tuple(on_version_apply, default=())
+        opts["script_directory"] = script_directroy
+        opts["fix_head"] = fix_head
 
         if render_item is not None:
             opts["render_item"] = render_item

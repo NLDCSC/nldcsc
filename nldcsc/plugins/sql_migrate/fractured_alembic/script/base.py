@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Generator, List, Mapping, Optional, Any
 
 from alembic import migration, util
+from alembic.script.revision import MultipleHeads, RevisionMap
 from alembic.config import MessagingOptions
 from alembic.migration import RevisionStep
 from alembic.script import ScriptDirectory
@@ -23,6 +24,14 @@ class SqlScriptDirectoryContext:
     db: Session
     table: Table
     revision_column: Optional[str] = "version_num"
+
+
+class _RevisionMap(RevisionMap):
+    def get_current_head(self, branch_label: Optional[str] = None):
+        try:
+            return super().get_current_head(branch_label)
+        except MultipleHeads as e:
+            return e.heads[0]
 
 
 class SqlScriptDirectory(ScriptDirectory):
@@ -59,6 +68,8 @@ class SqlScriptDirectory(ScriptDirectory):
             messaging_opts,
         )
         self.context = context
+
+        self.revision_map = _RevisionMap(self._load_revisions)
 
         assert self.context is not None
         self.create_diff_queue()

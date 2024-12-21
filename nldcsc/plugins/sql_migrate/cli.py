@@ -222,9 +222,14 @@ def migrate(ctx, message, sql, head, splice, branch_label, version_path):
     is_flag=True,
     help="Sync the old formatted migration files to the DB. Only available if no newly formatted migrations have been migrated.",
 )
+@click.option(
+    "--fix-head",
+    is_flag=True,
+    help="Fix the head if it is not in sync with the current directory",
+)
 @click.argument("revision", default="head")
 @click.pass_context
-def upgrade(ctx, sql, tag, x_arg, revision, max_lookback_days, sync):
+def upgrade(ctx, sql, tag, x_arg, revision, max_lookback_days, sync, fix_head):
     """Upgrade to a later version"""
     ctx.obj.upgrade(
         revision=revision,
@@ -233,6 +238,7 @@ def upgrade(ctx, sql, tag, x_arg, revision, max_lookback_days, sync):
         x_arg=x_arg,
         max_lookback_days=max_lookback_days,
         sync=sync,
+        fix_head=fix_head,
     )
 
 
