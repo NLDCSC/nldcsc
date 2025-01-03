@@ -27,9 +27,9 @@ def sso_login():
     else:
         redirect_uri = url_for("sso_auth.sso_authorize", _external=True)
     if current_app.config["SSO_CALLBACK_ENDPOINT"]:
-        session[
-            "next"
-        ] = f"{request.root_url}{current_app.config['SSO_CALLBACK_ENDPOINT']}"
+        session["next"] = (
+            f"{request.root_url}{current_app.config['SSO_CALLBACK_ENDPOINT']}"
+        )
     else:
         session["next"] = request.args.get("next", request.root_url)
     return g._sso_auth.authorize_redirect(redirect_uri)
