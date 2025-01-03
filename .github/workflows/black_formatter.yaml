@@ -4,22 +4,27 @@ on:
   - push
   - pull_request
 
-
 jobs:
   linter_name:
-    permissions: write-all
     name: runner / black
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v2
       - name: Check files using the black formatter
-        uses: rickstaa/action-black@v1
+        uses: psf/black@stable
         id: action_black
         with:
           black_args: "."
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+              echo "changes=true" >> "$GITHUB_OUTPUT";
+          fi
       - name: Create Pull Request
-        if: steps.action_black.outputs.is_formatted == 'true' && github.ref == 'refs/heads/master'
-        uses: peter-evans/create-pull-request@v7.0.5
+        if: steps.check_changes.outputs.changes == 'true' && github.ref == 'refs/heads/master'
+        uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Format Python code with psf/black push"
