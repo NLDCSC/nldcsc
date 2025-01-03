@@ -16,8 +16,7 @@ def get_shell_obj(
         def _classmethod(cls, operations, *args, **kwargs):
             cb(cls, operations, *args, **kwargs)
 
-    def __init__(self, *args, **kwargs):
-        ...
+    def __init__(self, *args, **kwargs): ...
 
     def reverse(*args, **kwargs):
         if reverse_obj is not None:

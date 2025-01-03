@@ -132,13 +132,13 @@ class ServerSideDataTable(ABC):
                             check_col_match.group(3)
                         ] = self.request_values[each]
                 else:
-                    col[check_col_match.group(1)][
-                        check_col_match.group(2)
-                    ] = self.request_values[each]
+                    col[check_col_match.group(1)][check_col_match.group(2)] = (
+                        self.request_values[each]
+                    )
             if check_order_match:
-                order[check_order_match.group(1)][
-                    check_order_match.group(2)
-                ] = self.request_values[each]
+                order[check_order_match.group(1)][check_order_match.group(2)] = (
+                    self.request_values[each]
+                )
 
         return col, order
 

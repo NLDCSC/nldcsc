@@ -7,7 +7,7 @@ class FlaskRedis(RedisWrapper):
     ):
         if app and init_standalone:
             raise Exception("App must be None when 'init_standalone' is set to True")
-        
+
         super().__init__(redis_url=redis_url, auto_connect=False, **kwargs)
 
         if app is not None or init_standalone:
