@@ -203,8 +203,10 @@ class SSOConnection(object):
     def get_config_setting(self, config_setting: str):
         with requests.session() as session:
             try:
+                # noinspection RequestsNoVerify
                 req = session.get(
                     self.app.config["SSO_DISCOVERY_URL"],
+                    verify=False,
                     **self.app.config["SSO_DISCOVERY_KWARGS"],
                 )
                 data = req.json()
