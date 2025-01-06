@@ -14,6 +14,8 @@ from flask import (
     url_for,
 )
 
+from nldcsc.sso.monkey_patch.ssl_verification import ssl_verification
+
 logger = logging.getLogger(__name__)
 
 sso_auth = Blueprint("sso_auth", __name__)
@@ -21,6 +23,7 @@ sso_auth = Blueprint("sso_auth", __name__)
 
 # noinspection PyProtectedMember
 @sso_auth.route("/sso_login")
+@ssl_verification
 def sso_login():
     if current_app.config["SSO_OVERWRITE_REDIRECT_URI"]:
         redirect_uri = current_app.config["SSO_OVERWRITE_REDIRECT_URI"]
@@ -37,6 +40,7 @@ def sso_login():
 
 # noinspection PyProtectedMember
 @sso_auth.route("/sso_authorize")
+@ssl_verification
 def sso_authorize():
     try:
         token = g._sso_auth.authorize_access_token()
@@ -58,6 +62,7 @@ def sso_authorize():
 
 # noinspection PyProtectedMember
 @sso_auth.route("/sso_logout")
+@ssl_verification
 def sso_logout():
     """
     Request the browser to please forget the cookie we set, to clear the

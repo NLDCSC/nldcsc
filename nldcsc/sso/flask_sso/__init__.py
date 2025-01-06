@@ -20,6 +20,8 @@ from nldcsc.sso.flask_sso.sso_views import sso_auth
 
 __all__ = ["SSOConnection"]
 
+from nldcsc.sso.monkey_patch.ssl_verification import ssl_verification
+
 
 # noinspection PyProtectedMember
 class IntrospectTokenValidator(BaseIntrospectTokenValidator):
@@ -120,6 +122,10 @@ class SSOConnection(object):
             os.getenv("SSO_TOKEN_ENDPOINT_AUTH_METHOD", "client_secret_post"),
         )
 
+        self.app.config.setdefault(
+            "SSO_TLS_VERIFICATION", getenv_bool("SSO_TLS_VERIFICATION", "True")
+        )
+
         self.oauth = OAuth(self.app)
         self.oauth.register(
             name="sso",
@@ -144,6 +150,7 @@ class SSOConnection(object):
         g._sso_auth = self.oauth.sso
         return self.check_token_expiry()
 
+    @ssl_verification
     def check_token_expiry(self):
         try:
             token = session.get("sso_auth_token")
@@ -163,6 +170,7 @@ class SSOConnection(object):
             self.logger.exception("Could not check token expiration")
             abort(500, f"{e.__class__.__name__}: {e}")
 
+    @ssl_verification
     def ensure_active_token(self, token: OAuth2Token):
         metadata = self.oauth.sso.load_server_metadata()
         with self.oauth.sso._get_oauth_client(**metadata) as session:
@@ -200,6 +208,7 @@ class SSOConnection(object):
         else:
             return req_data
 
+    @ssl_verification
     def get_config_setting(self, config_setting: str):
         with requests.session() as session:
             try:
@@ -260,6 +269,7 @@ class SSOConnection(object):
 
         return decorated
 
+    @ssl_verification
     def logout(self):
         """
         Request the browser to please forget the cookie we set, to clear the
