@@ -1,3 +1,4 @@
+---
 name: Security check - Bandit
 
 on:
@@ -9,23 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
-        python-version: [ '3.10', '3.11' ]
+        os: [ubuntu-latest]
+        python-version: ['3.10', '3.11']
     name: Python ${{ matrix.python-version }} ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.1
 
-    - name: Security check - Bandit
-      uses: Joel-hanson/bandit-report-artifacts@V1
-      with:
-        python_version: ${{ matrix.python-version }}
-        project_path: .
-        ignore_failure: true
+      - name: Security check - Bandit
+        uses: Joel-hanson/bandit-report-artifacts@V1
+        with:
+          python_version: ${{ matrix.python-version }}
+          project_path: .
+          ignore_failure: true
 
-    - name: Security check report artifacts
-      uses: actions/upload-artifact@v3
-      # if: failure()
-      with:
-        name: Security report
-        path: output/security_report.txt
+      - name: Security check report artifacts
+        uses: actions/upload-artifact@v4.6.0
+        # if: failure()
+        with:
+          name: Security report
+          path: output/security_report.txt
