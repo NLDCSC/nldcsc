@@ -1,8 +1,9 @@
 import asyncio
-from functools import wraps
-from json import dumps, loads
 from base64 import b64encode
+from functools import wraps
 from inspect import signature, Parameter
+from json import dumps, loads
+
 from redis import Redis
 from redis.asyncio import Redis as RedisAsync
 
@@ -76,33 +77,33 @@ def get_cache_lua_fn(client):
     if not hasattr(client, "_lua_cache_fn"):
         client._lua_cache_fn = client.register_script(
             """
-local ttl = tonumber(ARGV[2])
-local value
-if ttl > 0 then
-  value = redis.call('SETEX', KEYS[1], ttl, ARGV[1])
-else
-  value = redis.call('SET', KEYS[1], ARGV[1])
-end
-local limit = tonumber(ARGV[3])
-if limit > 0 then
-  local time_parts = redis.call('TIME')
-  local time = tonumber(time_parts[1] .. '.' .. time_parts[2])
-  redis.call('ZADD', KEYS[2], time, KEYS[1])
-  local count = tonumber(redis.call('ZCOUNT', KEYS[2], '-inf', '+inf'))
-  local over = count - limit
-  if over > 0 then
-    local stale_keys_and_scores = redis.call('ZPOPMIN', KEYS[2], over)
-    -- Remove the the scores and just leave the keys
-    local stale_keys = {}
-    for i = 1, #stale_keys_and_scores, 2 do
-      stale_keys[#stale_keys+1] = stale_keys_and_scores[i]
-    end
-    redis.call('ZREM', KEYS[2], unpack(stale_keys))
-    redis.call('DEL', unpack(stale_keys))
-  end
-end
-return value
-"""
+            local ttl = tonumber(ARGV[2])
+            local value
+            if ttl > 0 then
+              value = redis.call('SETEX', KEYS[1], ttl, ARGV[1])
+            else
+              value = redis.call('SET', KEYS[1], ARGV[1])
+            end
+            local limit = tonumber(ARGV[3])
+            if limit > 0 then
+              local time_parts = redis.call('TIME')
+              local time = tonumber(time_parts[1] .. '.' .. time_parts[2])
+              redis.call('ZADD', KEYS[2], time, KEYS[1])
+              local count = tonumber(redis.call('ZCOUNT', KEYS[2], '-inf', '+inf'))
+              local over = count - limit
+              if over > 0 then
+                local stale_keys_and_scores = redis.call('ZPOPMIN', KEYS[2], over)
+                -- Remove the the scores and just leave the keys
+                local stale_keys = {}
+                for i = 1, #stale_keys_and_scores, 2 do
+                  stale_keys[#stale_keys+1] = stale_keys_and_scores[i]
+                end
+                redis.call('ZREM', KEYS[2], unpack(stale_keys))
+                redis.call('DEL', unpack(stale_keys))
+              end
+            end
+            return value
+            """
         )
     return client._lua_cache_fn
 
@@ -146,7 +147,7 @@ async def async_chunks(iterable, n):
 class RedisCache:
     def __init__(
         self,
-        redis_client,
+        redis_client: Redis | RedisAsync,
         prefix="rc",
         serializer=compact_dump,
         deserializer=loads,
@@ -178,6 +179,38 @@ class RedisCache:
             exception_handler=exception_handler or self.exception_handler,
             active=self.active,
         )
+
+    def set(self, name, value, **kwargs):
+        if self.client and not isinstance(self.client, Redis):
+            raise RuntimeError(
+                "This method can only be used with a synchronous Redis client"
+            )
+        data = self.client.set(name, value, **kwargs)
+        return data
+
+    async def async_set(self, name, value, **kwargs):
+        if self.client and not isinstance(self.client, RedisAsync):
+            raise RuntimeError(
+                "This method can only be used with an async Redis client"
+            )
+        data = await self.client.set(name, value, **kwargs)
+        return data
+
+    def get(self, name):
+        if self.client and not isinstance(self.client, Redis):
+            raise RuntimeError(
+                "This method can only be used with a synchronous Redis client"
+            )
+        data = self.client.get(name)
+        return data
+
+    async def async_get(self, name):
+        if self.client and not isinstance(self.client, RedisAsync):
+            raise RuntimeError(
+                "This method can only be used with an async Redis client"
+            )
+        data = await self.client.get(name)
+        return data
 
     def mget(self, *fns_with_args):
         if self.client and not isinstance(self.client, Redis):
