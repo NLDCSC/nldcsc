@@ -12,6 +12,7 @@ from httpx import (
     HTTPError,
     Response,
 )
+
 from nldcsc.loggers.app_logger import AppLogger
 
 logging.setLoggerClass(AppLogger)
@@ -49,7 +50,20 @@ class HttpxBaseClass(object):
 
         self.baseurl = baseurl
         self.api_path = api_path
-        self.proxies = proxies
+
+        # httpx clients no longer use a multidict for proxies; now they only refer to a single proxy
+        # so let's check the dict key on https first and http second; then use the value to build a httpx.URL object
+        # url = httpx.URL("HTTPS://jo%40email.com:a%20secret@müller.de:1234/pa%20th?search=ab#anchorlink")
+        if "https" in proxies:
+            proxy = httpx.URL(proxies["https"])
+        elif "http" in proxies:
+            proxy = httpx.URL(proxies["http"])
+        else:
+            raise ValueError(
+                "Argument 'proxies' must contain http or https key and a full url as value"
+            )
+
+        self.proxies = proxy
         self.user_agent = user_agent
         self.use_async_client = use_async_client
         self.kwargs = kwargs
@@ -129,7 +143,7 @@ class HttpxBaseClass(object):
         transport = HTTPTransport(retries=3, http2=self.http2)
         client = httpx.Client(
             verify=self.verify,
-            proxies=self.proxies,
+            proxy=self.proxies,
             follow_redirects=self.follow_redirects,
             transport=transport,
             http2=self.http2,
@@ -142,7 +156,7 @@ class HttpxBaseClass(object):
         transport = AsyncHTTPTransport(retries=3, http2=self.http2)
         client = httpx.AsyncClient(
             verify=self.verify,
-            proxies=self.proxies,
+            proxy=self.proxies,
             follow_redirects=self.follow_redirects,
             transport=transport,
             http2=self.http2,
