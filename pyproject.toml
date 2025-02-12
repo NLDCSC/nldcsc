@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.25"
+version = "0.3.26"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -132,7 +132,7 @@ sqlalchemy = ">=2.0.21"
 redis = ">=4.6.0"
 
 [tool.poetry.group.cache_redis.dependencies]
-redis = ">=5.2.1"
+redis = ">=5.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
