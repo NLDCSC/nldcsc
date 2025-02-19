@@ -1,7 +1,11 @@
 import re
+from typing import Callable
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.query import Query
 from sqlalchemy import or_, and_
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.sql.elements import BinaryExpression
 
 from nldcsc.datatables.server_side_dt import ServerSideDataTable
 from nldcsc.generic.utils import str2bool
@@ -20,9 +24,12 @@ class SQLServerSideDataTable(ServerSideDataTable):
         backend: SQLAlchemy,
         target_model: str,
         model_mapping: dict,
-        additional_filters: list = None,
+        additional_filters: list[BinaryExpression] = None,
         use_column_filters: bool = False,
-        custom_column_filters: dict = None,
+        custom_column_filters: dict[
+            str, Callable[[InstrumentedAttribute, str, bool], BinaryExpression]
+        ] = None,
+        query_hook: Callable[[Query], Query] = None,
         **kwargs,
     ):
         if additional_filters is None:
@@ -35,6 +42,7 @@ class SQLServerSideDataTable(ServerSideDataTable):
         self.additional_filters = additional_filters
         self.use_column_filters = use_column_filters
         self.custom_column_filters = custom_column_filters
+        self.query_hook = query_hook
 
         self.models = model_mapping
 
@@ -86,13 +94,16 @@ class SQLServerSideDataTable(ServerSideDataTable):
         """
         Method responsible for querying the backend and fetching the results from the database
         """
-        query = self.models[self.target_model].query
+        query: Query = self.models[self.target_model].query
 
         for query_filter in self.additional_filters:
             query = query.filter(query_filter)
 
         if len(self.filtered) != 0:
             query = query.filter(*self.filtered)
+
+        if self.query_hook:
+            query = self.query_hook(query)
 
         data_objects = (
             query.order_by(*self.sort)
