@@ -1,5 +1,5 @@
 import re
-from typing import Callable
+from typing import Callable, Iterable
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.query import Query
@@ -27,11 +27,27 @@ class SQLServerSideDataTable(ServerSideDataTable):
         additional_filters: list[BinaryExpression] = None,
         use_column_filters: bool = False,
         custom_column_filters: dict[
-            str, Callable[[InstrumentedAttribute, str, bool], BinaryExpression]
+            str,
+            Callable[[InstrumentedAttribute, str, bool], Iterable[BinaryExpression]],
         ] = None,
         query_hook: Callable[[Query], Query] = None,
         **kwargs,
     ):
+        """
+        Sql server side datatable.
+
+        Generates a response needed from a datatable request.
+
+        Args:
+            request (request): The request the datatable info is in.
+            backend (SQLAlchemy): The backend to use to retrieve data from.
+            target_model (str): The targeted model to fetch.
+            model_mapping (dict): Mapping of models to their class.
+            additional_filters (list[BinaryExpression], optional): list of additional filter to apply. Defaults to None.
+            use_column_filters (bool, optional): apply filters on the column level. Defaults to False.
+            custom_column_filters (dict[ str, Callable[[InstrumentedAttribute, str, bool], BinaryExpression] ], optional): apply a custom filter to specific columns. Defaults to None.
+            query_hook (Callable[[Query], Query], optional): hook that is called before the query is submitted, gives the ability to modify the query. Defaults to None.
+        """
         if additional_filters is None:
             additional_filters = []
 
