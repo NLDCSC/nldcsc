@@ -47,11 +47,11 @@ class ApiBaseClass(object):
         """return a string representation of the obj GenericApi"""
         return f"<< ApiBaseClass:{self.baseurl} >>"
 
-    def _build_url(self, resource: str) -> str:
+    def _build_url(self, resource: str, ignore_api_path: bool = False) -> str:
         """
         Internal method to build a url to use when executing commands
         """
-        if self.api_path is None:
+        if self.api_path is None or ignore_api_path:
             return f"{self.baseurl}/{resource}"
         else:
             return f"{self.baseurl}/{self.api_path}/{resource}"
@@ -65,6 +65,7 @@ class ApiBaseClass(object):
         timeout: int = 60,
         return_response_object: bool = False,
         stream: bool = False,
+        ignore_api_path: bool = False,
     ) -> Response | str | Any:
         """
         Send a request
@@ -117,23 +118,33 @@ class ApiBaseClass(object):
         try:
             if method == self.methods.POST:
                 r = session.post(
-                    self._build_url(resource), stream=stream, **request_api_resource
+                    self._build_url(resource, ignore_api_path),
+                    stream=stream,
+                    **request_api_resource,
                 )
             elif method == self.methods.PUT:
                 r = session.put(
-                    self._build_url(resource), stream=stream, **request_api_resource
+                    self._build_url(resource, ignore_api_path),
+                    stream=stream,
+                    **request_api_resource,
                 )
             elif method == self.methods.PATCH:
                 r = session.patch(
-                    self._build_url(resource), stream=stream, **request_api_resource
+                    self._build_url(resource, ignore_api_path),
+                    stream=stream,
+                    **request_api_resource,
                 )
             elif method == self.methods.DELETE:
                 r = session.delete(
-                    self._build_url(resource), stream=stream, **request_api_resource
+                    self._build_url(resource, ignore_api_path),
+                    stream=stream,
+                    **request_api_resource,
                 )
             else:
                 r = session.get(
-                    self._build_url(resource), stream=stream, **request_api_resource
+                    self._build_url(resource, ignore_api_path),
+                    stream=stream,
+                    **request_api_resource,
                 )
 
             try:
@@ -197,6 +208,7 @@ class ApiBaseClass(object):
         timeout: int = 60,
         return_response_object: bool = False,
         stream: bool = False,
+        ignore_api_path: bool = False,
     ) -> Response | str | Any:
         """
         Method for requesting free format api resources
@@ -211,6 +223,7 @@ class ApiBaseClass(object):
                     timeout=timeout,
                     return_response_object=return_response_object,
                     stream=stream,
+                    ignore_api_path=ignore_api_path,
                 )
                 return result
         except requests.ConnectionError:
