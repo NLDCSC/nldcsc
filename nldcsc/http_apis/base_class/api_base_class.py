@@ -45,7 +45,7 @@ class ApiBaseClass(object):
 
     def __repr__(self) -> str:
         """return a string representation of the obj GenericApi"""
-        return f"<< ApiBaseClass:{self.baseurl} >>"
+        return f"<<{self.__class__.__name__}: {self.baseurl}>>"
 
     def _build_url(self, resource: str, ignore_api_path: bool = False) -> str:
         """
