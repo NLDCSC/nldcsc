@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 
 from pydantic import BaseModel
 
@@ -19,12 +19,12 @@ class Email(BaseModel):
     From: List[str] | str
     To: List[str] | str
     Subject: str
-    Cc: List[str] | str = None
-    Bcc: List[str] | str = None
-    Headers: dict[str, str] = None
-    Attachments: List[EmailAttachment] = None
+    Cc: Optional[List[str] | str] = None
+    Bcc: Optional[List[str] | str] = None
+    Headers: Optional[dict[str, str]] = None
+    Attachments: Optional[List[EmailAttachment]] = None
     TemplateData: dict[str, Any]
-    Send_at: int = None
+    Send_at: Optional[int] = None
 
     # {
     #     "From": "sender@example.com",
