@@ -1,8 +1,10 @@
 import logging
 
+from typing import List
 from nldcsc.http_apis.base_class.api_base_class import ApiBaseClass
 from nldcsc.loggers.app_logger import AppLogger
 from nldcsc.plugins.whoisxml.objects.whois import WhoisRecord
+from nldcsc.plugins.whoisxml.objects.reverse_ns import WhoisReverseNSRecord
 
 logging.setLoggerClass(AppLogger)
 
@@ -147,3 +149,60 @@ class WhoisXMLAPI(ApiBaseClass):
             return WhoisRecord(**response["WhoisRecord"])
         else:
             return response
+
+
+class WhoisReverseNSAPI(ApiBaseClass):
+    def __init__(
+        self,
+        api_key: str,
+        baseurl: str = "https://reverse-ns.whoisxmlapi.com",
+        api_path: str = "api/v1",
+        proxies: dict = None,
+        user_agent: str = "Certex",
+        **kwargs,
+    ):
+        super().__init__(
+            baseurl=baseurl,
+            api_path=api_path,
+            proxies=proxies,
+            user_agent=user_agent,
+            **kwargs,
+        )
+        self.api_key = api_key
+
+    def get_domains(
+        self, ns_value: str, get_obj: bool = False
+    ) -> List[WhoisReverseNSRecord]:
+        """
+
+
+        Finds domain names associated with a nameserver using the WhoisXML Reverse NS API.
+        Args:
+            ns_value (str): The nameserver value to query for associated domain names.
+            get_obj (bool, optional): If True, returns a list of WhoisReverseNSRecord objects.
+                    If False, returns a list of raw dictionary results. Defaults to False.
+        Returns:
+            List[WhoisReverseNSRecord] or List[dict]: A list of domain names associated with the given nameserver.
+                    The format depends on the value of `get_obj`.
+        Notes:
+            - The API is paginated, and this method handles pagination automatically.
+            - If the API response contains fewer than 300 results, it assumes there are no more pages.
+            - Refer to the API documentation for more details:
+                    https://reverse-ns.whoisxmlapi.com/api/documentation/making-requests
+
+        """
+        page = 1
+        all_results = []
+        while True:
+            resource = f"?apiKey={self.api_key}&ns={ns_value}&from={page}"
+            response: dict = self.call(method=self.methods.GET, resource=resource)
+            if "result" not in response or not response["result"]:
+                break
+            all_results.extend(response["result"])
+            if len(response["result"]) < 300:
+                break
+            page = response["result"][-1]["name"]
+        if get_obj:
+            return [WhoisReverseNSRecord(**record) for record in all_results]
+        else:
+            return all_results
