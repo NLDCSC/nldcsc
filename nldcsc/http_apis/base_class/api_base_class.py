@@ -134,10 +134,14 @@ class ApiBaseClass(object):
                         return r
                     if r.status_code >= 400:
                         if isinstance(r.text, str):
-                            raise requests.exceptions.ConnectionError(r.text)
+                            raise requests.exceptions.ConnectionError(
+                                r.text, **{"response": r}
+                            )
                         else:
                             the_response = json.loads(r.text)
-                            raise requests.exceptions.ConnectionError(the_response)
+                            raise requests.exceptions.ConnectionError(
+                                the_response, **{"response": r}
+                            )
                     else:
                         the_response = json.loads(r.text)
                 else:
