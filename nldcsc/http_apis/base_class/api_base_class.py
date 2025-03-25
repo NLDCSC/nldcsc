@@ -176,9 +176,9 @@ class ApiBaseClass(object):
 
             return the_response
         except requests.exceptions.ConnectionError as err:
-            raise requests.exceptions.ConnectionError(err)
+            raise
         except Exception as err:
-            raise Exception(err)
+            raise
 
     def get_session(
         self,
