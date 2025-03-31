@@ -171,7 +171,7 @@ class WhoisReverseNSAPI(ApiBaseClass):
         self.api_key = api_key
 
     def get_domains(
-        self, ns_value: str, get_obj: bool = False
+        self, ns_value: str, max_queries: int = None, get_obj: bool = False
     ) -> List[WhoisReverseNSRecord]:
         """
 
@@ -179,6 +179,7 @@ class WhoisReverseNSAPI(ApiBaseClass):
         Finds domain names associated with a nameserver using the WhoisXML Reverse NS API.
         Args:
             ns_value (str): The nameserver value to query for associated domain names.
+            max_queries (int): The maximum number of queries to run. The API returns up to 300 results per query.
             get_obj (bool, optional): If True, returns a list of WhoisReverseNSRecord objects.
                     If False, returns a list of raw dictionary results. Defaults to False.
         Returns:
@@ -193,9 +194,13 @@ class WhoisReverseNSAPI(ApiBaseClass):
         """
         page = 1
         all_results = []
+        query_count = 0
         while True:
+            if max_queries and query_count >= max_queries:
+                break
             resource = f"?apiKey={self.api_key}&ns={ns_value}&from={page}"
             response: dict = self.call(method=self.methods.GET, resource=resource)
+            query_count += 1
             if "result" not in response or not response["result"]:
                 break
             all_results.extend(response["result"])
