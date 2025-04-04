@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.37"
+version = "0.3.38"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
