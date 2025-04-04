@@ -142,7 +142,7 @@ class HttpxBaseClass(object):
         self.myheaders = None
 
     def create_sync_client(self, **kwargs) -> Client:
-        transport = HTTPTransport(retries=3, http2=self.http2)
+        transport = HTTPTransport(retries=3, http2=self.http2, verify=self.verify)
         client = httpx.Client(
             verify=self.verify,
             proxy=self.proxies,
@@ -155,7 +155,7 @@ class HttpxBaseClass(object):
         return client
 
     def create_async_client(self, **kwargs) -> AsyncClient:
-        transport = AsyncHTTPTransport(retries=3, http2=self.http2)
+        transport = AsyncHTTPTransport(retries=3, http2=self.http2, verify=self.verify)
         client = httpx.AsyncClient(
             verify=self.verify,
             proxy=self.proxies,
