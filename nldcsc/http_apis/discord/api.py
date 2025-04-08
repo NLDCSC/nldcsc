@@ -10,7 +10,7 @@ class DiscordWebhookApi(ApiBaseClass):
         webhook_id,
         token,
         proxies=None,
-        user_agent="Reaper",
+        user_agent="NLDCSC",
     ):
         super().__init__(
             self.DISCORD_URL,
