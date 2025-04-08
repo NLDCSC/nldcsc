@@ -19,7 +19,7 @@ class DiscordWebhookApi(ApiBaseClass):
             user_agent,
         )
 
-    def _build_url(self, resource: str) -> str:
+    def _build_url(self, resource: str, *args, **kwargs) -> str:
         """
         Internal method to build a url to use when executing commands
         """
