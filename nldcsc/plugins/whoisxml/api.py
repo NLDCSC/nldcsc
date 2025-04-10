@@ -7,6 +7,7 @@ from nldcsc.plugins.whoisxml.objects.whois import (
     WhoisRecord,
     WhoisReverseNSRecord,
     WhoisReverseMXRecord,
+    WhoisReverseIPRecord,
 )
 
 
@@ -275,5 +276,66 @@ class WhoisReverseMXAPI(ApiBaseClass):
             page = response["result"][-1]["name"]
         if get_obj:
             return [WhoisReverseMXRecord(**record) for record in all_results]
+        else:
+            return all_results
+
+
+class WhoisReverseIPAPI(ApiBaseClass):
+    def __init__(
+        self,
+        api_key: str,
+        baseurl: str = "https://reverse-ip.whoisxmlapi.com",
+        api_path: str = "api/v1",
+        proxies: dict = None,
+        user_agent: str = "Certex",
+        **kwargs,
+    ):
+        super().__init__(
+            baseurl=baseurl,
+            api_path=api_path,
+            proxies=proxies,
+            user_agent=user_agent,
+            **kwargs,
+        )
+        self.api_key = api_key
+
+    def get_domains(
+        self, ip_value: str, max_queries: int = None, get_obj: bool = False
+    ) -> List[WhoisReverseIPRecord]:
+        """
+
+
+        Finds domain names associated with an ip using the WhoisXML Reverse IP API.
+        Args:
+            ip_value (str): The ip value to query for associated domain names.
+            max_queries (int): The maximum number of queries to run. The API returns up to 300 results per query.
+            get_obj (bool, optional): If True, returns a list of WhoisReverseIPRecord objects.
+                    If False, returns a list of raw dictionary results. Defaults to False.
+        Returns:
+            List[WhoisReverseIPRecord] or List[dict]: A list of domain names associated with the given ip.
+                    The format depends on the value of `get_obj`.
+        Notes:
+            - The API is paginated, and this method handles pagination automatically.
+            - If the API response contains fewer than 300 results, it assumes there are no more pages.
+            - Refer to the API documentation for more details:
+                    https://reverse-ip.whoisxmlapi.com/api/documentation/making-requests
+        """
+        page = 1
+        all_results = []
+        query_count = 0
+        while True:
+            if max_queries and query_count >= max_queries:
+                break
+            resource = f"?apiKey={self.api_key}&ip={ip_value}&from={page}"
+            response: dict = self.call(method=self.methods.GET, resource=resource)
+            query_count += 1
+            if "result" not in response or not response["result"]:
+                break
+            all_results.extend(response["result"])
+            if len(response["result"]) < 300:
+                break
+            page = response["result"][-1]["name"]
+        if get_obj:
+            return [WhoisReverseIPRecord(**record) for record in all_results]
         else:
             return all_results

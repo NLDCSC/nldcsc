@@ -178,3 +178,11 @@ class WhoisReverseMXRecord:
     name: str = ""
     first_seen: int = 0
     last_visit: int = 0
+
+
+@dataclass_json
+@dataclass
+class WhoisReverseIPRecord:
+    name: str = ""
+    first_seen: int = 0
+    last_visit: int = 0
