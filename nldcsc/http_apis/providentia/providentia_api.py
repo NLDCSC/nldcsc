@@ -52,3 +52,11 @@ class ProvidentiaApi(ApiBaseClass):
     def environment_actors(self, environment: str) -> dict:
         resource = f"/{environment}/actors"
         return self.call(self.methods.GET, resource)
+
+    def environment_services(self, environment: str) -> dict:
+        resource = f"/{environment}/services"
+        return self.call(self.methods.GET, resource)
+
+    def environment_services_id(self, environment: str, service_id: str) -> dict:
+        resource = f"/{environment}/services/{service_id}"
+        return self.call(self.methods.GET, resource)
