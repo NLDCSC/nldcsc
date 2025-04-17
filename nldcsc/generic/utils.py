@@ -74,7 +74,9 @@ def getenv_choice(
             raise ValueError(f"{name} is not set!")
 
     if raw not in choices:
-        raise ValueError(f"{name} is not a valid choice!")
+        raise ValueError(
+            f"The variable {name} is not set to a valid choice, choices are {choices}!"
+        )
 
     return raw
 
