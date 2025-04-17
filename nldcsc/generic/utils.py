@@ -64,6 +64,21 @@ def getenv_str(name: str, default: str = None, mandatory: bool = False):
     return raw
 
 
+def getenv_choice(
+    name: str, choices: list[str], default: str = None, mandatory: bool = False
+):
+    raw = os.getenv(name, default)
+
+    if mandatory:
+        if raw == __MANDATORY_VALUE__:
+            raise ValueError(f"{name} is not set!")
+
+    if raw not in choices:
+        raise ValueError(f"{name} is not a valid choice!")
+
+    return raw
+
+
 _true_set = {"yes", "true", "t", "y", "1"}
 _false_set = {"no", "false", "f", "n", "0"}
 
