@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 from typing import List, Optional
 from datetime import datetime
 
 
+@dataclass_json
 @dataclass
 class Certificate:
     owner: Optional[str] = None
@@ -14,6 +16,7 @@ class Certificate:
     valid_until: Optional[datetime] = None
 
 
+@dataclass_json
 @dataclass
 class ExtractedFile:
     name: Optional[str] = None
@@ -33,6 +36,7 @@ class ExtractedFile:
     file_available_to_download: Optional[bool] = None
 
 
+@dataclass_json
 @dataclass
 class FileMetadata:
     file_compositions: Optional[List[str]] = None
@@ -41,6 +45,7 @@ class FileMetadata:
     total_file_compositions_imports: Optional[int] = None
 
 
+@dataclass_json
 @dataclass
 class FileAccess:
     type: Optional[str] = None
@@ -48,12 +53,14 @@ class FileAccess:
     mask: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class CreatedFile:
     file: Optional[str] = None
     null_byte: Optional[bool] = None
 
 
+@dataclass_json
 @dataclass
 class RegistryEntry:
     operation: Optional[str] = None
@@ -64,6 +71,7 @@ class RegistryEntry:
     status_human_readable: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class Handle:
     id: Optional[int] = None
@@ -71,12 +79,14 @@ class Handle:
     path: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class SignatureMatch:
     id: Optional[str] = None
     value: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class Stream:
     uid: Optional[str] = None
@@ -87,6 +97,7 @@ class Stream:
     matched_signatures: Optional[List[SignatureMatch]] = None
 
 
+@dataclass_json
 @dataclass
 class ScriptParameter:
     name: Optional[str] = None
@@ -96,6 +107,7 @@ class ScriptParameter:
     meaning: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class ScriptCall:
     cls_id: Optional[str] = None
@@ -106,12 +118,14 @@ class ScriptCall:
     matched_malicious_signatures: Optional[List[str]] = None
 
 
+@dataclass_json
 @dataclass
 class ProcessFlag:
     name: Optional[str] = None
     data: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class AmsiCall:
     app_name: Optional[str] = None
@@ -119,6 +133,7 @@ class AmsiCall:
     raw_script_content: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class Module:
     path: Optional[str] = None
@@ -126,6 +141,7 @@ class Module:
     interesting: Optional[bool] = None
 
 
+@dataclass_json
 @dataclass
 class Process:
     uid: Optional[str] = None
@@ -151,6 +167,7 @@ class Process:
     modules: Optional[List[Module]] = None
 
 
+@dataclass_json
 @dataclass
 class MitreAttackParent:
     technique: Optional[str] = None
@@ -158,6 +175,7 @@ class MitreAttackParent:
     attck_id_wiki: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class MitreAttack:
     tactic: Optional[str] = None
@@ -173,6 +191,7 @@ class MitreAttack:
     informative_identifiers: Optional[List[str]] = None
 
 
+@dataclass_json
 @dataclass
 class Signature:
     threat_level: Optional[int] = None
@@ -189,6 +208,7 @@ class Signature:
     attck_id_wiki: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class Submission:
     submission_id: Optional[str] = None
@@ -197,12 +217,14 @@ class Submission:
     created_at: Optional[datetime] = None
 
 
+@dataclass_json
 @dataclass
 class MLModelData:
     id: Optional[str] = None
     value: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class MachineLearningModel:
     name: Optional[str] = None
@@ -212,6 +234,7 @@ class MachineLearningModel:
     created_at: Optional[datetime] = None
 
 
+@dataclass_json
 @dataclass
 class ExecutableProcessMemoryAnalysis:
     filename: Optional[str] = None
@@ -224,6 +247,7 @@ class ExecutableProcessMemoryAnalysis:
     verdict: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class AnalysisRelatedUrl:
     url: Optional[str] = None
@@ -231,6 +255,7 @@ class AnalysisRelatedUrl:
     type: Optional[str] = None
 
 
+@dataclass_json
 @dataclass
 class CrowdstrikeAI:
     executable_process_memory_analysis: Optional[
@@ -239,6 +264,7 @@ class CrowdstrikeAI:
     analysis_related_urls: Optional[List[AnalysisRelatedUrl]] = None
 
 
+@dataclass_json
 @dataclass
 class HybridAnalysisHashRecord:
     job_id: Optional[str] = None
