@@ -146,43 +146,13 @@ class SQLServerSideDataTable(ServerSideDataTable):
 
         return ret_list
 
-    def get_filter_args(
-        self, column: str, filter_val: str, is_regex: bool, check_date: bool = True
-    ) -> list:
-        """
-        parses search values to valid search expressions for sqlalchemy.
-
-        when searching without regex the <>, >, < and ~ operators are supported.
-        where <> searches between two values, > searches for larger values, < searches for smaller values and ~
-        reverses the search operation. If only ~ is searched it is treated as a NULL filter, meaning column must
-        be holding value NULL.
-
-        when searching with regex only ~ is supported, reversing the search to a negate search.
-
-        If a custom filter is given for a column that function will be called with the column, filter_val and is_regex.
-        If the custom filter can't filter the values it can raise a ValueError to proceed with the normal filters.
-        The custom filter should return a list of filters.
-            Example:
-                def my_custom_filter(col: InstrumentedAttribute, filter_val: str, is_regex: bool):
-                    if filter_val.startswith("A"):
-                        return [col != "A", col != "a"]
-                    else:
-                        raise ValueError
-
-        Args:
-            column (str): str value representing the ORM column to filter on.
-            filter_val (str): value to search on.
-            is_regex (bool): if the search is a regex search or a regular search
-            check_date (bool, optional): will check if strings represent a date and convert it to a timestamp value.
-            Defaults to True.
-
-        Returns:
-            list: List of filter values
-        """
-        filter_val = str(filter_val)
-
-        custom_filter = self.custom_column_filters.get(column, None)
-
+    @staticmethod
+    def default_filter(
+        col: InstrumentedAttribute,
+        filter_val: str,
+        is_regex: bool,
+        check_date: bool = True,
+    ) -> list[BinaryExpression]:
         def is_date(value: str) -> int | str:
             if not check_date:
                 return value
@@ -195,20 +165,6 @@ class SQLServerSideDataTable(ServerSideDataTable):
             return value
 
         filter_args = []
-
-        try:
-            col = getattr(self.models[self.target_model], column)
-        except AttributeError:
-            return filter_args
-
-        if custom_filter is not None:
-            try:
-                # noinspection PyCallingNonCallable
-                filter_args.extend(custom_filter(col, filter_val, is_regex))
-                return filter_args
-            except ValueError:
-                # If the custom filter throws a ValueError we apply the normal filters
-                pass
 
         if is_regex:
             try:
@@ -252,6 +208,63 @@ class SQLServerSideDataTable(ServerSideDataTable):
                 filter_args.append(~col.like(f"%{filter_val}%"))
         else:
             filter_args.append(col.like(f"%{filter_val}%"))
+
+        return filter_args
+
+    def get_filter_args(
+        self, column: str, filter_val: str, is_regex: bool, check_date: bool = True
+    ) -> list:
+        """
+        parses search values to valid search expressions for sqlalchemy.
+
+        when searching without regex the <>, >, < and ~ operators are supported.
+        where <> searches between two values, > searches for larger values, < searches for smaller values and ~
+        reverses the search operation. If only ~ is searched it is treated as a NULL filter, meaning column must
+        be holding value NULL.
+
+        when searching with regex only ~ is supported, reversing the search to a negate search.
+
+        If a custom filter is given for a column that function will be called with the column, filter_val and is_regex.
+        If the custom filter can't filter the values it can raise a ValueError to proceed with the normal filters.
+        The custom filter should return a list of filters.
+            Example:
+                def my_custom_filter(col: InstrumentedAttribute, filter_val: str, is_regex: bool):
+                    if filter_val.startswith("A"):
+                        return [col != "A", col != "a"]
+                    else:
+                        raise ValueError
+
+        Args:
+            column (str): str value representing the ORM column to filter on.
+            filter_val (str): value to search on.
+            is_regex (bool): if the search is a regex search or a regular search
+            check_date (bool, optional): will check if strings represent a date and convert it to a timestamp value.
+            Defaults to True.
+
+        Returns:
+            list: List of filter values
+        """
+        filter_val = str(filter_val)
+
+        custom_filter = self.custom_column_filters.get(column, None)
+
+        filter_args = []
+
+        try:
+            col = getattr(self.models[self.target_model], column)
+        except AttributeError:
+            return filter_args
+
+        if custom_filter is not None:
+            try:
+                # noinspection PyCallingNonCallable
+                filter_args.extend(custom_filter(col, filter_val, is_regex))
+                return filter_args
+            except ValueError:
+                # If the custom filter throws a ValueError we apply the normal filters
+                pass
+
+        filter_args.extend(self.default_filter(col, filter_val, is_regex, check_date))
 
         return filter_args
 
