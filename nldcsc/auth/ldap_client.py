@@ -22,10 +22,14 @@ class LDAPClient(object):
         ldap_ipa_superuser_groups: list = None,
         ldap_ipa_groups: list = None,
         ldap_ca_cert_file: str = None,
+        ldap_user_template: str = "uid={user_id}",
+        ldap_member_field: str = "memberOf",
+        ldap_display_name_field: str = "displayName",
     ):
         self._url = url
         self._username = username
         self._password = password
+
         self.ldap_user_base = ldap_user_base
         self.ldap_ipa_admin_groups = self.convert_to_bytes(ldap_ipa_admin_groups)
         self.ldap_ipa_superuser_groups = self.convert_to_bytes(
@@ -36,7 +40,11 @@ class LDAPClient(object):
             + self.ldap_ipa_superuser_groups
             + self.convert_to_bytes(ldap_ipa_groups)
         )
-        self.ldap_username = f"uid={self._username},{self.ldap_user_base}"
+        self.ldap_user_template = ldap_user_template
+        self.ldap_member_field = ldap_member_field
+        self.ldap_display_name_field = ldap_display_name_field
+
+        self.ldap_username = f"{self.ldap_user_template.format(user_id=self._username)},{self.ldap_user_base}"
         self.is_admin = None
         self.is_superuser = None
 
@@ -129,9 +137,11 @@ class LDAPClient(object):
 
     def validate_user(self) -> tuple[bool, None] | tuple[bool, str | Any]:
         # Fields to return
-        FIELDS = ["memberOf", "displayName"]
+        FIELDS = [self.ldap_member_field, self.ldap_display_name_field]
 
-        query = f"uid={escape_filter_chars(self._username)}"
+        query = self.ldap_user_template.format(
+            user_id=escape_filter_chars(self._username)
+        )
         # Get LDAP connection with account
         with self.ldap_connection() as ldap_connection:
             results = ldap_connection.search_s(
@@ -146,20 +156,24 @@ class LDAPClient(object):
             return False, None
 
         fields = results[0][1]
-        username = fields.get("displayName")
+        username = fields.get(self.ldap_display_name_field)
         if username:
             username = username[0].decode("utf-8")
         else:
             # Should always be a username but just in case, return the id
             username = self._username
         # Check if user is in a required group
-        if any(i in fields.get("memberOf", []) for i in self.ldap_ipa_groups):
+        if any(
+            i in fields.get(self.ldap_member_field, []) for i in self.ldap_ipa_groups
+        ):
             self.logger.info(f"User: {self._username} granted access; returning")
             self.is_admin = any(
-                i in fields.get("memberOf", []) for i in self.ldap_ipa_admin_groups
+                i in fields.get(self.ldap_member_field, [])
+                for i in self.ldap_ipa_admin_groups
             )
             self.is_superuser = any(
-                i in fields.get("memberOf", []) for i in self.ldap_ipa_superuser_groups
+                i in fields.get(self.ldap_member_field, [])
+                for i in self.ldap_ipa_superuser_groups
             )
             return True, username
         else:
