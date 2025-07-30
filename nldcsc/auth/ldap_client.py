@@ -22,6 +22,7 @@ class LDAPClient(object):
         ldap_ipa_superuser_groups: list = None,
         ldap_ipa_groups: list = None,
         ldap_ca_cert_file: str = None,
+        ldap_ca_cert_verify: bool = True,
         ldap_user_template: str = "uid={user_id}",
         ldap_member_field: str = "memberOf",
         ldap_display_name_field: str = "displayName",
@@ -53,6 +54,7 @@ class LDAPClient(object):
             if ldap_ca_cert_file is not None
             else os.getenv("LDAP_CACERTFILE", None)
         )
+        self.ldap_ca_cert_verify = ldap_ca_cert_verify
 
         self.logger = logging.getLogger(__name__)
 
@@ -87,6 +89,11 @@ class LDAPClient(object):
                 ldap.OPT_X_TLS_CACERTFILE, self.ldap_ca_cert_file
             )
             # Force libldap to create a new SSL context (must be last TLS option!)
+            ldap_connection.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
+        elif self.ldap_ca_cert_verify is False:
+            ldap_connection.set_option(
+                ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER
+            )
             ldap_connection.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
 
         try:
