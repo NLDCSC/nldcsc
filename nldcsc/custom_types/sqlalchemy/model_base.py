@@ -4,6 +4,7 @@ from .custom_types import char_UUID
 from .annotations import (
     str_16,
     str_30,
+    str_32,
     str_50,
     str_64,
     str_100,
@@ -13,6 +14,7 @@ from .annotations import (
     str_text,
     list_json,
     dict_json,
+    big_int,
     big_int_pk,
     uuid,
     uuid_pk,
@@ -24,6 +26,7 @@ class ModelBase(DeclarativeBase):
         type_annotation_map={
             str_16: String(16),
             str_30: String(30),
+            str_32: String(32),
             str_50: String(50),
             str_64: String(64),
             str_100: String(100),
@@ -34,6 +37,7 @@ class ModelBase(DeclarativeBase):
             dict_json: JSON,
             list_json: JSON,
             big_int_pk: BigInteger,
+            big_int: BigInteger,
             uuid: char_UUID,
             uuid_pk: char_UUID,
         },

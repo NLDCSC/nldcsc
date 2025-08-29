@@ -9,10 +9,12 @@ from sqlalchemy.orm import mapped_column
 # ints
 int_pk = Annotated[int, mapped_column(primary_key=True)]
 big_int_pk = Annotated[int, mapped_column(primary_key=True)]
+big_int = Annotated[int, "big_int"]
 
 # strings
 str_16 = Annotated[str, 16]
 str_30 = Annotated[str, 30]
+str_32 = Annotated[str, 32]
 str_50 = Annotated[str, 50]
 str_64 = Annotated[str, 64]
 str_100 = Annotated[str, 100]
