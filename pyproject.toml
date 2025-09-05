@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.52"
+version = "0.3.53"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -33,6 +33,7 @@ flask_plugins = ["plugin_sql_migrate", "custom_type_sqlalchemy", "plugin_redis"]
 plugin_doh = ["httpx_apis", "loggers"]
 plugin_geo_ip = ["httpx_apis", "loggers"]
 plugin_whoisxml = ["http_apis", "loggers"]
+plugin_mailgun = ["http_apis"]
 redis_cache = ["cache_redis"]
 
 
@@ -63,10 +64,11 @@ flask-sqlalchemy = ">=3.1.1"
 flask-migrate = ">=4.0.5"
 werkzeug = ">=2.3.7"
 
+[tool.poetry.group.plugin_mailgun.dependencies]
+pydantic = ">=2.11.7"
 
 [tool.poetry.group.http_apis.dependencies]
 requests = ">=2.31.0"
-
 
 [tool.poetry.group.httpx_apis.dependencies]
 httpx = {version = ">=0.27.0", extras = ["http2"]}
