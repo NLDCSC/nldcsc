@@ -45,6 +45,7 @@ The following modules are available in the nldcsc package:
     - plugin_geo_ip
     - plugin_sql_migrate
     - plugin_redis
+    - plugin_mailgun
 * custom_types
     - custom_type_sqlalchemy
 
