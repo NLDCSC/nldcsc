@@ -26,6 +26,7 @@ class LDAPClient(object):
         ldap_user_template: str = "uid={user_id}",
         ldap_member_field: str = "memberOf",
         ldap_display_name_field: str = "displayName",
+        additional_fields: list[str] = None,
     ):
         self._url = url
         self._username = username
@@ -44,6 +45,7 @@ class LDAPClient(object):
         self.ldap_user_template = ldap_user_template
         self.ldap_member_field = ldap_member_field
         self.ldap_display_name_field = ldap_display_name_field
+        self.additional_fields = additional_fields or []
 
         self.ldap_username = f"{self.ldap_user_template.format(user_id=self._username)},{self.ldap_user_base}"
         self.is_admin = None
@@ -144,7 +146,11 @@ class LDAPClient(object):
 
     def validate_user(self) -> tuple[bool, None] | tuple[bool, str | Any]:
         # Fields to return
-        FIELDS = [self.ldap_member_field, self.ldap_display_name_field]
+        FIELDS = [
+            self.ldap_member_field,
+            self.ldap_display_name_field,
+            *self.additional_fields,
+        ]
 
         query = self.ldap_user_template.format(
             user_id=escape_filter_chars(self._username)
@@ -163,12 +169,34 @@ class LDAPClient(object):
             return False, None
 
         fields = results[0][1]
+
         username = fields.get(self.ldap_display_name_field)
+
         if username:
             username = username[0].decode("utf-8")
         else:
             # Should always be a username but just in case, return the id
             username = self._username
+
+        if self.additional_fields:
+            return_fields = {
+                self.ldap_display_name_field: username,
+            }
+
+            for field in self.additional_fields:
+                field_value = fields.get(field, None)
+
+                if not field_value:
+                    continue
+
+                field_value = [f.decode() for f in field_value]
+
+                if len(field_value) == 1:
+                    field_value = field_value[0]
+
+            return_fields[field] = field_value
+        else:
+            return_fields = username
         # Check if user is in a required group
         if any(
             i in fields.get(self.ldap_member_field, []) for i in self.ldap_ipa_groups
@@ -182,7 +210,7 @@ class LDAPClient(object):
                 i in fields.get(self.ldap_member_field, [])
                 for i in self.ldap_ipa_superuser_groups
             )
-            return True, username
+            return True, return_fields
         else:
             self.logger.info(f"User: {self._username} denied access; returning")
             return False, None
