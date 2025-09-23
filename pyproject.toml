@@ -104,7 +104,7 @@ flask = ">=2.3.3"
 
 
 [tool.poetry.group.sso.dependencies]
-authlib = ">=1.3.0"
+authlib = ">=1.6.4"
 flask = ">=2.3.3"
 pyjwt = ">=2.8.0"
 
