@@ -1,5 +1,6 @@
 import re
 from typing import Callable, Iterable
+
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.query import Query
@@ -8,8 +9,8 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.elements import BinaryExpression
 
 from nldcsc.datatables.server_side_dt import ServerSideDataTable
-from nldcsc.generic.utils import str2bool
 from nldcsc.generic.times import timestringTOtimestamp
+from nldcsc.generic.utils import str2bool
 
 
 class SQLServerSideDataTable(ServerSideDataTable):

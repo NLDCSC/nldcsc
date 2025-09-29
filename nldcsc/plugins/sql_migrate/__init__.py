@@ -1,10 +1,10 @@
 import argparse
-from contextlib import contextmanager
 import logging
 import os
 import re
 import shutil
 import sys
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from functools import wraps
@@ -13,28 +13,26 @@ from typing import Optional, Dict, List
 
 from alembic import __version__ as __alembic_version__
 from alembic import util, migration
-from alembic.operations import Operations, BatchOperations
-from alembic.migration import RevisionStep
 from alembic.autogenerate import RevisionContext
 from alembic.config import Config as AlembicConfig
+from alembic.migration import RevisionStep
+from alembic.operations import Operations, BatchOperations
 from alembic.runtime.environment import ProcessRevisionDirectiveFn
 from alembic.script.revision import _RevIdType
 from alembic.util import CommandError
-from dataclasses_json import dataclass_json
 from dataclasses_json import config as json_config
+from dataclasses_json import dataclass_json
 from sqlalchemy import Engine, MetaData
 from sqlalchemy import Row
 from sqlalchemy.schema import ColumnCollectionConstraint
 
 from nldcsc.generic.utils import exclude_optional_dict
-
+from .config.constants import LOGGING_CONFIG, schema_migrations_table
+from .fractured_alembic.runtime.environment import SqlEnvironmentContext
+from .fractured_alembic.runtime.migration import FracturedMigrationContext
 from .fractured_alembic.runtime.op_shell import (
     create_shell,
 )
-
-from .fractured_alembic.runtime.migration import FracturedMigrationContext
-from .config.constants import LOGGING_CONFIG, schema_migrations_table
-from .fractured_alembic.runtime.environment import SqlEnvironmentContext
 from .fractured_alembic.script.base import SqlScriptDirectory, SqlScriptDirectoryContext
 from .utils.helpers import timestamp_to_strf_string
 

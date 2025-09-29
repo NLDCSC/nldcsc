@@ -3,9 +3,9 @@ from datetime import datetime
 
 import colors
 import rfc3339
-from flask import g, request, Flask
+from flask import g, request, Flask, Response
 
-from nldcsc.flask_midddleware.base import BaseHTTPMiddleware, Response
+from nldcsc.flask_midddleware.base import BaseHTTPMiddleware
 
 
 class DebugLoggingMiddleware(BaseHTTPMiddleware):

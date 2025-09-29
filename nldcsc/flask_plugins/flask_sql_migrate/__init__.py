@@ -1,12 +1,11 @@
 from logging.config import dictConfig
 
-from flask import Flask, current_app
+from flask import Flask
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
 
-from nldcsc.plugins.sql_migrate.config.constants import LOGGING_CONFIG
-
 from nldcsc.plugins.sql_migrate import Config, SqlMigrate as _SqlMigrate
+from nldcsc.plugins.sql_migrate.config.constants import LOGGING_CONFIG
 
 dictConfig(LOGGING_CONFIG)
 

@@ -1,6 +1,6 @@
 from sqlalchemy import JSON, TEXT, BigInteger, String
 from sqlalchemy.orm import DeclarativeBase, registry
-from .custom_types import char_UUID
+
 from .annotations import (
     str_16,
     str_30,
@@ -19,6 +19,7 @@ from .annotations import (
     uuid,
     uuid_pk,
 )
+from .custom_types import char_UUID
 
 
 class ModelBase(DeclarativeBase):

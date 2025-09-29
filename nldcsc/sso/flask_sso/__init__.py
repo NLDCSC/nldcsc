@@ -14,8 +14,8 @@ from authlib.oauth2.rfc7662 import (
     IntrospectTokenValidator as BaseIntrospectTokenValidator,
 )
 from flask import abort, g, redirect, request, session, url_for
-from nldcsc.generic.utils import getenv_bool, getenv_list, getenv_dict
 
+from nldcsc.generic.utils import getenv_bool, getenv_list, getenv_dict
 from nldcsc.sso.flask_sso.sso_views import sso_auth
 
 __all__ = ["SSOConnection"]

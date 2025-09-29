@@ -1,6 +1,6 @@
 import logging
-
 from typing import List
+
 from nldcsc.http_apis.base_class.api_base_class import ApiBaseClass
 from nldcsc.loggers.app_logger import AppLogger
 from nldcsc.plugins.whoisxml.objects.whois import (
@@ -9,7 +9,6 @@ from nldcsc.plugins.whoisxml.objects.whois import (
     WhoisReverseMXRecord,
     WhoisReverseIPRecord,
 )
-
 
 logging.setLoggerClass(AppLogger)
 

@@ -8,9 +8,9 @@ from dataclasses_json import config as json_config
 from dataclasses_json import dataclass_json
 from httpx import Response
 from netaddr.ip import IPAddress
+
 from nldcsc.generic.utils import exclude_optional_dict, reverse_from_named_tuple
 from nldcsc.loggers.app_logger import AppLogger
-
 from nldcsc.plugins.doh.doh_requester import DOHRequester, q_types
 
 logging.setLoggerClass(AppLogger)

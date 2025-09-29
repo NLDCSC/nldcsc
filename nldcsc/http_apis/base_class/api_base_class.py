@@ -1,6 +1,6 @@
+import io
 import json
 from collections import namedtuple
-import io
 from json import JSONDecodeError
 from typing import Any
 

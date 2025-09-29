@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from dataclasses_json import dataclass_json, config as json_config
+
 from nldcsc.generic.utils import exclude_optional_dict
 from nldcsc.plugins.vuln_tracker.objects.data_class_validations import Validations
 

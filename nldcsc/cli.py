@@ -1,4 +1,5 @@
 import click
+
 from nldcsc.plugins.sql_migrate.cli import db
 
 

@@ -3,6 +3,7 @@ from ipaddress import ip_address
 from typing import List
 
 from httpx import Response
+
 from nldcsc.httpx_apis.base_class.httpx_base_class import HttpxBaseClass
 
 q_types = collections.namedtuple(

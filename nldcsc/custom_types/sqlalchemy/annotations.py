@@ -1,7 +1,7 @@
 from typing import Any
 
-from typing_extensions import Annotated
 from sqlalchemy.orm import mapped_column
+from typing_extensions import Annotated
 
 # this file should contain all common annotations used:
 # - to keep things consistent the naming convention should be <type>_<identifier> -> str_64, str_128, int_pk, etc.

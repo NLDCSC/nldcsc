@@ -4,8 +4,8 @@ from typing import Optional
 
 from dataclasses_json import config as json_config
 from dataclasses_json import dataclass_json
-from nldcsc.generic.utils import exclude_optional_dict
 
+from nldcsc.generic.utils import exclude_optional_dict
 from nldcsc.plugins.vuln_tracker.objects.common import CVSS40, CVSS31, CVSS30, CVSS2
 from nldcsc.plugins.vuln_tracker.objects.data_class_validations import Validations
 

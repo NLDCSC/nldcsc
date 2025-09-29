@@ -1,9 +1,9 @@
 import logging
 
-from typing import List
+import requests
+
 from nldcsc.loggers.app_logger import AppLogger
 from nldcsc.plugins.hybrid_analysis.objects import HybridAnalysisHashRecord
-import requests
 
 logging.setLoggerClass(AppLogger)
 

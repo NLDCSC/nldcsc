@@ -6,6 +6,7 @@ from pathlib import Path
 from flask import Flask
 from flask_socketio import SocketIO
 from gunicorn.app.base import BaseApplication
+
 from nldcsc.generic.utils import getenv_bool
 from nldcsc.loggers.app_logger import AppLogger
 from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate

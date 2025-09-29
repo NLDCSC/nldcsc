@@ -1,4 +1,3 @@
-from datetime import datetime
 import logging
 import time
 from typing import Any, Tuple, Optional, Dict, Union
@@ -23,7 +22,6 @@ from sqlalchemy.engine import url as sqla_url
 from sqlalchemy.exc import OperationalError
 
 from nldcsc.plugins.sql_migrate.fractured_alembic.script.base import SqlScriptDirectory
-
 from ...config.constants import schema_migrations_table
 
 log = logging.getLogger(__name__)

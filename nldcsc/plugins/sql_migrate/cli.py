@@ -1,8 +1,8 @@
 import os
 import sys
-import click
 from importlib import util
-import pkgutil
+
+import click
 
 from nldcsc.plugins.sql_migrate import SqlMigrate
 

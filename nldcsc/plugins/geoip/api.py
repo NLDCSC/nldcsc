@@ -1,14 +1,15 @@
-import aiohttp
 import asyncio
 import json
 import logging
 import os
+from typing import List
 
+import aiohttp
 from netaddr import IPAddress
 from netaddr.core import AddrFormatError
+
 from nldcsc.http_apis.base_class.api_base_class import ApiBaseClass
 from nldcsc.loggers.app_logger import AppLogger
-from typing import List
 
 logging.setLoggerClass(AppLogger)
 
