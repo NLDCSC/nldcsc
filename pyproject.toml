@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.60"
+version = "0.3.61"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -34,6 +34,7 @@ plugin_doh = ["httpx_apis", "loggers"]
 plugin_geo_ip = ["httpx_apis", "loggers"]
 plugin_whoisxml = ["http_apis", "loggers"]
 plugin_mailgun = ["http_apis"]
+plugin_limit = ["plugin_redis"]
 redis_cache = ["cache_redis"]
 
 
