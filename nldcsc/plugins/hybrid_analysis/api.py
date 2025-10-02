@@ -44,8 +44,27 @@ class HybridAnalysisAPI:
 
         if get_obj:
             records = []
-            for record in response:
-                records.append(HybridAnalysisHashRecord(**record))
+            items = []
+            if isinstance(response, dict):
+                items = [response]
+            elif isinstance(response, list):
+                items = response
+            else:
+                logging.getLogger(__name__).warning(
+                    "Unexpected response type from HybridAnalysis API: %s",
+                    type(response),
+                )
+                return response
+
+            for record in items:
+                if isinstance(record, dict):
+                    records.append(HybridAnalysisHashRecord(**record))
+                else:
+                    logging.getLogger(__name__).warning(
+                        "Skipping HybridAnalysis record with unexpected type: %s",
+                        type(record),
+                    )
+
             return records
         else:
             return response
