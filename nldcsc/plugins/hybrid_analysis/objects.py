@@ -321,3 +321,4 @@ class HybridAnalysisHashRecord:
     submissions: Optional[List[Submission]] = None
     machine_learning_models: Optional[List[MachineLearningModel]] = None
     crowdstrike_ai: Optional[CrowdstrikeAI] = None
+    validation_errors: Optional[List[str]] = None

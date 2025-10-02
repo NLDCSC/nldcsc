@@ -56,9 +56,12 @@ class HybridAnalysisAPI:
                 )
                 return response
 
+            allowed_fields = set(HybridAnalysisHashRecord.__dataclass_fields__.keys())
+
             for record in items:
                 if isinstance(record, dict):
-                    records.append(HybridAnalysisHashRecord(**record))
+                    filtered = {k: v for k, v in record.items() if k in allowed_fields}
+                    records.append(HybridAnalysisHashRecord(**filtered))
                 else:
                     logging.getLogger(__name__).warning(
                         "Skipping HybridAnalysis record with unexpected type: %s",
