@@ -1,5 +1,3 @@
-import pytest
-
 from nldcsc.plugins.doh.doh_parser import DohParser
 
 

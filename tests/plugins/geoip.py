@@ -1,6 +1,4 @@
 import os
-import pytest
-
 
 from nldcsc.plugins.geoip.api import GeoIp
 

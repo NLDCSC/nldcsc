@@ -1,9 +1,8 @@
 import os.path
 from shutil import rmtree
 
-import mock
 import pytest
-from sqlalchemy import inspect, select
+from sqlalchemy import inspect
 
 from nldcsc.flask_plugins.flask_sql_migrate import SqlMigrate
 

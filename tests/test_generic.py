@@ -1,11 +1,21 @@
+import os
+import re
 from collections import namedtuple
 from datetime import date, datetime
-import os
 from json import JSONDecodeError
-import re
 
 import pytest
 
+from nldcsc.generic.times import (
+    timestampTOcalendarattrs,
+    timestampTOdatestring,
+    timestampTOdatetime,
+    timestampTOdatetimestring,
+    timestringTOdatetimestring,
+    timestringTOtimestamp,
+    datetimeTOtimestamp,
+    dateTOtimestamp,
+)
 from nldcsc.generic.utils import (
     getenv_dict,
     getenv_bool,
@@ -18,17 +28,6 @@ from nldcsc.generic.utils import (
     _true_set,
     _false_set,
     __MANDATORY_VALUE__,
-)
-
-from nldcsc.generic.times import (
-    timestampTOcalendarattrs,
-    timestampTOdatestring,
-    timestampTOdatetime,
-    timestampTOdatetimestring,
-    timestringTOdatetimestring,
-    timestringTOtimestamp,
-    datetimeTOtimestamp,
-    dateTOtimestamp,
 )
 
 
