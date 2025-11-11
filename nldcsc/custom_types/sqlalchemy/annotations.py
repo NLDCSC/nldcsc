@@ -30,5 +30,5 @@ dict_json = dict[str, Any]
 list_json = list[Any]
 
 # custom
-uuid = Annotated[str, 32]
-uuid_pk = Annotated[str, mapped_column(primary_key=True)]
+uuid = Annotated[str, "uuid"]
+uuid_pk = Annotated[str, mapped_column(primary_key=True), "uuid"]
