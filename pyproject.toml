@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.65"
+version = "0.3.66"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -70,6 +70,7 @@ requests = ">=2.31.0"
 
 [tool.poetry.group.httpx_apis.dependencies]
 httpx = {version = ">=0.27.0", extras = ["http2"]}
+aiofiles = "^25.1.0"
 
 [tool.poetry.group.loggers.dependencies]
 gunicorn = ">=21.2.0"
