@@ -4,7 +4,15 @@ from collections.abc import Callable
 from functools import partial, wraps
 import math
 import os
-from typing import IO, Any, TypeVar, ParamSpec, Awaitable
+from typing import (
+    IO,
+    Any,
+    DefaultDict,
+    Iterable,
+    TypeVar,
+    ParamSpec,
+    Awaitable,
+)
 from aiofiles.threadpool.text import AsyncTextIOWrapper
 
 from httpx import Response
@@ -71,6 +79,50 @@ def sync_call(
 
 def json_parser(response: Response) -> dict[Any, Any]:
     return response.json()
+
+
+class UploadHelper:
+    def __init__(self, upload_info: dict):
+        self.max_chunk_size: int = upload_info["max_chunk_size"]
+        self.batch_id: str = None
+        self.chunks: DefaultDict[str, list[str]] = None
+
+    def prepare_batch(
+        self,
+        *,
+        handles: Iterable[IO[bytes] | AsyncTextIOWrapper] = None,
+        filenames: list[str] = None,
+    ):
+        if not filenames:
+            filenames = []
+
+        if handles:
+            filenames.extend(os.path.basename(io.name) for io in handles)
+
+        return filenames
+
+    def set_batch(self, batch: dict):
+        self.batch_id = batch["batch_id"]
+        self.chunks = defaultdict(list)
+
+        for chunk in batch["expected"]:
+            self.chunks[chunk["file"]].append(chunk["chunk_id"])
+
+    def get_from_batch(
+        self, *, handle: IO[bytes] | AsyncTextIOWrapper = None, filename: str = None
+    ):
+        if not self.batch_id:
+            raise KeyError
+
+        if not any(self.chunks.values()):
+            raise EOFError
+
+        filename = os.path.basename(handle.name) if handle else filename
+
+        return self.chunks[filename].pop(), filename
+
+    def calculate_chunk_count(self, file_size: int):
+        return math.ceil(file_size / self.max_chunk_size)
 
 
 class DCSCTransferAPI(HttpxBaseClass):
@@ -280,57 +332,35 @@ class DCSCTransferAPI(HttpxBaseClass):
 
             files, start = generator.send(await self.a_list_hashes(start, fetch_size))
 
-    def _upload_files(
-        self, *handles: IO[bytes] | AsyncTextIOWrapper, upload_info: dict
-    ):
-        max_chunk_size = upload_info["max_chunk_size"]
-        batch: dict = yield [os.path.basename(io.name) for io in handles]
-
-        batch_id = batch["batch_id"]
-        chunks = defaultdict(list)
-
-        for chunk in batch["expected"]:
-            chunks[chunk["file"]].append(chunk["chunk_id"])
-
-        file_size, handle = yield chunks
-
-        while any(chunks.values()):
-            file_size, handle = (
-                yield batch_id,
-                chunks[os.path.basename(handle.name)].pop(),
-                max_chunk_size,
-                math.ceil(file_size / max_chunk_size),
-                os.path.basename(handle.name),
-            )
-
     async def a_upload_files(
         self,
         *file_handles: AsyncTextIOWrapper,
         comment: str = None,
         is_malware: bool = True,
     ):
-        helper = self._upload_files(
-            *file_handles, upload_info=await self.a_get_upload_info()
+        helper = UploadHelper(await self.a_get_upload_info())
+        helper.set_batch(
+            await self.a_request_batch(
+                helper.prepare_batch(handles=file_handles), comment, is_malware
+            )
         )
-        helper.send(await self.a_request_batch(next(helper), comment, is_malware))
 
         async def upload(file_handle: AsyncTextIOWrapper):
             await file_handle.seek(0, os.SEEK_END)
             file_size = await file_handle.tell()
             await file_handle.seek(0, os.SEEK_SET)
 
-            batch_id, chunk_id, chunk_size, chunk_count, filename = helper.send(
-                (file_size, file_handle)
-            )
+            chunk_id, filename = helper.get_from_batch(handle=file_handle)
+            chunk_count = helper.calculate_chunk_count(file_size)
 
             for idx in range(chunk_count):
                 result = await self.a_upload_chunk(
-                    batch_id,
+                    helper.batch_id,
                     chunk_id,
                     idx,
                     chunk_count,
                     filename,
-                    await file_handle.read(chunk_size),
+                    await file_handle.read(helper.max_chunk_size),
                 )
 
             return {**result, "file": filename}
@@ -342,8 +372,12 @@ class DCSCTransferAPI(HttpxBaseClass):
     def upload_files(
         self, *file_handles: IO[bytes], comment: str = None, is_malware: bool = True
     ):
-        helper = self._upload_files(*file_handles, upload_info=self.get_upload_info())
-        helper.send(self.request_batch(next(helper), comment, is_malware))
+        helper = UploadHelper(self.get_upload_info())
+        helper.set_batch(
+            self.request_batch(
+                helper.prepare_batch(handles=file_handles), comment, is_malware
+            )
+        )
 
         results = []
 
@@ -353,18 +387,17 @@ class DCSCTransferAPI(HttpxBaseClass):
 
             file_handle.seek(0, os.SEEK_SET)
 
-            batch_id, chunk_id, chunk_size, chunk_count, filename = helper.send(
-                (file_size, file_handle)
-            )
+            chunk_id, filename = helper.get_from_batch(handle=file_handle)
+            chunk_count = helper.calculate_chunk_count(file_size)
 
             for idx in range(chunk_count):
                 result = self.upload_chunk(
-                    batch_id,
+                    helper.batch_id,
                     chunk_id,
                     idx,
                     chunk_count,
                     filename,
-                    file_handle.read(chunk_size),
+                    file_handle.read(helper.max_chunk_size),
                 )
 
             results.append({**result, "file": filename})
