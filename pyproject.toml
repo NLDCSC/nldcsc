@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.70"
+version = "0.3.71"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -67,6 +67,7 @@ pydantic = ">=2.11.7"
 
 [tool.poetry.group.http_apis.dependencies]
 requests = ">=2.31.0"
+requests-toolbelt = "^1.0.0"
 
 [tool.poetry.group.httpx_apis.dependencies]
 httpx = {version = ">=0.27.0", extras = ["http2"]}

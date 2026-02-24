@@ -7,7 +7,7 @@ from typing import Any
 import requests
 from requests import Response
 from requests.adapters import HTTPAdapter, Retry
-
+from requests_toolbelt import MultipartEncoder
 
 class ApiBaseClass(object):
     """
@@ -107,6 +107,9 @@ class ApiBaseClass(object):
                             raise TypeError(
                                 "Dict provided to list in 'data' is not json serializable."
                             )
+                elif isinstance(data, MultipartEncoder):
+                    # Passing form silently....
+                    pass
                 elif not isinstance(data, (str, list, bytes, io.TextIOBase)):
                     raise TypeError(
                         f"'data' type for {method} must be str, dict, bytes, file-like or a list of tuples."
