@@ -66,6 +66,7 @@ class ApiBaseClass(object):
         return_response_object: bool = False,
         stream: bool = False,
         ignore_api_path: bool = False,
+        files: dict = None,
     ) -> Response | str | Any:
         """
         Send a request
@@ -115,37 +116,15 @@ class ApiBaseClass(object):
 
         request_api_resource.update(self.kwargs)
 
+        if files is not None:
+            request_api_resource["files"] = files
+
         try:
-            if method == self.methods.POST:
-                r = session.post(
-                    self._build_url(resource, ignore_api_path),
-                    stream=stream,
-                    **request_api_resource,
-                )
-            elif method == self.methods.PUT:
-                r = session.put(
-                    self._build_url(resource, ignore_api_path),
-                    stream=stream,
-                    **request_api_resource,
-                )
-            elif method == self.methods.PATCH:
-                r = session.patch(
-                    self._build_url(resource, ignore_api_path),
-                    stream=stream,
-                    **request_api_resource,
-                )
-            elif method == self.methods.DELETE:
-                r = session.delete(
-                    self._build_url(resource, ignore_api_path),
-                    stream=stream,
-                    **request_api_resource,
-                )
-            else:
-                r = session.get(
-                    self._build_url(resource, ignore_api_path),
-                    stream=stream,
-                    **request_api_resource,
-                )
+            r = getattr(session, method.lower())(
+                self._build_url(resource, ignore_api_path),
+                stream=stream,
+                **request_api_resource,
+            )
 
             try:
                 if isinstance(r, Response):
@@ -213,6 +192,7 @@ class ApiBaseClass(object):
         return_response_object: bool = False,
         stream: bool = False,
         ignore_api_path: bool = False,
+        files: dict = None,
     ) -> Response | str | Any:
         """
         Method for requesting free format api resources
@@ -228,6 +208,7 @@ class ApiBaseClass(object):
                     return_response_object=return_response_object,
                     stream=stream,
                     ignore_api_path=ignore_api_path,
+                    files=files,
                 )
                 return result
         except requests.ConnectionError:
