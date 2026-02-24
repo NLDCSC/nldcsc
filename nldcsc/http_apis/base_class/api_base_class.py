@@ -118,6 +118,7 @@ class ApiBaseClass(object):
 
         if files is not None:
             request_api_resource["files"] = files
+            request_api_resource["data"] = json.loads(request_api_resource["data"])
 
         try:
             r = getattr(session, method.lower())(
