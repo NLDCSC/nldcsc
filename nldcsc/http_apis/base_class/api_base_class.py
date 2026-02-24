@@ -9,6 +9,7 @@ from requests import Response
 from requests.adapters import HTTPAdapter, Retry
 from requests_toolbelt import MultipartEncoder
 
+
 class ApiBaseClass(object):
     """
     The GenericApi class serves as a base class for all API's
