@@ -26,7 +26,7 @@ auth = ["loggers"]
 datatables = ["flask_plugins"]
 flask_managers = ["loggers", "sql_migrations"]
 flask_middleware = ["flask_managers"]
-plugins = ["plugin_doh", "plugin_geo_ip", "plugin_sql_migrate", "plugin_redis", "plugin_whoisxml", "plugin_mailgun"]
+plugins = ["plugin_doh", "plugin_geo_ip", "plugin_fbf", "plugin_sql_migrate", "plugin_redis", "plugin_whoisxml", "plugin_mailgun"]
 custom_types = ["custom_type_sqlalchemy"]
 sql_migrations = ["mysql", "loggers"]
 flask_plugins = ["plugin_sql_migrate", "custom_type_sqlalchemy", "plugin_redis"]
@@ -35,6 +35,7 @@ plugin_geo_ip = ["httpx_apis", "loggers"]
 plugin_whoisxml = ["http_apis", "loggers"]
 plugin_mailgun = ["http_apis"]
 plugin_limit = ["plugin_redis"]
+plugin_fbf = ["http_apis", "loggers"]
 redis_cache = ["cache_redis"]
 
 
@@ -84,6 +85,9 @@ netaddr = ">=1.3.0"
 
 [tool.poetry.group.plugin_geo_ip.dependencies]
 aiohttp = ">=3.10.9"
+
+[tool.poetry.group.plugin_fbf.dependencies]
+dataclasses-json = ">=0.6.7"
 
 [tool.poetry.group.plugin_whoisxml.dependencies]
 dataclasses-json = ">=0.6.7"

@@ -1,0 +1,45 @@
+from dataclasses import dataclass
+from typing import Any, Optional
+from dataclasses_json import DataClassJsonMixin
+
+
+@dataclass
+class NCSCFeedInfo(DataClassJsonMixin):
+    feeds: list[str]
+
+
+@dataclass
+class NCSCFeedUpdate(DataClassJsonMixin):
+    count: int
+
+
+@dataclass
+class NCSCFeedUpdateSquence(DataClassJsonMixin):
+    timestamp: int
+    updates: list[NCSCFeedUpdate]
+
+
+@dataclass
+class NCSCFeedUpdateSequenceList(DataClassJsonMixin):
+    entries: list[NCSCFeedUpdateSquence]
+
+
+@dataclass
+class NCSCFeedIndex(DataClassJsonMixin):
+    name: str
+    request_id: str
+    index: str
+    total_count: int
+    start_time: Optional[int] = None
+    stop_time: Optional[int] = None
+
+
+@dataclass
+class NCSCFeedItems(DataClassJsonMixin):
+    entries: list[Any]
+    entries_count: int
+    total_count: int
+    request_id: str
+    limit: int
+    offset: int
+    last: bool
