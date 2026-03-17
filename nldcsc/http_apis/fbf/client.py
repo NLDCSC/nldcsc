@@ -150,17 +150,19 @@ class FBFClient(ApiBaseClass):
             batch_size (int, optional): size to request per request. Defaults to 1000.
             offset (int, optional): starting offset. Defaults to 0.
         """
-        batch = 0
+        batch_cnt = 0
 
         while True:
             batch = self.get_ncsc_feed_index_items(
-                index, batch_size, offset + batch_size * batch
+                index, batch_size, offset + batch_size * batch_cnt
             )
 
             yield from batch.entries
 
             if batch.last:
                 break
+
+            batch_cnt += 1
 
     def get_last_stop_ts(self, feed: str, client: str):
         resource = f"ncsc/feeds/last_update_ts/{feed}/{client}"
