@@ -21,6 +21,7 @@ class NCSCFeedInfo(DataClassJsonMixin):
 
 @dataclass
 class NCSCFeedUpdate(DataClassJsonMixin):
+    name: str
     count: int
 
 
@@ -47,6 +48,7 @@ class NCSCFeedIndex(DataClassJsonMixin):
 
 @dataclass
 class NCSCFeedItems(DataClassJsonMixin):
+    name: str
     entries: list[Any]
     entries_count: int
     total_count: int
