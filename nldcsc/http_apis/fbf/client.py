@@ -11,6 +11,7 @@ from .objects import (
     NCSCFeedUpdateSequenceList,
     NCSCFeedUpdateTS,
     FBFErrors,
+    FBFInfo,
 )
 
 P = TypeVar("P", bound=DataClassJsonMixin)
@@ -62,17 +63,19 @@ class FBFClient(ApiBaseClass):
         return data
 
     def get_info(self):
-        return self.call(self.methods.GET)
+        return self.call(self.methods.GET, response_dataclass=FBFInfo)
 
     def get_ncsc_feeds(self):
         resource = "ncsc/feeds"
 
-        self.call(self.methods.GET, resource=resource, response_dataclass=NCSCFeedInfo)
+        return self.call(
+            self.methods.GET, resource=resource, response_dataclass=NCSCFeedInfo
+        )
 
     def get_ncsc_feed_updates(self):
         resource = "ncsc/feeds/updates"
 
-        self.call(
+        return self.call(
             self.methods.GET,
             resource=resource,
             response_dataclass=NCSCFeedUpdateSequenceList,
