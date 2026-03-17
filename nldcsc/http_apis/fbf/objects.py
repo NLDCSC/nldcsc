@@ -4,6 +4,11 @@ from dataclasses_json import DataClassJsonMixin
 
 
 @dataclass
+class FBFErrors(DataClassJsonMixin):
+    errors: list[str] | str
+
+
+@dataclass
 class NCSCFeedInfo(DataClassJsonMixin):
     feeds: list[str]
 
@@ -43,3 +48,9 @@ class NCSCFeedItems(DataClassJsonMixin):
     limit: int
     offset: int
     last: bool
+
+
+@dataclass
+class NCSCFeedUpdateTS(DataClassJsonMixin):
+    name: str
+    timestamp: int

@@ -9,6 +9,8 @@ from .objects import (
     NCSCFeedInfo,
     NCSCFeedItems,
     NCSCFeedUpdateSequenceList,
+    NCSCFeedUpdateTS,
+    FBFErrors,
 )
 
 P = TypeVar("P", bound=DataClassJsonMixin)
@@ -52,7 +54,10 @@ class FBFClient(ApiBaseClass):
         )
 
         if response_dataclass:
-            return response_dataclass.from_dict(data)
+            try:
+                return response_dataclass.from_dict(data)
+            except Exception:
+                return FBFErrors.from_dict(data)
 
         return data
 
@@ -153,3 +158,10 @@ class FBFClient(ApiBaseClass):
 
             if batch.last:
                 break
+
+    def get_last_stop_ts(self, feed: str, client: str):
+        resource = f"ncsc/feeds/last_update_ts/{feed}/{client}"
+
+        return self.call(
+            self.methods.GET, resource=resource, response_dataclass=NCSCFeedUpdateTS
+        )
