@@ -1,11 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, config
 
 
 @dataclass
 class FBFErrors(DataClassJsonMixin):
     errors: list[str] | str
+
+
+@dataclass
+class FBFInfo(DataClassJsonMixin):
+    application_name: str = field(metadata=config(field_name="ApplicationName"))
+    application_version: str = field(metadata=config(field_name="ApplicationVersion"))
 
 
 @dataclass
