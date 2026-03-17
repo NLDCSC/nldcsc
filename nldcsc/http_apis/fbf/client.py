@@ -128,7 +128,7 @@ class FBFClient(ApiBaseClass):
             limit (int, optional): amount of items. Defaults to 1000.
             offset (int, optional): item offset. Defaults to 0.
         """
-        resource = f"ncsc/feeds//process/{index}"
+        resource = f"ncsc/feeds/process/{index}"
 
         params = {"limit": limit, "offset": offset}
 
