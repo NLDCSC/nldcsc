@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.76a2"
+version = "0.3.77"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -105,6 +105,7 @@ flask = ">=2.3.3"
 authlib = ">=1.6.5"
 flask = ">=2.3.3"
 pyjwt = ">=2.8.0"
+flask-session = ">=0.5.0"
 
 [tool.poetry.group.plugin_sql_migrate.dependencies]
 sqlalchemy = ">=2.0.21"

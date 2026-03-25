@@ -4,6 +4,8 @@ from functools import wraps
 from urllib.parse import quote_plus
 
 import jwt
+import redis
+from flask_session import Session
 import requests
 from authlib.common.errors import AuthlibBaseError
 from authlib.integrations.base_client import InvalidTokenError
@@ -125,6 +127,15 @@ class SSOConnection(object):
         self.app.config.setdefault(
             "SSO_TLS_VERIFICATION", getenv_bool("SSO_TLS_VERIFICATION", "True")
         )
+
+        redis_session_storage = getenv_bool("REDIS_SESSION_STORAGE", "False")
+        if redis_session_storage:
+            self.app.config.setdefault("SESSION_TYPE", "redis")
+            self.app.config.setdefault(
+                "SESSION_REDIS",
+                redis.from_url(os.getenv("REDIS_URL", "redis://redis:6379/")),
+            )
+            Session(self.app)
 
         self.oauth = OAuth(self.app)
         self.oauth.register(
