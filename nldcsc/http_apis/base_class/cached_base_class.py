@@ -2,7 +2,7 @@ import logging
 from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 from contextvars import ContextVar
-from functools import lru_cache, partial
+from functools import partial
 from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
 from uuid import uuid4
 
@@ -16,7 +16,6 @@ R = TypeVar("R")
 C = TypeVar("C")
 
 
-@lru_cache
 def signature_of(_: Callable[P, Any]):
     def wrapper(f: Callable[[C], R]) -> Callable[Concatenate[C, P], R]:
         return f
