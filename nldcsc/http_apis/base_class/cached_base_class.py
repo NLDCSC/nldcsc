@@ -1,16 +1,15 @@
-from collections import namedtuple
+import logging
+from collections import OrderedDict, namedtuple
+from contextlib import contextmanager
 from contextvars import ContextVar
-from functools import lru_cache
+from functools import lru_cache, partial
+from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
 from uuid import uuid4
 
 from requests import JSONDecodeError, Response
+from requests.adapters import HTTPAdapter, Retry
 from requests_cache import CachedSession
 from requests_cache.backends import BaseCache, SQLiteCache
-from requests.adapters import Retry, HTTPAdapter
-from contextlib import contextmanager
-from collections import OrderedDict
-
-from typing import Callable, ParamSpec, TypeVar, Concatenate
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -18,14 +17,14 @@ C = TypeVar("C")
 
 
 @lru_cache
-def signature_of(_: Callable[P]):
+def signature_of(_: Callable[P, Any]):
     def wrapper(f: Callable[[C], R]) -> Callable[Concatenate[C, P], R]:
         return f
 
     return wrapper
 
 
-class CachedApi:
+class CachedAPI:
     methods = namedtuple("methods", ("GET", "POST", "DELETE", "PUT", "PATCH"))(
         "get", "post", "delete", "put", "patch"
     )
@@ -43,7 +42,7 @@ class CachedApi:
         persist_self: bool = True,
         default_retry: Retry = None,
         default_expiry: int = 3600,
-        default_backend: BaseCache = None,
+        default_backend: Callable[[], BaseCache] = None,
     ):
         self.baseurl = baseurl.removesuffix("/")
         self.api_path = api_path.strip("/") if api_path else None
@@ -56,7 +55,9 @@ class CachedApi:
         self.default_backend = (
             default_backend
             if default_backend
-            else SQLiteCache(db_path=f"file:{uuid4()}?mode=memory&cache=shared")
+            else partial(
+                SQLiteCache, db_path=f"file:{uuid4()}?mode=memory&cache=shared"
+            )
         )
         self.retry = (
             default_retry
@@ -73,6 +74,7 @@ class CachedApi:
         }
         self.sessions: OrderedDict[str, CachedSession] = OrderedDict()
         self.headers = self.default_headers
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     @property
     def default_headers(self):
@@ -102,13 +104,20 @@ class CachedApi:
             self._session_kwargs.reset(t)
 
     def persist_session(self, key: str, session: CachedSession):
+        self.logger.debug(f"Persisting session {session=} for {key=}")
+
         if current := self.sessions.pop(key, None):
+            self.logger.debug(f"Closing session {current=} due to replacement")
             current.close()
 
         self.sessions[key] = session
 
         if len(self.sessions) > self.max_sessions:
             _, session = self.sessions.popitem(False)
+            self.logger.debug(
+                f"Closing session {session=} due to exceeding {self.max_sessions=}"
+            )
+
             session.close()
 
     def create_session_key(self, backend, **kwargs):
@@ -124,11 +133,10 @@ class CachedApi:
         self,
         force_recreate: bool = False,
         allow_persist: bool = True,
-        backend: BaseCache = None,
         **kwargs,
     ):
-        if not backend:
-            backend = self.default_backend
+        backend: BaseCache = kwargs.pop("backend", self.default_backend())
+        kwargs = kwargs or self._session_kwargs.get(self.default_session_kwargs)
 
         key = self.create_session_key(backend, **kwargs)
 
@@ -140,9 +148,8 @@ class CachedApi:
             s = self.sessions.get(key)
 
         if s and not force_recreate:
+            self.logger.debug(f"Reusing existing session {s=}")
             return s
-
-        kwargs = kwargs or self._session_kwargs.get(self.default_session_kwargs)
 
         s = (
             CachedSession(backend=backend, **kwargs)
