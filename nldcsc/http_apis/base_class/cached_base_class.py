@@ -6,6 +6,7 @@ from functools import partial
 from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
 from uuid import uuid4
 
+import urllib3
 from requests import JSONDecodeError, Response
 from requests.adapters import HTTPAdapter, Retry
 from requests_cache import CachedSession
@@ -74,6 +75,9 @@ class CachedAPI:
         self.sessions: OrderedDict[str, CachedSession] = OrderedDict()
         self.headers = self.default_headers
         self.logger = logging.getLogger(self.__class__.__name__)
+
+        if self.verify is False:
+            urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
 
     @property
     def default_headers(self):
