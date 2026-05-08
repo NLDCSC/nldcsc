@@ -3,7 +3,7 @@ from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import partial
-from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
+from typing import Any, Callable, Concatenate, ParamSpec, TypeVar, Optional
 from uuid import uuid4
 
 import urllib3
@@ -33,16 +33,16 @@ class CachedAPI:
     def __init__(
         self,
         baseurl: str,
-        api_path: str = None,
-        proxies: dict = None,
+        api_path: Optional[str] = None,
+        proxies: Optional[dict[str, str]] = None,
         user_agent: str = "CachedApi",
         verify: bool | str = True,
         timeout: int = 10,
         max_sessions: int = 128,
         persist_self: bool = True,
-        default_retry: Retry = None,
+        default_retry: Optional[Retry] = None,
         default_expiry: int = 3600,
-        default_backend: Callable[[], BaseCache] = None,
+        default_backend: Optional[Callable[[], BaseCache]] = None,
     ):
         self.baseurl = baseurl.removesuffix("/")
         self.api_path = api_path.strip("/") if api_path else None
@@ -116,20 +116,20 @@ class CachedAPI:
         self.sessions[key] = session
 
         if len(self.sessions) > self.max_sessions:
-            _, session = self.sessions.popitem(False)
+            oldest_key, session = self.sessions.popitem(False)
             self.logger.debug(
-                f"Closing session {session=} due to exceeding {self.max_sessions=}"
+                f"Closing session {session=} for {oldest_key=} due to exceeding {self.max_sessions=}"
             )
 
             session.close()
 
-    def create_session_key(self, backend, **kwargs):
+    @staticmethod
+    def create_session_key(backend, **kwargs):
         return f"{backend}:{kwargs}"
 
     def close(self):
         while self.sessions:
             _, session = self.sessions.popitem()
-
             session.close()
 
     def get_session(

@@ -75,7 +75,8 @@ def get_args(fn, args, kwargs):
 
 def get_cache_lua_fn(client):
     if not hasattr(client, "_lua_cache_fn"):
-        client._lua_cache_fn = client.register_script("""
+        client._lua_cache_fn = client.register_script(
+            """
             local ttl = tonumber(ARGV[2])
             local value
             if ttl > 0 then
@@ -92,7 +93,7 @@ def get_cache_lua_fn(client):
               local over = count - limit
               if over > 0 then
                 local stale_keys_and_scores = redis.call('ZPOPMIN', KEYS[2], over)
-                -- Remove the the scores and just leave the keys
+                -- Remove the scores and just leave the keys
                 local stale_keys = {}
                 for i = 1, #stale_keys_and_scores, 2 do
                   stale_keys[#stale_keys+1] = stale_keys_and_scores[i]
@@ -102,7 +103,8 @@ def get_cache_lua_fn(client):
               end
             end
             return value
-            """)
+            """
+        )
     return client._lua_cache_fn
 
 
@@ -118,7 +120,7 @@ def chunks(iterable, n):
             except StopIteration:
                 break
 
-        if not len(elements):
+        if len(elements) == 0:
             break
 
         yield elements
@@ -136,7 +138,7 @@ async def async_chunks(iterable, n):
             except StopAsyncIteration:
                 break
 
-        if not len(elements):
+        if len(elements) == 0:
             break
 
         yield elements
@@ -411,7 +413,7 @@ class CacheDecorator:
             inner.invalidate = self.async_invalidate
             inner.invalidate_all = self.async_invalidate_all
         else:
-            if self.client and not isinstance(self.client, Redis):
+            if not isinstance(self.client, Redis):
                 raise RuntimeError(
                     "This method can only be used with a synchronous Redis client"
                 )
