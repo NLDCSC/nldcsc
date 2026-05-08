@@ -9,7 +9,8 @@ on:
 
 jobs:
   release:
-    permissions: write-all
+    permissions:
+      contents: write
     name: Create Release
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +36,8 @@ jobs:
           prerelease: false
   build:
     needs: release
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
@@ -59,6 +62,7 @@ jobs:
     needs:
       - build
     permissions:
+      contents: read
       id-token: write
     steps:
       - name: Retrieve release distributions
