@@ -43,6 +43,7 @@ class CachedAPI:
         default_retry: Optional[Retry] = None,
         default_expiry: int = 3600,
         default_backend: Optional[Callable[[], BaseCache]] = None,
+        **requests_kwargs,
     ):
         self.baseurl = baseurl.removesuffix("/")
         self.api_path = api_path.strip("/") if api_path else None
@@ -72,6 +73,7 @@ class CachedAPI:
             "cache_control": True,
             "expire_after": default_expiry,
         }
+        self.requests_kwargs = requests_kwargs
         self.sessions: OrderedDict[str, CachedSession] = OrderedDict()
         self.headers = self.default_headers
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -217,7 +219,7 @@ class CachedAPI:
             method,
             self.build_url(resource, ignore_api_path),
             unpack_response,
-            **kwargs,
+            **{**self.requests_kwargs, **kwargs},
         )
 
     def unpack_response(self, response: Response):
