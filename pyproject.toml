@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.78a1"
+version = "0.3.78a2"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -55,7 +55,7 @@ flask-socketio = ">=5.3.6"
 rfc3339 = ">=6.2"
 
 [tool.poetry.group.flask_plugins.dependencies]
-eswrap = ">=0.5.0"
+eswrap = ">=0.5.3"
 kafka-python = ">=2.0.2"
 elasticsearch = ">=8.7.0"
 flask = ">=2.3.3"
