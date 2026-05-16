@@ -36,6 +36,7 @@ class AppLogger(logging.Logger):
         formatter: DCSCTaskFormatter = DCSCTaskFormatter(
             "%(asctime)s - %(task_name)s - %(name)-8s - %(levelname)-8s - [%(task_id)s] %(message)s"
         ),
+        logging_filter: logging.Filter = None,
     ):
         self.formatter = formatter
 
@@ -53,6 +54,8 @@ class AppLogger(logging.Logger):
 
         cli = logging.StreamHandler(stream=sys.stdout)
         cli.setFormatter(self.formatter)
+        if logging_filter is not None:
+            cli.addFilter(logging_filter)
         cli.setLevel(os.getenv("LOG_LEVEL", "INFO"))
         self.addHandler(cli)
 
@@ -72,6 +75,8 @@ class AppLogger(logging.Logger):
             )
             crf.setLevel(logging.DEBUG)
             crf.setFormatter(self.formatter)
+            if logging_filter is not None:
+                crf.addFilter(logging_filter)
             self.addHandler(crf)
 
         if getenv_bool("SYSLOG_ENABLE", "False"):
@@ -100,6 +105,8 @@ class AppLogger(logging.Logger):
                 )
 
             syslog.setFormatter(self.formatter)
+            if logging_filter is not None:
+                syslog.addFilter(logging_filter)
             syslog.setLevel(logging.DEBUG)
             self.addHandler(syslog)
 
