@@ -29,10 +29,15 @@ level_map = {
 
 
 class AppLogger(logging.Logger):
-    def __init__(self, name, level=logging.NOTSET):
-        self.formatter = DCSCTaskFormatter(
+    def __init__(
+        self,
+        name,
+        level=logging.NOTSET,
+        formatter: DCSCTaskFormatter = DCSCTaskFormatter(
             "%(asctime)s - %(task_name)s - %(name)-8s - %(levelname)-8s - [%(task_id)s] %(message)s"
-        )
+        ),
+    ):
+        self.formatter = formatter
 
         root = logging.getLogger()
 
