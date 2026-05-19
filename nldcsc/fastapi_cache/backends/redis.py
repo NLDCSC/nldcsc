@@ -3,7 +3,7 @@ from typing import Optional, Tuple, Union
 from redis.asyncio.client import Redis
 from redis.asyncio.cluster import RedisCluster
 
-from viper.core.fastapi_cache.backends.base import Backend
+from nldcsc.fastapi_cache.backends.base import Backend
 
 
 class RedisBackend(Backend):

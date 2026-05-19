@@ -4,8 +4,8 @@ from typing import ClassVar, Optional, Type, Any, Callable, Protocol, Awaitable,
 from starlette.requests import Request
 from starlette.responses import Response
 
-from viper.core.fastapi_cache.backends.base import Backend
-from viper.core.fastapi_cache.coder import Coder, JsonCoder
+from nldcsc.fastapi_cache.backends.base import Backend
+from nldcsc.fastapi_cache.coder import Coder, JsonCoder
 
 __all__ = [
     "FastAPICache",
