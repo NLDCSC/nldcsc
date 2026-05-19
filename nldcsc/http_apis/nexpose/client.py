@@ -11,7 +11,7 @@ def as_object(
     obj: Type[T], transform: Callable[..., T] = None
 ) -> Callable[..., Callable[..., T]]:
     def wrapper(f) -> Callable[..., T]:
-        @wraps
+        @wraps(f)
         def inner(*args, **kwargs) -> T:
             r = f(*args, **kwargs)
 
@@ -50,15 +50,16 @@ class NexposeClient(CachedAPI):
         batch_size: int = 100,
         sorting: list[tuple[str, Union[Literal["ASC"], Literal["DESC"]]]] = None,
     ):
-        page = batch_size // offset
+        page = offset // batch_size
+        skip = offset % batch_size
 
-        while True:
-            assets = self.get_assets(page, batch_size, sorting)
+        assets = self.get_assets(page, batch_size, sorting)
 
+        while assets.page.number < assets.page.total_pages:
             page += 1
 
-            if assets.page.number == assets.page.total_pages:
-                ...
+            if skip:
+                assets.resources = assets.resources[skip:]
+                skip = 0
 
-            if page * batch_size < offset:
-                pass
+            yield from assets.resources
