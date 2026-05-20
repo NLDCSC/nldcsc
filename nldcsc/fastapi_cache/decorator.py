@@ -1,29 +1,27 @@
 import logging
 from functools import wraps
-from inspect import Parameter, Signature, isawaitable, iscoroutinefunction
+from inspect import Parameter, isawaitable, iscoroutinefunction
 from typing import (
     Awaitable,
     Callable,
-    List,
     Optional,
     Type,
     TypeVar,
     Union,
-    cast,
     ParamSpec,
 )
 
+from fastapi import Depends
 from fastapi.concurrency import run_in_threadpool
 from fastapi.dependencies.utils import (
     get_typed_return_annotation,
     get_typed_signature,
 )
+from nldcsc.fastapi_cache import FastAPICache, KeyBuilder
+from nldcsc.fastapi_cache.coder import Coder
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.status import HTTP_304_NOT_MODIFIED
-
-from nldcsc.fastapi_cache import FastAPICache, KeyBuilder
-from nldcsc.fastapi_cache.coder import Coder
 
 logger: logging.Logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -32,33 +30,12 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def _augment_signature(signature: Signature, *extra: Parameter) -> Signature:
-    if not extra:
-        return signature
-
-    parameters = list(signature.parameters.values())
-    variadic_keyword_params: List[Parameter] = []
-    while parameters and parameters[-1].kind is Parameter.VAR_KEYWORD:
-        variadic_keyword_params.append(parameters.pop())
-
-    return signature.replace(parameters=[*parameters, *extra, *variadic_keyword_params])
+def get_request(request: Request):
+    yield request
 
 
-def _locate_param(
-    sig: Signature, dep: Parameter, to_inject: List[Parameter]
-) -> Parameter:
-    """Locate an existing parameter in the decorated endpoint
-
-    If not found, returns the injectable parameter, and adds it to the to_inject list.
-
-    """
-    param = next(
-        (p for p in sig.parameters.values() if p.annotation is dep.annotation), None
-    )
-    if param is None:
-        to_inject.append(dep)
-        param = dep
-    return param
+def get_response(response: Response):
+    yield response
 
 
 def _uncacheable(request: Optional[Request]) -> bool:
@@ -84,27 +61,48 @@ def fastapi_cache(
     coder: Optional[Type[Coder]] = None,
     key_builder: Optional[KeyBuilder] = None,
     namespace: str = "",
-    injected_dependency_namespace: str = "__fastapi_cache",
 ) -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[Union[R, Response]]]]:
-    injected_request = Parameter(
-        name=f"{injected_dependency_namespace}_request",
-        annotation=Request,
-        kind=Parameter.KEYWORD_ONLY,
-    )
-    injected_response = Parameter(
-        name=f"{injected_dependency_namespace}_response",
-        annotation=Response,
-        kind=Parameter.KEYWORD_ONLY,
-    )
-
     def wrapper(
         func: Callable[P, Awaitable[R]]
     ) -> Callable[P, Awaitable[Union[R, Response]]]:
-        # get_typed_signature ensures that any forward references are resolved first
+
         wrapped_signature = get_typed_signature(func)
-        to_inject: List[Parameter] = []
-        request_param = _locate_param(wrapped_signature, injected_request, to_inject)
-        response_param = _locate_param(wrapped_signature, injected_response, to_inject)
+
+        parameters = list(wrapped_signature.parameters.values())
+
+        for i, param in enumerate(parameters):
+            if param.kind == param.VAR_POSITIONAL:
+                break
+            if param.kind == param.VAR_KEYWORD:
+                break
+        else:
+            i = len(parameters)
+
+        req_name = "request"
+        req_present = req_name in wrapped_signature.parameters
+
+        res_name = "response"
+        res_present = res_name in wrapped_signature.parameters
+
+        if not req_present:
+            new_request_param = Parameter(
+                name=req_name,
+                annotation=Request,
+                kind=Parameter.POSITIONAL_OR_KEYWORD,
+                default=Depends(get_request),
+            )
+            parameters.insert(i, new_request_param)
+
+        if not res_present:
+            new_response_param = Parameter(
+                name=res_name,
+                annotation=Response,
+                kind=Parameter.POSITIONAL_OR_KEYWORD,
+                default=Depends(get_response),
+            )
+            parameters.insert(i, new_response_param)
+
+        new_signature = wrapped_signature.replace(parameters=parameters)
         return_type = get_typed_return_annotation(func)
 
         @wraps(func)
@@ -118,8 +116,10 @@ def fastapi_cache(
                 # if the wrapped function does NOT have request or response in
                 # its function signature, make sure we don't pass them in as
                 # keyword arguments
-                kwargs.pop(injected_request.name, None)
-                kwargs.pop(injected_response.name, None)
+                if not req_present:
+                    kwargs.pop(req_name, None)
+                if not res_present:
+                    kwargs.pop(res_name, None)
 
                 if iscoroutinefunction(func):
                     # async, return as is.
@@ -133,8 +133,8 @@ def fastapi_cache(
                     return await run_in_threadpool(func, *args, **kwargs)  # type: ignore[arg-type]
 
             copy_kwargs = kwargs.copy()
-            request: Optional[Request] = copy_kwargs.pop(request_param.name, None)  # type: ignore[assignment]
-            response: Optional[Response] = copy_kwargs.pop(response_param.name, None)  # type: ignore[assignment]
+            request: Optional[Request] = copy_kwargs.pop(req_name, None)  # type: ignore[assignment]
+            response: Optional[Response] = copy_kwargs.pop(res_name, None)  # type: ignore[assignment]
 
             if _uncacheable(request):
                 return await ensure_async_func(*args, **kwargs)
@@ -206,11 +206,11 @@ def fastapi_cache(
                         response.status_code = HTTP_304_NOT_MODIFIED
                         return response
 
-                result = cast(R, coder.decode_as_type(cached, type_=return_type))
+                result = coder.decode_as_type(cached, type_=return_type)
 
             return result
 
-        inner.__signature__ = _augment_signature(wrapped_signature, *to_inject)  # type: ignore[attr-defined]
+        inner.__signature__ = new_signature
 
         return inner
 
