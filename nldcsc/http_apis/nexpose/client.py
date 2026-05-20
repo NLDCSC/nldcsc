@@ -19,6 +19,17 @@ T = TypeVar("T")
 def as_object(
     obj: Type[T], transform: Callable[..., T] = None
 ) -> Callable[..., Callable[..., T]]:
+    """
+    Wrapper to transform a dict into a object.
+
+    Args:
+        obj (Type[T]): Object to to transform to.
+        transform (Callable[..., T], optional): Method that transforms the dict into the object. Defaults to None.
+
+    Returns:
+        Callable[..., Callable[..., T]]: Wrapper that transforms the dict into the object.
+    """
+
     def wrapper(f) -> Callable[..., T]:
         @wraps(f)
         def inner(*args, **kwargs) -> T:
@@ -55,6 +66,17 @@ class NexposePageSource(Protocol[T]):
 
 class NexposeClient(CachedAPI):
     def _pss_to_params(self, page: int = 0, size: int = 10, sorting: Sorting = None):
+        """
+        Transforms page, size and sorting (pss) to a params dict.
+
+        Args:
+            page (int, optional): page to start 0 indexed. Defaults to 0.
+            size (int, optional): size per page. Defaults to 10.
+            sorting (Sorting, optional): how to sort the page. Defaults to None.
+
+        Returns:
+            dict: params formatted as dict
+        """
 
         params = {
             "page": page,
@@ -72,6 +94,17 @@ class NexposeClient(CachedAPI):
         offset: int = 0,
         batch_size: int = 100,
     ):
+        """
+        Reusable generator to iter through paginated nexpose responses.
+
+        Args:
+            source (NexposePageSource[T]): Function to call and get a paginated response; function should accept kwarg 'page'
+            offset (int, optional): Amount of resources to initially skip. Defaults to 0.
+            batch_size (int, optional): Amount of resources to retrieve per page. Defaults to 100.
+
+        Yields:
+            T: Type that is returned from the source function as resource
+        """
         page = offset // batch_size
         skip = offset % batch_size
 
@@ -100,6 +133,19 @@ class NexposeClient(CachedAPI):
             Literal["any"], Literal["all"], NexposeSearchMatch
         ] = NexposeSearchMatch.ALL,
     ):
+        """
+        gets an page of assets.
+
+        Args:
+            page (int, optional): page number to retrieve. Defaults to 0.
+            size (int, optional): amount of resources on the page. Defaults to 10.
+            sorting (Sorting, optional): how to sort the assets. Defaults to None.
+            filters (list[NexposeFilter], optional): filters to apply to search for specific assets. Defaults to None.
+            match ( NexposeSearchMatch, optional): match method to use when searching. Defaults to NexposeSearchMatch.ALL.
+
+        Returns:
+            NexposeAssets: paginated response
+        """
         params = self._pss_to_params(page, size, sorting)
 
         if filters:
@@ -127,6 +173,19 @@ class NexposeClient(CachedAPI):
             Literal["any"], Literal["all"], NexposeSearchMatch
         ] = NexposeSearchMatch.ALL,
     ):
+        """
+        iter asset from pages starting at an offset.
+
+        Args:
+            offset (int, optional): offset to start iterating from. Defaults to 0.
+            batch_size (int, optional): amount of assets to retrieve per page. Defaults to 100.
+            sorting (Sorting, optional): how the assets are sorted. Defaults to None.
+            filters (list[NexposeFilter], optional): filters to apply to the assets. Defaults to None.
+            match ( NexposeSearchMatch, optional): match method to use when searching. Defaults to NexposeSearchMatch.ALL..
+
+        Yields:
+            NexposeResource: Singular asset
+        """
         yield from self._iter_pages(
             partial(
                 self.get_assets,
@@ -156,11 +215,35 @@ class NexposeClient(CachedAPI):
             offset,
             batch_size,
         )
+        """
+        iter asset vulnerabilities starting at an offset.
+
+        Args:
+            asset_id (int): asset id to retrieve vulnerabilities from.
+            offset (int, optional): offset to start iterating from. Defaults to 0.
+            batch_size (int, optional): amount of assets to retrieve per page. Defaults to 100.
+            sorting (Sorting, optional): how the assets are sorted. Defaults to None.
+
+        Yields:
+            NexposeVulnerability: Singular vulnerability on the requested asset
+        """
 
     @as_object(NexposeAssetVulnerabilities, NexposeAssetVulnerabilities.from_dict)
     def get_asset_vulnerabilities(
         self, asset_id: int, page: int = 0, size: int = 10, sorting: Sorting = None
     ):
+        """
+        Get asset vulnerabilities.
+
+        Args:
+            asset_id (int): asset id to retrieve vulnerabilities from.
+            page (int, optional): page to retrieve. Defaults to 0.
+            size (int, optional): page size. Defaults to 10.
+            sorting (Sorting, optional): how to sort the assets. Defaults to None.
+
+        Returns:
+            NexposeAssetVulnerabilities: paginated response
+        """
         resource = f"assets/{asset_id}/vulnerabilities"
 
         return self.call(
@@ -169,6 +252,15 @@ class NexposeClient(CachedAPI):
 
     @as_object(NexposeResource, NexposeResource.from_dict)
     def get_asset(self, asset_id: int):
+        """
+        Get a singular asset by id.
+
+        Args:
+            asset_id (int): asset id of asset to retrieve.
+
+        Returns:
+            NexposeResource: singular asset
+        """
         resource = f"assets/{asset_id}"
 
         return self.call(self.methods.GET, resource)
