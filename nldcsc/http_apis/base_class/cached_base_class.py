@@ -57,7 +57,7 @@ class CachedAPI:
             -> self.build_url
             -> self.get_session
                 -> self.persist_session
-            -> self.requests
+            -> self.request
                 -> self.unpack_response
 
         Args:
