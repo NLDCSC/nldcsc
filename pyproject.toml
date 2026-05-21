@@ -127,7 +127,7 @@ dataclasses-json = ">=0.6.7"
 optional = true
 
 [tool.poetry.group.tests.dependencies]
-pytest = "^8.3.3"
+pytest = ">=8.3.3,<10.0.0"
 pytest-cov = "^6.0.0"
 pytest-env = "^1.1.5"
 mock = "^5.1.0"
