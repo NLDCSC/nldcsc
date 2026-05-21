@@ -63,7 +63,7 @@ def fastapi_cache(
     namespace: str = "",
 ) -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[Union[R, Response]]]]:
     def wrapper(
-        func: Callable[P, Awaitable[R]]
+        func: Callable[P, Awaitable[R]],
     ) -> Callable[P, Awaitable[Union[R, Response]]]:
 
         wrapped_signature = get_typed_signature(func)

@@ -75,8 +75,7 @@ def get_args(fn, args, kwargs):
 
 def get_cache_lua_fn(client):
     if not hasattr(client, "_lua_cache_fn"):
-        client._lua_cache_fn = client.register_script(
-            """
+        client._lua_cache_fn = client.register_script("""
             local ttl = tonumber(ARGV[2])
             local value
             if ttl > 0 then
@@ -103,8 +102,7 @@ def get_cache_lua_fn(client):
               end
             end
             return value
-            """
-        )
+            """)
     return client._lua_cache_fn
 
 
