@@ -1,16 +1,18 @@
 from dataclasses import dataclass, field
-from typing import Any, Optional, Type, TypedDict, NotRequired
+from typing import Any, Optional, Type, TypeVar, TypedDict, NotRequired
 
 from dataclasses_json import DataClassJsonMixin, LetterCase, config, global_config
 from enum import StrEnum, Enum, auto
 
+T = TypeVar("T")
 
-def encode_as_string(e: Type[Enum]):
+
+def encode_as_string(e: Type[T]):
     """
     decorator to be used and encode the enum back to its str value
 
     Args:
-        e (Enum): enum to register a string encoder for
+        e (T): type to register a string encoder for
     """
     global_config.encoders[e] = str
 
