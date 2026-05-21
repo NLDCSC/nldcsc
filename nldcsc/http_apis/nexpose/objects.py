@@ -19,87 +19,79 @@ def encode_as_string(e: Type[T]):
     return e
 
 
-@encode_as_string
-class NexposeVulnerabilitySeverity(StrEnum):
+class StrEnumCapitalize(StrEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         return name.capitalize()
 
+
+class StrEnumFirstChar(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+
+class StrEnumDashed(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name.lower().replace("_", "-")
+
+
+class StrEnumUpper(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name.upper()
+
+
+@encode_as_string
+class NexposeVulnerabilitySeverity(StrEnumCapitalize):
     MODERATE = auto()
     SEVERE = auto()
     CRITICAL = auto()
 
 
 @encode_as_string
-class NexposePCIStatus(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name.capitalize()
-
+class NexposePCIStatus(StrEnumCapitalize):
     PASS = auto()
     FAIL = auto()
 
 
 @encode_as_string
-class NexposeCVSS2Complexity(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS2Complexity(StrEnumFirstChar):
     LOW = auto()
     MEDIUM = auto()
     HIGH = auto()
 
 
 @encode_as_string
-class NexposeCVSS2Impact(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS2Impact(StrEnumFirstChar):
     NONE = auto()
     PARTIAL = auto()
     COMPLETE = auto()
 
 
 @encode_as_string
-class NexposeCVSS2Vector(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS2Vector(StrEnumFirstChar):
     LOCAL = auto()
     ADJACENT = auto()
     NETWORK = auto()
 
 
 @encode_as_string
-class NexposeCVSS2Authentication(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS2Authentication(StrEnumFirstChar):
     NONE = auto()
     SINGLE = auto()
     MULTIPLE = auto()
 
 
 @encode_as_string
-class NexposeCVSS3Complexity(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS3Complexity(StrEnumFirstChar):
     LOW = auto()
     HIGH = auto()
 
 
 @encode_as_string
-class NexposeCVSS3Vector(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS3Vector(StrEnumFirstChar):
     NETWORK = auto()
     ADJACENT = auto()
     LOCAL = auto()
@@ -107,41 +99,25 @@ class NexposeCVSS3Vector(StrEnum):
 
 
 @encode_as_string
-class NexposeCVSS3Impact(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS3Impact(StrEnumFirstChar):
     NONE = auto()
     LOW = auto()
     HIGH = auto()
 
 
 @encode_as_string
-class NexposeCVSS3Scope(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS3Scope(StrEnumFirstChar):
     UNCHANGED = auto()
     CHANGED = auto()
 
 
 @encode_as_string
-class NexposeCVSS3Interaction(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name[0]
-
+class NexposeCVSS3Interaction(StrEnumFirstChar):
     NONE = auto()
     REQUIRED = auto()
 
 
-class NexposeFilterOperator(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name.lower().replace("_", "-")
-
+class NexposeFilterOperator(StrEnumDashed):
     IN = auto()
     IS = auto()
     IS_NOT = auto()
@@ -174,32 +150,20 @@ class NexposeSearchMatch(StrEnum):
     ALL = auto()
 
 
-class NexposeSortingDirection(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name
-
+class NexposeSortingDirection(StrEnumUpper):
     ASC = auto()
     DESC = auto()
 
 
 @encode_as_string
-class NexposeVulnerabilityStatus(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name.lower().replace("_", "-")
-
+class NexposeVulnerabilityStatus(StrEnumDashed):
     VULNERABLE = auto()
     INVULNERABLE = auto()
     NO_RESULTS = auto()
 
 
 @encode_as_string
-class NexposeResultStatus(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name.lower().replace("_", "-")
-
+class NexposeResultStatus(StrEnumDashed):
     UNKNOWN = auto()
     NOT_VULNERABLE = auto()
     VULNERABLE = auto()
@@ -265,11 +229,7 @@ class NexposeProtocol(StrEnum):
 
 
 @encode_as_string
-class NexposeLinkType(StrEnum):
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        return name.lower().replace("_", "-")
-
+class NexposeLinkType(StrEnumDashed):
     SEED = auto()
     ROBOTS = auto()
     PDF = auto()
