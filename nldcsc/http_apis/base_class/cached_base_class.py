@@ -45,6 +45,36 @@ class CachedAPI:
         default_backend: Optional[Callable[[], BaseCache]] = None,
         **requests_kwargs,
     ):
+        """
+        API class which utilizes requests_cache to cache requests.
+
+        By default this class respects the cache control headers; this can be overriden
+        by setting the default session kwargs or using the override_session_options context manager when calling your resource.
+
+        When extending this class you probably should call self.call, which is responsible for orchestrating the requests call; see call tree below.
+
+        self.call
+            -> self.build_url
+            -> self.get_session
+                -> self.persist_session
+            -> self.requests
+                -> self.unpack_response
+
+        Args:
+            baseurl (str): baseurl of the api resource.
+            api_path (Optional[str], optional): api path of the resource. Defaults to None.
+            proxies (Optional[dict[str, str]], optional): proxies to use. Defaults to None.
+            user_agent (str, optional): user agent to use. Defaults to "CachedApi".
+            verify (bool | str, optional): certificate verification, when passing a string it should be a path to the certificate. Defaults to True.
+            timeout (int, optional): default timeout to use. Defaults to 10.
+            max_sessions (int, optional): max amount of unique sessions this object may create and manage. Defaults to 128.
+            persist_self (bool, optional): allow reusing sessions this object creates. Defaults to True.
+            default_retry (Optional[Retry], optional): default retry to use. Defaults to 3 retries; bf 1; status 50[0234].
+            default_expiry (int, optional): default cache expiry. Defaults to 3600.
+            default_backend (Optional[Callable[[], BaseCache]], optional): default cache backend to use. Defaults to an in memory SQLiteCache.
+            **requests_kwargs (Any, optional): Kwargs to pass to every requests created like authentication headers.
+
+        """
         self.baseurl = baseurl.removesuffix("/")
         self.api_path = api_path.strip("/") if api_path else None
         self.proxies = proxies
@@ -83,25 +113,53 @@ class CachedAPI:
 
     @property
     def default_headers(self):
+        """
+        Default headers of this class.
+
+        Returns:
+            dict: dict containing http headers
+        """
         return {
             "User-Agent": f"{self.user_agent}",
         }
 
     def set_header(self, key: str, value: str):
+        """
+        Set a header key to a value.
+
+        Args:
+            key (str): http header to set.
+            value (str): value of http header.
+        """
         self.headers[key] = value
 
     def del_header(self, key: str):
+        """
+        Remove a header.
+
+        Args:
+            key (str): http header to remove.
+        """
         self.headers.pop(key, None)
 
     def reset_headers(self):
+        """
+        Reset headers to the default defined in default_headers/
+        """
         self.headers = self.default_headers
 
     def clear_headers(self):
+        """
+        Clear all headers.
+        """
         self.headers = {}
 
     @contextmanager
     @signature_of(CachedSession)
     def override_session_options(self, **kwargs):
+        """
+        Context manager to override the default kwargs handed to create or fetch a CachedSession.
+        """
         try:
             t = self._session_kwargs.set(kwargs)
             yield
@@ -109,6 +167,15 @@ class CachedAPI:
             self._session_kwargs.reset(t)
 
     def persist_session(self, key: str, session: CachedSession):
+        """
+        Persist a session to this objects session store.
+
+        Evicts existing sessions (lru) if max_sessions is exceeded.
+
+        Args:
+            key (str): session key.
+            session (CachedSession): session to store.
+        """
         self.logger.debug(f"Persisting session {session=} for {key=}")
 
         if current := self.sessions.pop(key, None):
@@ -127,9 +194,24 @@ class CachedAPI:
 
     @staticmethod
     def create_session_key(backend, **kwargs):
+        """
+        Creates a unique key that describes a session and its kwargs.
+
+        The unique consists of the backend settings and session kwargs.
+
+        Args:
+            backend (BaseCache): backend cache that is used.
+
+        Returns:
+            str: unique key describing this session
+        """
+
         return f"{backend}:{kwargs}"
 
     def close(self):
+        """
+        Close and evict all sessions managed by this object.
+        """
         while self.sessions:
             _, session = self.sessions.popitem()
             session.close()
@@ -140,6 +222,16 @@ class CachedAPI:
         allow_persist: bool = True,
         **kwargs,
     ):
+        """
+        Create or get an existing session from the session store.
+
+        Args:
+            force_recreate (bool, optional): force recreating the session skipping the session store. Defaults to False.
+            allow_persist (bool, optional): allow saving a session to the session store if newly created. Defaults to True.
+
+        Returns:
+            CachedSession: a cached session instance.
+        """
         backend: BaseCache = kwargs.pop("backend", self.default_backend())
         kwargs = kwargs or self._session_kwargs.get(self.default_session_kwargs)
 
@@ -180,6 +272,16 @@ class CachedAPI:
         return s
 
     def build_url(self, resource: str | None, ignore_api_path: bool = False):
+        """
+        Build a resource url using the baseurl, api path and resource.
+
+        Args:
+            resource (str | None): resource to create an url for.
+            ignore_api_path (bool, optional): ignore the default api path set. Defaults to False.
+
+        Returns:
+            str: complete api path to call.
+        """
         if resource:
             resource = resource.removeprefix("/")
 
@@ -194,6 +296,9 @@ class CachedAPI:
         return url
 
     def __del__(self):
+        """
+        Attempts to close all existing session when this object is deleted.
+        """
         self.close()
 
     def call(
@@ -206,6 +311,26 @@ class CachedAPI:
         force_recreate_session: bool = False,
         **kwargs,
     ):
+        """
+        Call an endpoint.
+
+        This function should be the default entrypoint when calling a resource.
+
+        Args:
+            method (str): http method to use.
+            resource (str, optional): resource to call. Defaults to None.
+            unpack_response (bool, optional): if the response should be unpacked or returned as Response. Defaults to True.
+            ignore_api_path (bool, optional): if the default api path should be ignored. Defaults to False.
+            allow_persist_session (bool, optional): allow the created session to be persisted. Defaults to True.
+            force_recreate_session (bool, optional): force the session to be recreated. Defaults to False.
+
+        Raises:
+            ValueError: If the http method passed is unknown.
+
+        Returns:
+            dict | list | str | Response: Depending if unpack_response is set and the type of data returned from the api.
+        """
+
         if method not in self.methods:
             raise ValueError(f"Unknown {method=}")
 
@@ -223,6 +348,15 @@ class CachedAPI:
         )
 
     def unpack_response(self, response: Response):
+        """
+        Unpacks a response object to by decoding it as JSON or raw text.
+
+        Args:
+            response (Response): response to unpack.
+
+        Returns:
+            dict | list | str: Depends of the type of data returned.
+        """
         if not response.ok:
             response.raise_for_status()
 
@@ -239,6 +373,18 @@ class CachedAPI:
         timeout: int = None,
         **kwargs,
     ):
+        """
+        Send the actual request by calling the function provided on the session or requests object.
+
+        Args:
+            method (Callable[..., Response]): requests function to call.
+            url (str): url to pass to requests.
+            unpack (bool): if the response should be unpacked.
+            timeout (int, optional): overriding timeout otherwise the default timeout is used. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """
         if timeout is None:
             timeout = self.timeout
 
