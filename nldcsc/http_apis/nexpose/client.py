@@ -264,3 +264,6 @@ class NexposeClient(CachedAPI):
         resource = f"assets/{asset_id}"
 
         return self.call(self.methods.GET, resource)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}({self.build_url(None)})>"
