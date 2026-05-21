@@ -72,6 +72,8 @@ class CachedAPI:
             default_retry (Optional[Retry], optional): default retry to use. Defaults to 3 retries; bf 1; status 50[0234].
             default_expiry (int, optional): default cache expiry. Defaults to 3600.
             default_backend (Optional[Callable[[], BaseCache]], optional): default cache backend to use. Defaults to an in memory SQLiteCache.
+
+        Kwargs
             **requests_kwargs (Any, optional): Kwargs to pass to every requests created like authentication headers.
 
         """
@@ -144,7 +146,7 @@ class CachedAPI:
 
     def reset_headers(self):
         """
-        Reset headers to the default defined in default_headers/
+        Reset headers to the default defined in default_headers.
         """
         self.headers = self.default_headers
 
@@ -228,6 +230,9 @@ class CachedAPI:
         Args:
             force_recreate (bool, optional): force recreating the session skipping the session store. Defaults to False.
             allow_persist (bool, optional): allow saving a session to the session store if newly created. Defaults to True.
+
+        Kwargs:
+            **kwargs: Kwargs to this function will override the default session kwargs and the kwargs set when using the override_session_options context manager
 
         Returns:
             CachedSession: a cached session instance.
@@ -314,7 +319,14 @@ class CachedAPI:
         """
         Call an endpoint.
 
-        This function should be the default entrypoint when calling a resource.
+        This function should be the default entrypoint when calling a resource. As it will orchestrate the correct flow to call the resource; see call tree below.
+
+        self.call
+            -> self.build_url
+            -> self.get_session
+                -> self.persist_session
+            -> self.request
+                -> self.unpack_response
 
         Args:
             method (str): http method to use.
@@ -323,6 +335,9 @@ class CachedAPI:
             ignore_api_path (bool, optional): if the default api path should be ignored. Defaults to False.
             allow_persist_session (bool, optional): allow the created session to be persisted. Defaults to True.
             force_recreate_session (bool, optional): force the session to be recreated. Defaults to False.
+
+        Kwargs:
+            **kwargs: additional kwargs to pass to the request call.
 
         Raises:
             ValueError: If the http method passed is unknown.
@@ -383,7 +398,7 @@ class CachedAPI:
             timeout (int, optional): overriding timeout otherwise the default timeout is used. Defaults to None.
 
         Returns:
-            _type_: _description_
+            dict | list | str | Response: Depending if unpack_response is set and the type of data returned from the api.
         """
         if timeout is None:
             timeout = self.timeout
