@@ -1,5 +1,14 @@
 from functools import partial, wraps
-from typing import Callable, Literal, Protocol, Type, TypeAlias, TypeVar, Union
+from typing import (
+    Callable,
+    Literal,
+    ParamSpec,
+    Protocol,
+    Type,
+    TypeAlias,
+    TypeVar,
+    Union,
+)
 
 from nldcsc.http_apis.base_class.cached_base_class import CachedAPI
 from .objects import (
@@ -14,11 +23,10 @@ from .objects import (
 )
 
 T = TypeVar("T")
+P = ParamSpec("P")
 
 
-def as_object(
-    obj: Type[T], transform: Callable[..., T] = None
-) -> Callable[..., Callable[..., T]]:
+def as_object(obj: Type[T], transform: Callable[..., T] = None):
     """
     Wrapper to transform a dict into a object.
 
@@ -30,7 +38,7 @@ def as_object(
         Callable[..., Callable[..., T]]: Wrapper that transforms the dict into the object.
     """
 
-    def wrapper(f) -> Callable[..., T]:
+    def wrapper(f: Callable[P, dict]) -> Callable[P, T]:
         @wraps(f)
         def inner(*args, **kwargs) -> T:
             r = f(*args, **kwargs)
