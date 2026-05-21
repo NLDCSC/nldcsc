@@ -428,6 +428,12 @@ class NexposeService(NexposeDataClassConfig):
 
 
 @dataclass
+class NexposeHostName(NexposeDataClassConfig):
+    name: Optional[str] = None
+    source: Optional[NexposeHostNameSource] = None
+
+
+@dataclass
 class NexposeResource(NexposeDataClassConfig):
     addresses: Optional[list[NexposeAddress]] = field(default_factory=list)
     assessed_for_policies: Optional[bool] = None
@@ -437,7 +443,7 @@ class NexposeResource(NexposeDataClassConfig):
     files: Optional[list[NexposeFile]] = field(default_factory=list)
     history: Optional[list[NexposeHistory]] = field(default_factory=list)
     host_name: Optional[str] = None
-    host_names: Optional[list[str]] = field(default_factory=list)
+    host_names: Optional[list[NexposeHostName]] = field(default_factory=list)
     id: Optional[int] = None
     ids: Optional[list[NexposeID]] = field(default_factory=list)
     ip: Optional[str] = None
