@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Optional, Type, TypeVar, TypedDict, NotRequired
 
 from dataclasses_json import DataClassJsonMixin, LetterCase, config, global_config
-from enum import StrEnum, Enum, auto
+from enum import StrEnum, auto
 
 T = TypeVar("T")
 
@@ -17,6 +17,124 @@ def encode_as_string(e: Type[T]):
     global_config.encoders[e] = str
 
     return e
+
+
+@encode_as_string
+class NexposeVulnerabilitySeverity(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name.capitalize()
+
+    MODERATE = auto()
+    SEVERE = auto()
+    CRITICAL = auto()
+
+
+@encode_as_string
+class NexposePCIStatus(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name.capitalize()
+
+    PASS = auto()
+    FAIL = auto()
+
+
+@encode_as_string
+class NexposeCVSS2Complexity(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    LOW = auto()
+    MEDIUM = auto()
+    HIGH = auto()
+
+
+@encode_as_string
+class NexposeCVSS2Impact(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    NONE = auto()
+    PARTIAL = auto()
+    COMPLETE = auto()
+
+
+@encode_as_string
+class NexposeCVSS2Vector(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    LOCAL = auto()
+    ADJACENT = auto()
+    NETWORK = auto()
+
+
+@encode_as_string
+class NexposeCVSS2Authentication(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    NONE = auto()
+    SINGLE = auto()
+    MULTIPLE = auto()
+
+
+@encode_as_string
+class NexposeCVSS3Complexity(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    LOW = auto()
+    HIGH = auto()
+
+
+@encode_as_string
+class NexposeCVSS3Vector(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    NETWORK = auto()
+    ADJACENT = auto()
+    LOCAL = auto()
+    PHYSICAL = auto()
+
+
+@encode_as_string
+class NexposeCVSS3Impact(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    NONE = auto()
+    LOW = auto()
+    HIGH = auto()
+
+
+@encode_as_string
+class NexposeCVSS3Scope(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    UNCHANGED = auto()
+    CHANGED = auto()
+
+
+@encode_as_string
+class NexposeCVSS3Interaction(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name[0]
+
+    NONE = auto()
+    REQUIRED = auto()
 
 
 class NexposeFilterOperator(StrEnum):
@@ -393,13 +511,89 @@ class NexposeResult(NexposeDataClassConfig):
 
 
 @dataclass
+class NexposeAssetVulnerability(NexposeDataClassConfig):
+    id: Optional[str] = None
+    instances: Optional[int] = None
+    links: Optional[list[NexposeLink]] = field(default_factory=list)
+    status: Optional[NexposeVulnerabilityStatus] = None
+    results: Optional[Optional[list[NexposeResult]]] = field(default_factory=list)
+    since: Optional[Optional[str]] = None
+
+
+@dataclass
+class NexposePCI(NexposeDataClassConfig):
+    adjusted_cvs_score: Optional[int] = field(
+        metadata=config(field_name="adjustedCVSSScore"), default=None
+    )
+    adjusted_severity_score: Optional[int] = None
+    fail: Optional[bool] = None
+    special_notes: Optional[str] = None
+    status: Optional[NexposePCIStatus] = None
+
+
+@dataclass
+class NexposeDescription(NexposeDataClassConfig):
+    html: Optional[str] = None
+    text: Optional[str] = None
+
+
+@dataclass
+class NexposeCVSSV2(NexposeDataClassConfig):
+    access_complexity: Optional[NexposeCVSS2Complexity] = None
+    access_vector: Optional[NexposeCVSS2Vector] = None
+    authentication: Optional[NexposeCVSS2Authentication] = None
+    availability_impact: Optional[NexposeCVSS2Impact] = None
+    confidentiality_impact: Optional[NexposeCVSS2Impact] = None
+    integrity_impact: Optional[NexposeCVSS2Impact] = None
+    exploit_score: Optional[float] = None
+    impact_score: Optional[float] = None
+    score: Optional[float] = None
+    vector: Optional[str] = None
+
+
+@dataclass
+class NexposeCVSSV3(NexposeDataClassConfig):
+    access_complexity: Optional[NexposeCVSS3Complexity] = None
+    access_vector: Optional[NexposeCVSS3Vector] = None
+    availability_impact: Optional[NexposeCVSS3Impact] = None
+    confidentiality_impact: Optional[NexposeCVSS3Impact] = None
+    integrity_impact: Optional[NexposeCVSS3Impact] = None
+    exploit_score: Optional[float] = None
+    impact_score: Optional[float] = None
+    privilege_required: Optional[NexposeCVSS3Impact] = None
+    scope: Optional[NexposeCVSS3Scope] = None
+    score: Optional[float] = None
+    user_interaction: Optional[NexposeCVSS3Interaction] = None
+    vector: Optional[str] = None
+
+
+@dataclass
+class NexposeCVSS(NexposeDataClassConfig):
+    links: Optional[list[NexposeLink]] = field(default_factory=list)
+    v2: Optional[NexposeCVSSV2] = None
+    v3: Optional[NexposeCVSSV3] = None
+
+
+@dataclass
 class NexposeVulnerability(NexposeDataClassConfig):
-    id: str
-    instances: int
-    links: list[NexposeLink]
-    status: NexposeVulnerabilityStatus
-    results: Optional[list[NexposeResult]] = field(default_factory=list)
-    since: Optional[str] = None
+    added: Optional[str] = None
+    categories: Optional[list[str]] = field(default_factory=list)
+    cves: Optional[list[str]] = field(default_factory=list)
+    cvss: Optional[NexposeCVSS] = None
+    denial_of_service: Optional[bool] = None
+    description: Optional[NexposeDescription] = None
+    exploits: Optional[int] = None
+    fix_available: Optional[bool] = None
+    id: Optional[str] = None
+    links: Optional[list[NexposeLink]] = field(default_factory=list)
+    malware_kits: Optional[int] = None
+    modified: Optional[str] = None
+    pci: Optional[NexposePCI] = None
+    published: Optional[str] = None
+    risk_score: Optional[float] = None
+    severity: Optional[NexposeVulnerabilitySeverity] = None
+    severity_score: Optional[int] = None
+    title: Optional[str] = None
 
 
 @dataclass
@@ -413,4 +607,4 @@ class NexposeAssets(NexposeDataClassConfig):
 class NexposeAssetVulnerabilities(NexposeDataClassConfig):
     links: list[NexposeLink]
     page: NexposePage
-    resources: list[NexposeVulnerability]
+    resources: list[NexposeAssetVulnerability]

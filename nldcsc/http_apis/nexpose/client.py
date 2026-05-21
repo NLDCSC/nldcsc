@@ -20,6 +20,7 @@ from .objects import (
     NexposeSortingDirection,
     NexposeSearchMatch,
     NexposeFilter,
+    NexposeVulnerability,
 )
 
 T = TypeVar("T")
@@ -270,6 +271,22 @@ class NexposeClient(CachedAPI):
             NexposeResource: singular asset
         """
         resource = f"assets/{asset_id}"
+
+        return self.call(self.methods.GET, resource)
+
+    @as_object(NexposeVulnerability, NexposeVulnerability.from_dict)
+    def get_vulnerability(self, vulnerability_id: str):
+        """
+        Gets a vulnerability by id
+
+        Args:
+            vulnerability_id (str): id of the vulnerability
+
+        Returns:
+            NexposeVulnerability: singular vulnerability
+        """
+
+        resource = f"vulnerabilities/{vulnerability_id}"
 
         return self.call(self.methods.GET, resource)
 
