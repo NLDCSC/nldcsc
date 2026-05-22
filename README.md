@@ -92,6 +92,13 @@ Depending on the configuration the FlaskAppManager uses a werkzeug (DEBUG == Tru
 or a gunicorn webserver. TLS could be set for both webservers iaw the module specific
 README.md.
 
+### HTTP apis cached
+
+Baseclass for http api communication is present under
+nldcsc.http_apis.base_class.cached_base_class.CachedApi
+
+This baseclass utilizes requests_cache to cache requests automagically.
+
 ### HTTP apis
 
 Baseclass for http api communication is present under 
