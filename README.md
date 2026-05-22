@@ -36,6 +36,7 @@ The following modules are available in the nldcsc package:
 * flask_middleware
 * flask_plugins
 * http_apis
+* http_apis_cached
 * httpx_apis
 * loggers
 * sql_migrations
@@ -46,6 +47,7 @@ The following modules are available in the nldcsc package:
     - plugin_sql_migrate
     - plugin_redis
     - plugin_mailgun
+    - plugin_nexpose
 * custom_types
     - custom_type_sqlalchemy
 
