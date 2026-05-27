@@ -21,6 +21,8 @@ from .objects import (
     NexposeSearchMatch,
     NexposeFilter,
     NexposeVulnerability,
+    NexposeSolution,
+    NexposeVulnerabilitySolutions,
 )
 
 T = TypeVar("T")
@@ -287,6 +289,38 @@ class NexposeClient(CachedAPI):
         """
 
         resource = f"vulnerabilities/{vulnerability_id}"
+
+        return self.call(self.methods.GET, resource)
+
+    @as_object(NexposeVulnerabilitySolutions, NexposeVulnerabilitySolutions.from_dict)
+    def get_vulnerability_solutions(self, vulnerability_id: str):
+        """
+        Gets the solutions that can remediate a vulnerability.
+
+        Args:
+            vulnerability_id (str): id of the vulnerability
+
+        Returns:
+            NexposeVulnerabilitySolutions: collection of solution ids
+        """
+
+        resource = f"vulnerabilities/{vulnerability_id}/solutions"
+
+        return self.call(self.methods.GET, resource)
+
+    @as_object(NexposeSolution, NexposeSolution.from_dict)
+    def get_solution(self, solution_id: str):
+        """
+        Gets a solution by id.
+
+        Args:
+            solution_id (str): id of the solution
+
+        Returns:
+            NexposeSolution: singular solution
+        """
+
+        resource = f"solutions/{solution_id}"
 
         return self.call(self.methods.GET, resource)
 

@@ -563,6 +563,19 @@ class NexposeVulnerability(NexposeDataClassConfig):
 
 
 @dataclass
+class NexposeSolution(NexposeDataClassConfig):
+    additional_information: Optional[NexposeDescription] = None
+    applies_to: Optional[str] = None
+    estimate: Optional[str] = None
+    fix_available: Optional[bool] = None
+    id: Optional[str] = None
+    links: Optional[list[NexposeLink]] = field(default_factory=list)
+    steps: Optional[NexposeDescription] = None
+    summary: Optional[NexposeDescription] = None
+    type: Optional[str] = None
+
+
+@dataclass
 class NexposeAssets(NexposeDataClassConfig):
     links: list[NexposeLink]
     page: NexposePage
@@ -574,3 +587,9 @@ class NexposeAssetVulnerabilities(NexposeDataClassConfig):
     links: list[NexposeLink]
     page: NexposePage
     resources: list[NexposeAssetVulnerability]
+
+
+@dataclass
+class NexposeVulnerabilitySolutions(NexposeDataClassConfig):
+    links: list[NexposeLink]
+    resources: list[str]
