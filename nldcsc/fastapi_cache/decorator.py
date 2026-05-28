@@ -102,8 +102,10 @@ def fastapi_cache(
             )
             parameters.insert(i, new_response_param)
 
-        new_signature = wrapped_signature.replace(parameters=parameters)
         return_type = get_typed_return_annotation(func)
+        new_signature = wrapped_signature.replace(
+            parameters=parameters, return_annotation=return_type
+        )
 
         @wraps(func)
         async def inner(*args: P.args, **kwargs: P.kwargs) -> Union[R, Response]:

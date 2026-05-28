@@ -315,7 +315,7 @@ class NexposeHistory(NexposeDataClassConfig):
     type: Optional[NexposeHistoryType] = None
     user: Optional[str] = None
     version: Optional[int] = None
-    vulnerability_Exception_id: Optional[int] = None
+    vulnerability_exception_id: Optional[int] = None
 
 
 @dataclass
