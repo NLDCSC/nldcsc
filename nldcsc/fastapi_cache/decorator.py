@@ -148,14 +148,25 @@ def fastapi_cache(
             backend = FastAPICache.get_backend()
             cache_status_header = FastAPICache.get_cache_status_header()
 
-            cache_key = key_builder(
-                func,
-                f"{prefix}:{namespace}",
-                request=request,
-                response=response,
-                args=args,
-                kwargs=copy_kwargs,
-            )
+            if iscoroutinefunction(key_builder):
+                cache_key = await key_builder(
+                    func,
+                    f"{prefix}:{namespace}",
+                    request=request,
+                    response=response,
+                    args=args,
+                    kwargs=copy_kwargs,
+                )
+            else:
+                cache_key = key_builder(
+                    func,
+                    f"{prefix}:{namespace}",
+                    request=request,
+                    response=response,
+                    args=args,
+                    kwargs=copy_kwargs,
+                )
+
             if isawaitable(cache_key):
                 cache_key = await cache_key
 
