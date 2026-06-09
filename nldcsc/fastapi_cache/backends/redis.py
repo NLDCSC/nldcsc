@@ -8,8 +8,12 @@ from nldcsc.fastapi_cache.backends.base import Backend
 
 class RedisBackend(Backend):
     def __init__(self, redis: Union[Redis, RedisCluster]):
-        self.redis = redis
+        self._redis = redis
         self.is_cluster: bool = isinstance(redis, RedisCluster)
+
+    @property
+    def redis(self) -> Redis | RedisCluster:
+        return self._redis
 
     async def get_with_ttl(self, key: str) -> Tuple[int, Optional[bytes]]:
         async with self.redis.pipeline(transaction=not self.is_cluster) as pipe:
