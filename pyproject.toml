@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "NLDCSC"
-version = "0.3.85a2"
+version = "0.3.85a3"
 description = "Package with general devops code"
 readme = "README.md"
 repository = "https://github.com/NLDCSC/nldcsc"
@@ -146,7 +146,7 @@ redis = ">=4.6.0"
 redis = ">=5.0.0"
 
 [tool.poetry.group.cache_fastapi.dependencies]
-fastapi = "^0.136.1"
+fastapi = ">=0.136.1"
 redis = ">=5.0.0"
 
 [tool.poetry.dependencies]
