@@ -355,12 +355,17 @@ class CachedAPI:
 
         method = getattr(s, method)
 
-        return self.request(
-            method,
-            self.build_url(resource, ignore_api_path),
-            unpack_response,
-            **{**self.requests_kwargs, **kwargs},
-        )
+        try:
+            response = self.request(
+                method,
+                self.build_url(resource, ignore_api_path),
+                unpack_response,
+                **{**self.requests_kwargs, **kwargs},
+            )
+        finally:
+            if not self.persist or not allow_persist_session:
+                s.close()
+        return response
 
     def unpack_response(self, response: Response):
         """
