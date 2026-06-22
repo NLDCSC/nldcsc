@@ -304,7 +304,8 @@ class CachedAPI:
         """
         Attempts to close all existing session when this object is deleted.
         """
-        self.close()
+        if hasattr(self, "sessions"):
+            self.close()
 
     def call(
         self,
