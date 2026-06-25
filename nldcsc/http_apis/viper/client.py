@@ -1,11 +1,8 @@
-from functools import cached_property
-
-
 from nldcsc.http_apis.base_class.cached_base_class import CachedAPI
+from nldcsc.http_apis.viper.auth import ViperAuth
 from nldcsc.http_apis.viper.collections.v1 import V1Collection
 
 
-from .collections.auth.objects import AuthInfo
 from .collections.unversioned import UnversionedCollection
 
 
@@ -24,7 +21,7 @@ class ViperClient(CachedAPI):
         default_retry=None,
         default_expiry=3600,
         default_backend=None,
-        **requests_kwargs
+        **requests_kwargs,
     ):
         super().__init__(
             baseurl,
@@ -38,17 +35,20 @@ class ViperClient(CachedAPI):
             default_retry,
             default_expiry,
             default_backend,
-            **requests_kwargs
+            **requests_kwargs,
         )
 
-        self.auth_info = AuthInfo(*auth)
+        self.auth = ViperAuth(
+            auth,
+            self.v1.auth.login,
+            self.v1.auth.refresh_token,
+        )
+        self.request = self.auth.auth_wrap(self.request)
 
-    def get_token(self): ...
-
-    @cached_property
+    @property
     def unversioned(self):
         return UnversionedCollection(client=self)
 
-    @cached_property
+    @property
     def v1(self):
         return V1Collection(client=self)

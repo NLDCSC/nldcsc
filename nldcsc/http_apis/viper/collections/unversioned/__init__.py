@@ -11,10 +11,10 @@ class UnversionedCollection(EndpointCollection):
     def welcome(self):
         resource = ""
 
-        return self.call(self.methods.GET, resource)
+        return self.call(self.methods.GET, resource, auth=None)
 
     @as_object(ChangelogResponse)
     def changelog(self):
         resource = "changelog"
 
-        return self.call(self.methods.GET, resource)
+        return self.call(self.methods.GET, resource, auth=None)

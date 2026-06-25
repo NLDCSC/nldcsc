@@ -1,8 +1,12 @@
-from functools import lru_cache
-from typing import TYPE_CHECKING, Type
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Type, TypeVar
+
+from dataclasses_json import DataClassJsonMixin
 
 if TYPE_CHECKING:
     from nldcsc.http_apis.viper.client import ViperClient
+
+T = TypeVar("T")
 
 
 class EndpointCollection:
@@ -18,8 +22,7 @@ class EndpointCollection:
         self.client = client
         self.prefix = self._build_prefix_path(prefix)
 
-    @lru_cache
-    def get_collection(self, collection: "Type[EndpointCollection]"):
+    def get_collection(self, collection: Type[T]) -> T:
         return collection(self.client, self.prefix)
 
     def _build_prefix_path(self, prefix: str | None):
@@ -50,3 +53,11 @@ class EndpointCollection:
 
     def call(self, method: str, resource: str = None, **kwargs):
         return self.client.call(method, self._build_resource_path(resource), **kwargs)
+
+
+@dataclass
+class PaginatedResponse(DataClassJsonMixin):
+    total: int
+    page: int
+    size: int
+    pages: int
