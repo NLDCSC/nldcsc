@@ -2,7 +2,7 @@ import time
 from dataclasses import dataclass
 from functools import wraps
 from threading import RLock
-from typing import TYPE_CHECKING, Callable
+from typing import Callable
 
 from requests import HTTPError
 from requests.auth import AuthBase
@@ -10,9 +10,6 @@ from requests.auth import AuthBase
 
 from .collections.auth.objects import AuthResponse
 from .objects import ErrorItem
-
-if TYPE_CHECKING:
-    from .client import ViperClient
 
 
 @dataclass
