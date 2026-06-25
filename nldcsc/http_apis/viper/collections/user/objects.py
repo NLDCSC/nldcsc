@@ -28,10 +28,10 @@ class AsyncSearchItem(DataClassJsonMixin):
     created: int
     search_query: dict
     task_id: str
-    completed: Optional[int] | None = None
-    started: Optional[int] | None = None
-    error: Optional[str] | None = None
-    result: Optional[int] | None = None
+    completed: Optional[int] = None
+    started: Optional[int] = None
+    error: Optional[str] = None
+    result: Optional[int] = None
 
 
 @dataclass

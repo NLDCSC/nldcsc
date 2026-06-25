@@ -34,11 +34,11 @@ class EndpointsEntry(DataClassJsonMixin):
     method: str
     url: str
     rollout_percentage: int
-    rate_limit_policy: Optional[EndpointRateLimitPolicy] | None = None
-    service: Optional[str] | None = None
-    sunset_date: Optional[str] | None = None
-    maintenance_window: Optional[EndpointMaintenanceWindow] | None = None
-    successor_path: Optional[str] | None = None
+    rate_limit_policy: Optional[EndpointRateLimitPolicy] = None
+    service: Optional[str] = None
+    sunset_date: Optional[str] = None
+    maintenance_window: Optional[EndpointMaintenanceWindow] = None
+    successor_path: Optional[str] = None
 
 
 @dataclass

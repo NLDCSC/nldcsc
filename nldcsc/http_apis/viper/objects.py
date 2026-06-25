@@ -10,7 +10,7 @@ class ErrorDescription(DataClassJsonMixin):
     message: str
     request_id: str
     status_code: int
-    details: Optional[str] | None = None
+    details: Optional[str] = None
 
 
 @dataclass
