@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable, ParamSpec, Type, TypeVar
+from typing import Any, Callable, ParamSpec, Type, TypeVar
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -34,5 +34,12 @@ def as_object(obj: Type[T], transform: Callable[..., T] = None):
                 )
 
         return inner
+
+    return wrapper
+
+
+def signature_of(_: Callable[P, Any]):
+    def wrapper(f: Callable[..., T]) -> Callable[P, T]:
+        return f
 
     return wrapper

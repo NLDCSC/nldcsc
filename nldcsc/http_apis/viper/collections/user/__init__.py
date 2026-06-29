@@ -1,7 +1,8 @@
 from nldcsc.http_apis.viper.collections.bases import EndpointCollection
-from nldcsc.http_apis.viper.collections.utils import as_object
+from nldcsc.http_apis.viper.collections.utils import as_object, signature_of
+from nldcsc.http_apis.viper.objects import AsyncSearchState, AsyncSearchesResponse
 
-from .objects import MeResponse, AsyncSearchesResponse, AsyncSearchState
+from .objects import MeResponse
 
 
 class UserCollection(EndpointCollection, prefix="user"):
@@ -26,3 +27,7 @@ class UserCollection(EndpointCollection, prefix="user"):
             resource,
             params={"page": page, "size": size, "sort": sort, "state": state},
         )
+
+    @signature_of
+    def iter_async_searches(self, page: int = 0, size: int = 50, *args, **kwargs):
+        yield from self.iter_endpoint(self.async_searches, page, size, *args, **kwargs)

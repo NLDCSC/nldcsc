@@ -1,6 +1,19 @@
 from dataclasses import dataclass, field
+from enum import IntEnum, auto
 
 from dataclasses_json import DataClassJsonMixin, LetterCase, config
+
+from nldcsc.http_apis.viper.collections.bases import PaginatedResponse
+
+
+class UserAction(IntEnum):
+    LOGIN = 0
+    LOGOUT = auto()
+    REQUEST = auto()
+    CREATE = auto()
+    UPDATE = auto()
+    DELETE = auto()
+    REFRESH_TOKEN = auto()
 
 
 @dataclass
@@ -24,3 +37,21 @@ class TaskState(DataClassJsonMixin):
 class StatusResponse(DataClassJsonMixin):
     redis_info: RedisInfo
     celery_info: dict[str, dict[str, TaskState]]
+
+
+@dataclass
+class AuditItem(DataClassJsonMixin):
+    id: str
+    timestamp: int
+    username: str
+    user_action: UserAction
+    origin: str
+    affected_resources: dict
+    description: str
+    tags: list[str]
+    request_id: str
+
+
+@dataclass
+class AuditLogResponse(PaginatedResponse):
+    items: list[AuditItem]

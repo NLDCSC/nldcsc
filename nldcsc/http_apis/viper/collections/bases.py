@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Generator, Type, TypeVar
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -7,6 +7,22 @@ if TYPE_CHECKING:
     from nldcsc.http_apis.viper.client import ViperClient
 
 T = TypeVar("T")
+
+
+@dataclass
+class PaginatedResponse(DataClassJsonMixin):
+    total: int
+    page: int
+    size: int
+    pages: int
+    items: list[Any]
+
+    @property
+    def has_next_page(self):
+        return self.page < self.pages
+
+
+P = TypeVar("P", bound=PaginatedResponse)
 
 
 class EndpointCollection:
@@ -51,13 +67,19 @@ class EndpointCollection:
     def methods(self):
         return self.client.methods
 
+    def iter_endpoint(
+        self, function: Callable[[int, int], P], page: int, size: int, *args, **kwargs
+    ) -> Generator[P, None, None]:
+        r = function(page, size, *args, **kwargs)
+
+        yield from r.items
+
+        while r.has_next_page:
+            page += 1
+
+            r = function(page, size, *args, **kwargs)
+
+            yield from r.items
+
     def call(self, method: str, resource: str = None, **kwargs):
         return self.client.call(method, self._build_resource_path(resource), **kwargs)
-
-
-@dataclass
-class PaginatedResponse(DataClassJsonMixin):
-    total: int
-    page: int
-    size: int
-    pages: int
