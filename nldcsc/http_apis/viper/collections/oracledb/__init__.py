@@ -98,7 +98,7 @@ class OracleDBCollection(EndpointCollection, prefix="oracle_db"):
             json=[oracle_db.to_dict() for oracle_db in oracle_dbs],
         )
 
-    @as_object(SuccessResponse, transform=lambda v: SuccessResponse(v))
+    @as_object(SuccessResponse, transform=SuccessResponse)
     def delete(self, ids: list[int]):
         resource = "delete"
 
