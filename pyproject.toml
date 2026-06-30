@@ -36,6 +36,7 @@ plugin_whoisxml = ["http_apis", "loggers"]
 plugin_mailgun = ["http_apis"]
 plugin_limit = ["plugin_redis"]
 plugin_fbf = ["http_apis", "loggers"]
+plugin_viper = ["http_apis_cached"]
 plugin_nexpose = ["http_apis_cached", "loggers"]
 plugin_confluence = ["http_apis_cached", "loggers"]
 redis_cache = ["cache_redis"]
@@ -86,6 +87,9 @@ aiofiles = "^25.1.0"
 gunicorn = ">=21.2.0"
 ansicolors = ">=1.1.8"
 pygelf = ">=0.4.2"
+
+[tool.poetry.group.plugin_viper.dependencies]
+dataclasses-json = ">=0.6.7"
 
 [tool.poetry.group.plugin_doh.dependencies]
 dataclasses-json = ">=0.6.7"

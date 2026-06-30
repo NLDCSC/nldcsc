@@ -48,6 +48,7 @@ The following modules are available in the nldcsc package:
     - plugin_redis
     - plugin_mailgun
     - plugin_nexpose
+    - plugin_viper
 * custom_types
     - custom_type_sqlalchemy
 

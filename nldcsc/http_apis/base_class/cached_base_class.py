@@ -218,6 +218,23 @@ class CachedAPI:
             _, session = self.sessions.popitem()
             session.close()
 
+    def update_session(self, session: CachedSession):
+        """
+        Updates session to contain the latest settings.
+
+        Args:
+            session (CachedSession): session to
+
+        Returns:
+            CachedSession: Updated session
+        """
+        session.verify = self.verify
+
+        if self.proxies:
+            session.proxies.update(self.proxies)
+
+        return session
+
     def get_session(
         self,
         force_recreate: bool = False,
@@ -251,7 +268,10 @@ class CachedAPI:
 
         if s and not force_recreate:
             self.logger.debug(f"Reusing existing session {s=}")
-            return s
+
+            return self.update_session(s)
+        elif s:
+            s.close()
 
         s = (
             CachedSession(backend=backend, **kwargs)
@@ -265,16 +285,10 @@ class CachedAPI:
             s.mount("http://", adapter)
             s.mount("https://", adapter)
 
-        s.verify = self.verify
-        s.headers.update(self.headers)
-
-        if self.proxies:
-            s.proxies.update(self.proxies)
-
         if self.persist and allow_persist:
             self.persist_session(key, s)
 
-        return s
+        return self.update_session(s)
 
     def build_url(self, resource: str | None, ignore_api_path: bool = False):
         """
@@ -356,12 +370,18 @@ class CachedAPI:
 
         method = getattr(s, method)
 
+        requests_kwargs = {**self.requests_kwargs, **kwargs}
+        requests_kwargs["headers"] = {
+            **requests_kwargs.get("headers", {}),
+            **self.headers,
+        }
+
         try:
             response = self.request(
                 method,
                 self.build_url(resource, ignore_api_path),
                 unpack_response,
-                **{**self.requests_kwargs, **kwargs},
+                **requests_kwargs,
             )
         finally:
             if not self.persist or not allow_persist_session:
