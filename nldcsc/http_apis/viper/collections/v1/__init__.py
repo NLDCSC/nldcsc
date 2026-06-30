@@ -6,6 +6,7 @@ from nldcsc.http_apis.viper.collections.general import GeneralCollection
 from nldcsc.http_apis.viper.collections.kpi import KPICollection
 from nldcsc.http_apis.viper.collections.user import UserCollection
 from nldcsc.http_apis.viper.collections.oracledb import OracleDBCollection
+from nldcsc.http_apis.viper.collections.nexpose import NexposeCollection
 
 
 class V1Collection(EndpointCollection, prefix="v1"):
@@ -36,3 +37,7 @@ class V1Collection(EndpointCollection, prefix="v1"):
     @property
     def oracle_db(self):
         return self.get_collection(OracleDBCollection)
+
+    @property
+    def nexpose(self):
+        return self.get_collection(NexposeCollection)
