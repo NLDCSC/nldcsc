@@ -34,7 +34,7 @@ class EndpointCollection:
         if prefix:
             cls._prefix = prefix.strip("/")
 
-    def __init__(self, client: ViperClient, prefix: str | None = None):
+    def __init__(self, client: "ViperClient", prefix: str | None = None):
         self.client = client
         self.prefix = self._build_prefix_path(prefix)
 
