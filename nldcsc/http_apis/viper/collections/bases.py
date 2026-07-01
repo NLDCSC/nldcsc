@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Generator, Type, TypeVar
+from typing import TYPE_CHECKING, Callable, Generator, Generic, Type, TypeVar
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -10,19 +10,16 @@ T = TypeVar("T")
 
 
 @dataclass
-class PaginatedResponse(DataClassJsonMixin):
+class PaginatedResponse(Generic[T], DataClassJsonMixin):
     total: int
     page: int
     size: int
     pages: int
-    items: list[Any]
+    items: list[T]
 
     @property
     def has_next_page(self):
         return self.page < self.pages
-
-
-P = TypeVar("P", bound=PaginatedResponse)
 
 
 class EndpointCollection:
@@ -68,8 +65,13 @@ class EndpointCollection:
         return self.client.methods
 
     def iter_endpoint(
-        self, function: Callable[[int, int], P], page: int, size: int, *args, **kwargs
-    ) -> Generator[P, None, None]:
+        self,
+        function: Callable[[int, int], PaginatedResponse[T]],
+        page: int,
+        size: int,
+        *args,
+        **kwargs
+    ) -> Generator[T, None, None]:
         r = function(page, size, *args, **kwargs)
 
         yield from r.items

@@ -29,5 +29,4 @@ class KPIItem(DataClassJsonMixin):
 
 
 @dataclass
-class KPIResponse(PaginatedResponse):
-    items: list[KPIItem]
+class KPIResponse(PaginatedResponse[KPIItem]): ...

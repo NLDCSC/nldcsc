@@ -37,5 +37,4 @@ class OracleDBModifyResponse(OracleDBResponse): ...
 
 
 @dataclass
-class OracleDBSearchResponse(PaginatedResponse):
-    items: list[OracleDBItem]
+class OracleDBSearchResponse(PaginatedResponse[OracleDBItem]): ...

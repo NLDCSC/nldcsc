@@ -53,5 +53,4 @@ class AuditItem(DataClassJsonMixin):
 
 
 @dataclass
-class AuditLogResponse(PaginatedResponse):
-    items: list[AuditItem]
+class AuditLogResponse(PaginatedResponse[AuditItem]): ...

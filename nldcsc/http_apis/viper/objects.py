@@ -80,8 +80,7 @@ class AsyncSearchItem(DataClassJsonMixin):
 
 
 @dataclass
-class AsyncSearchesResponse(PaginatedResponse):
-    items: list[AsyncSearchItem]
+class AsyncSearchesResponse(PaginatedResponse[AsyncSearchItem]): ...
 
 
 @dataclass
