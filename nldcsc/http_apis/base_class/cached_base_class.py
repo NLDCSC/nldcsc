@@ -185,7 +185,12 @@ class CachedAPI:
     @contextmanager
     def override_request_options(self, **kwargs: Unpack[RequestKwargs]):
         """
-        Context manager to override the default kwargs handed to create or fetch a CachedSession.
+        Context manager to override the default kwargs handed to the request.
+
+        Priority order (low->high) in case of duplicate kwargs:
+            1. self.request_kwargs
+            2. this override
+            3. kwargs handed to self.call
         """
         try:
             t = self._request_kwargs.set(kwargs)
@@ -195,6 +200,9 @@ class CachedAPI:
 
     @contextmanager
     def bypass_cache(self):
+        """
+        Context manager to bypass the cache for every request made.
+        """
         with self.override_request_options(headers={"Cache-Control": "no-cache"}):
             yield
 
@@ -406,8 +414,8 @@ class CachedAPI:
             **kwargs,
         }
         requests_kwargs["headers"] = {
-            **requests_kwargs.get("headers", {}),
             **self.headers,
+            **requests_kwargs.get("headers", {}),
         }
 
         try:
