@@ -3,14 +3,27 @@ from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 from contextvars import ContextVar
 from functools import partial
-from typing import Any, Callable, Concatenate, ParamSpec, TypeVar, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Concatenate,
+    ParamSpec,
+    TypeVar,
+    Optional,
+    Unpack,
+)
 from uuid import uuid4
+
 
 import urllib3
 from requests import JSONDecodeError, Response
 from requests.adapters import HTTPAdapter, Retry
 from requests_cache import CachedSession
 from requests_cache.backends import BaseCache, SQLiteCache
+
+if TYPE_CHECKING:
+    from requests._types import RequestKwargs
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -29,6 +42,7 @@ class CachedAPI:
         "get", "post", "delete", "put", "patch"
     )
     _session_kwargs = ContextVar("session_kwargs")
+    _request_kwargs = ContextVar("requests_kwargs")
 
     def __init__(
         self,
@@ -167,6 +181,22 @@ class CachedAPI:
             yield
         finally:
             self._session_kwargs.reset(t)
+
+    @contextmanager
+    def override_request_options(self, **kwargs: Unpack[RequestKwargs]):
+        """
+        Context manager to override the default kwargs handed to create or fetch a CachedSession.
+        """
+        try:
+            t = self._request_kwargs.set(kwargs)
+            yield
+        finally:
+            self._request_kwargs.reset(t)
+
+    @contextmanager
+    def bypass_cache(self):
+        with self.override_request_options(headers={"Cache-Control": "no-cache"}):
+            yield
 
     def persist_session(self, key: str, session: CachedSession):
         """
@@ -370,7 +400,11 @@ class CachedAPI:
 
         method = getattr(s, method)
 
-        requests_kwargs = {**self.requests_kwargs, **kwargs}
+        requests_kwargs = {
+            **self.requests_kwargs,
+            **self._request_kwargs.get({}),
+            **kwargs,
+        }
         requests_kwargs["headers"] = {
             **requests_kwargs.get("headers", {}),
             **self.headers,
