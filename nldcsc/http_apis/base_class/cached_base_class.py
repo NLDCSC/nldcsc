@@ -183,7 +183,7 @@ class CachedAPI:
             self._session_kwargs.reset(t)
 
     @contextmanager
-    def override_request_options(self, **kwargs: Unpack[RequestKwargs]):
+    def override_request_options(self, **kwargs: Unpack["RequestKwargs"]):
         """
         Context manager to override the default kwargs handed to the request.
 
