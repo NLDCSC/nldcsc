@@ -245,7 +245,7 @@ version = "4.13.0"
 description = "High-level concurrency and networking framework on top of asyncio or Trio"
 optional = false
 python-versions = ">=3.10"
-groups = ["cache-fastapi", "dev", "flask-plugins", "httpx-apis"]
+groups = ["cache-fastapi", "flask-plugins", "httpx-apis"]
 files = [
     {file = "anyio-4.13.0-py3-none-any.whl", hash = "sha256:08b310f9e24a9594186fd75b4f73f4a4152069e3853f1ed8bfbf58369f4ad708"},
     {file = "anyio-4.13.0.tar.gz", hash = "sha256:334b70e641fd2221c1505b3890c69882fe4a2df910cba14d97019b90b24439dc"},
@@ -911,7 +911,7 @@ version = "1.3.1"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
-groups = ["cache-fastapi", "dev", "flask-plugins", "http-apis", "http-apis-cached", "httpx-apis", "tests"]
+groups = ["cache-fastapi", "flask-plugins", "http-apis", "http-apis-cached", "httpx-apis", "tests"]
 markers = "python_version == \"3.10\""
 files = [
     {file = "exceptiongroup-1.3.1-py3-none-any.whl", hash = "sha256:a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598"},
@@ -1401,7 +1401,7 @@ version = "3.15"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
 python-versions = ">=3.8"
-groups = ["cache-fastapi", "dev", "flask-plugins", "http-apis", "http-apis-cached", "httpx-apis", "plugin-geo-ip", "tests"]
+groups = ["cache-fastapi", "flask-plugins", "http-apis", "http-apis-cached", "httpx-apis", "plugin-geo-ip", "tests"]
 files = [
     {file = "idna-3.15-py3-none-any.whl", hash = "sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8"},
     {file = "idna-3.15.tar.gz", hash = "sha256:ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc"},
@@ -1472,14 +1472,14 @@ drafts = ["pycryptodome"]
 
 [[package]]
 name = "kafka-python"
-version = "2.3.1"
+version = "2.3.2"
 description = "Pure Python client for Apache Kafka"
 optional = false
 python-versions = "*"
 groups = ["flask-plugins"]
 files = [
-    {file = "kafka_python-2.3.1-py2.py3-none-any.whl", hash = "sha256:4908865da9e57f0f966a83788c71cb0ae91c33451a26ab6e6984a00b15c6ed71"},
-    {file = "kafka_python-2.3.1.tar.gz", hash = "sha256:90f1caa12d8faa9fd059852b0c73adf169b979279aa2e3ff370f9fe615d654b6"},
+    {file = "kafka_python-2.3.2-py2.py3-none-any.whl", hash = "sha256:e8a5e6f2c4ce13a8041669337038d5125e0e09e6d6f0911902ae5939e5b9595e"},
+    {file = "kafka_python-2.3.2.tar.gz", hash = "sha256:2d2469bcabc2551be7eaf7fb512e1241484d358800f2665b90e7e24fea84259d"},
 ]
 
 [package.extras]
@@ -2785,7 +2785,7 @@ version = "1.3.1"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.10"
-groups = ["cache-fastapi", "dev"]
+groups = ["cache-fastapi"]
 files = [
     {file = "starlette-1.3.1-py3-none-any.whl", hash = "sha256:c7372aae11c3c3f26a42df7bd626cec2f47d03483d261d369516a615a53714c6"},
     {file = "starlette-1.3.1.tar.gz", hash = "sha256:05d0213193f2fbaae60e2ecb593b4add4262ad4e46536b54abe36f11a71724e0"},
@@ -2877,12 +2877,12 @@ version = "4.15.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
 python-versions = ">=3.9"
-groups = ["cache-fastapi", "custom-type-sqlalchemy", "dev", "flask-managers", "flask-plugins", "http-apis", "http-apis-cached", "httpx-apis", "plugin-doh", "plugin-fbf", "plugin-geo-ip", "plugin-mailgun", "plugin-nexpose", "plugin-sql-migrate", "plugin-viper", "plugin-whoisxml", "sql-migrations", "sso", "tests"]
+groups = ["cache-fastapi", "custom-type-sqlalchemy", "flask-managers", "flask-plugins", "http-apis", "http-apis-cached", "httpx-apis", "plugin-doh", "plugin-fbf", "plugin-geo-ip", "plugin-mailgun", "plugin-nexpose", "plugin-sql-migrate", "plugin-viper", "plugin-whoisxml", "sql-migrations", "sso", "tests"]
 files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
-markers = {dev = "python_version < \"3.13\"", flask-managers = "python_version < \"3.13\"", httpx-apis = "python_version < \"3.13\"", plugin-geo-ip = "python_version < \"3.13\"", sso = "python_version == \"3.10\"", tests = "python_version == \"3.10\""}
+markers = {flask-managers = "python_version < \"3.13\"", httpx-apis = "python_version < \"3.13\"", plugin-geo-ip = "python_version < \"3.13\"", sso = "python_version == \"3.10\"", tests = "python_version == \"3.10\""}
 
 [[package]]
 name = "typing-inspect"
