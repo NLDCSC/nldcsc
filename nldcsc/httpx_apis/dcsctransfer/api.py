@@ -122,7 +122,13 @@ class UploadHelper:
         return self.chunks[filename].pop(), filename
 
     def calculate_chunk_count(self, file_size: int):
+        if not file_size:
+            return -1
+
         return math.ceil(file_size / self.max_chunk_size)
+
+    def should_finalize(self, chunk_count):
+        return chunk_count == -1
 
 
 class DCSCTransferAPI(HttpxBaseClass):
@@ -240,6 +246,25 @@ class DCSCTransferAPI(HttpxBaseClass):
             "data": data,
             "files": files,
         }
+
+    def _finalize_chunk(self, batch_id: str, chunk_id: str, chunk_count: int):
+        resource = "uploads/parts/finalize"
+
+        data = {
+            "batch_id": batch_id,
+            "chunk_id": chunk_id,
+            "chunk_count": chunk_count,
+        }
+
+        return (self.methods.POST), {"resources": resource, "data": data}
+
+    @signature_of(_finalize_chunk)
+    @async_call(_finalize_chunk, json_parser)
+    async def a_finalize_chunk(self): ...
+
+    @signature_of(_finalize_chunk)
+    @sync_call(_finalize_chunk, json_parser)
+    async def finalize_chunk(self): ...
 
     @signature_of(_get_file)
     @async_call(_get_file, json_parser)
