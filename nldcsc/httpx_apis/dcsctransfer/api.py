@@ -256,7 +256,7 @@ class DCSCTransferAPI(HttpxBaseClass):
             "chunk_count": chunk_count,
         }
 
-        return (self.methods.POST), {"resources": resource, "data": data}
+        return (self.methods.POST,), {"resources": resource, "data": data}
 
     @signature_of(_finalize_chunk)
     @async_call(_finalize_chunk, json_parser)
