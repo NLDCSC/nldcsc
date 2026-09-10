@@ -41,9 +41,9 @@ There is no configured linter or formatter (no black/ruff/flake8 config in this 
 ## Testing Guidelines
 - Keep verification proportional to the change. Prefer focused existing tests, syntax checks, or the relevant build/lint command over broad test runs.
 - Add tests for meaningful behavior and regressions, not solely to increase coverage or assert boilerplate.
-- Structure each test with Arrange-Act-Assert: set up inputs, exercise the unit, then assert on the outcome — don't interleave setup and assertions.
+- Structure each test with Arrange-Act-Assert: set up inputs, exercise the unit, then assert on the outcome, don't interleave setup and assertions.
 - Keep tests small and independent: one behavior per test, no shared mutable state between tests, and no ordering dependency between them.
-- Isolate the unit under test — mock or fake external dependencies (databases, network, filesystem, other services) rather than exercising them for real, unless the test is explicitly an integration test.
+- Isolate the unit under test, mock or fake external dependencies (databases, network, filesystem, other services) rather than exercising them for real, unless the test is explicitly an integration test. Then use testcontainers.
 - Name tests for the behavior they verify (e.g. `test_returns_empty_list_when_input_is_none`), not for the function name alone.
 - Cover edge cases explicitly: empty/None inputs, boundary values, and invalid types, not just the happy path.
 - Use fixtures (pytest) or setUp/tearDown (unittest) to share setup across tests instead of duplicating it inline.
