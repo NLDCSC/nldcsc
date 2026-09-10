@@ -137,6 +137,7 @@ pytest-cov = "^6.0.0"
 pytest-env = "^1.1.5"
 mock = "^5.1.0"
 requests-mock = "^1.12.1"
+mutmut = "^3.7.0"
 
 
 [tool.poetry.group.custom_type_sqlalchemy.dependencies]
@@ -165,3 +166,24 @@ build-backend = "setuptools.build_meta"
 exclude_dirs = ["tests"]
 tests = []
 skips = []
+
+[tool.mutmut]
+# nldcsc/loggers and nldcsc/sql_migrations are deliberately excluded: their tests
+# reimport nldcsc modules from a fresh `flask` CLI subprocess / mutate global
+# logging state, which breaks under mutmut's import-shadowed `mutants/` tree
+# (the subprocess re-imports the mutmut-instrumented copy outside mutmut's own
+# process, which can't resolve its own config). Re-evaluate if mutmut adds
+# support for this pattern.
+source_paths = ["nldcsc"]
+only_mutate = [
+    "nldcsc/generic/*",
+    "nldcsc/http_apis/base_class/api_base_class.py",
+    "nldcsc/flask_plugins/flask_sql_migrate/*",
+    "nldcsc/plugins/sql_migrate/*",
+]
+mutate_only_covered_lines = true
+pytest_add_cli_args_test_selection = [
+    "tests/test_generic.py",
+    "tests/test_http_apis.py",
+    "tests/test_sql_migrate.py",
+]

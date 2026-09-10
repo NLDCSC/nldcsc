@@ -161,3 +161,8 @@ cython_debug/
 test_data
 test_env
 .vscode/
+
+# mutmut mutation testing
+mutants/
+.mutmut-cache
+mutmut-cicd-stats.json

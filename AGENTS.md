@@ -21,6 +21,7 @@ poetry run pytest
 poetry run pytest tests/<file>.py::<node-id>
 tox                      # full matrix across py310/py311 and per-module extras, see tox.ini
 tox -e py311-loggers     # a single tox environment
+tox -e mutmut            # mutation testing, see Module Testing Notes below
 ```
 
 There is no configured linter or formatter (no black/ruff/flake8 config in this repo) — don't assume one.
@@ -33,6 +34,7 @@ There is no configured linter or formatter (no black/ruff/flake8 config in this 
 ## Module Testing Notes
 - `tox.ini` defines per-module test environments (e.g. `-loggers`, `-flask_app`, `-sql_migrate`, `-http_apis`, `-plugins`, `-flask_plugins`) that install only that module's extras before running its test file — prefer the matching tox env when testing a single module in isolation.
 - Tests use `mock`/`requests-mock` for external services; there is no live-service test dependency.
+- Mutation testing runs via `mutmut` (config in `pyproject.toml` `[tool.mutmut]`, `tox -e mutmut`, `.github/workflows/mutation_testing.yaml` on PRs — report-only, does not block merges). Scope is intentionally limited to modules with meaningful existing coverage (`generic`, `http_apis/base_class`, `flask_plugins/flask_sql_migrate`, `plugins/sql_migrate`) plus `mutate_only_covered_lines = true`. `nldcsc/loggers` and `nldcsc/sql_migrations` are excluded — their tests reimport nldcsc modules via a fresh `flask` CLI subprocess or mutate global logging state, which breaks under mutmut's import-shadowed `mutants/` tree. When expanding scope to a new module, verify its tests still pass under `tox -e mutmut` before adding it to `only_mutate`.
 
 ## Git Workflow
 - Never create commits or push branches/remotes unless explicitly asked. Leave changes in the working tree for the user to review, commit, and push.
