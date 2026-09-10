@@ -180,10 +180,12 @@ only_mutate = [
     "nldcsc/http_apis/base_class/api_base_class.py",
     "nldcsc/flask_plugins/flask_sql_migrate/*",
     "nldcsc/plugins/sql_migrate/*",
+    "nldcsc/auth/*",
 ]
 mutate_only_covered_lines = true
 pytest_add_cli_args_test_selection = [
     "tests/test_generic.py",
     "tests/test_http_apis.py",
     "tests/test_sql_migrate.py",
+    "tests/test_ldap_client.py",
 ]
