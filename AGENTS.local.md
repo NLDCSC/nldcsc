@@ -18,7 +18,12 @@ tox -e py311-loggers     # a single tox environment
 tox -e mutmut            # mutation testing, see Module Testing Notes below
 ```
 
-There is no configured linter or formatter (no black/ruff/flake8 config in this repo) — don't assume one.
+```bash
+poetry install --only dev --no-root   # pre-commit, commitizen, black
+poetry run pre-commit install --hook-type pre-commit --hook-type commit-msg
+```
+
+`pre-commit` runs `black` (pinned in `.pre-commit-config.yaml`, matching `.github/workflows/black_formatter.yaml`) plus basic hygiene hooks on staged files, and `commitizen` enforces Conventional Commits (`feat:`, `fix:`, `chore:`, etc. — see `[tool.commitizen]` in `pyproject.toml`) on the commit message via the `commit-msg` hook. Both must be installed locally per clone/worktree (`pre-commit install`) — they aren't enforced in CI.
 
 ## Runtime Conventions
 - This package has no single entry point; each module under `nldcsc/` is meant to be imported independently by consuming applications. Avoid adding cross-module imports that would force an unrelated extra to be installed.
