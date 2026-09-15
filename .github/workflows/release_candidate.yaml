@@ -49,13 +49,16 @@ jobs:
         env:
           NEXT: ${{ steps.next_version.outputs.next }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
-          # PyPI requires a PEP 440 compliant version, so the PR number
-          # becomes the release-candidate number (e.g. 2.1.2rc47). The git
-          # tag / GitHub release instead uses the human-readable form the
-          # user asked for (e.g. v2.1.2-pr47).
-          echo "pypi_version=${NEXT}rc${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "pypi_version=${NEXT}rc${PR_NUMBER}.dev${RUN_NUMBER}" >> "$GITHUB_OUTPUT"
           echo "tag=v${NEXT}-pr${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Remove previous release/tag for this PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete "${{ steps.rc.outputs.tag }}" --yes --cleanup-tag || true
 
       - name: Set package version and changelog
         run: |
