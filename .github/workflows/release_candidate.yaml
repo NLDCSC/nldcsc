@@ -1,0 +1,98 @@
+---
+name: Release Candidate
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+concurrency:
+  group: release-candidate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  release-candidate:
+    if: github.event.label.name == 'release-candidate'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: '3.10'
+
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install commitizen build
+
+      - name: Determine next version
+        id: next_version
+        run: |
+          NEXT=$(cz bump --get-next)
+          echo "next=$NEXT" >> "$GITHUB_OUTPUT"
+
+      - name: Compute release candidate version
+        id: rc
+        env:
+          NEXT: ${{ steps.next_version.outputs.next }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # PyPI requires a PEP 440 compliant version, so the PR number
+          # becomes the release-candidate number (e.g. 2.1.2rc47). The git
+          # tag / GitHub release instead uses the human-readable form the
+          # user asked for (e.g. v2.1.2-pr47).
+          echo "pypi_version=${NEXT}rc${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${NEXT}-pr${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Set package version and changelog
+        run: |
+          cz bump "${{ steps.rc.outputs.pypi_version }}" --files-only --changelog --yes
+          # Extract just the newly added section for the release body.
+          awk '/^## /{c++} c==1{print} c==2{exit}' CHANGELOG.md > body.md
+
+      - name: Build
+        run: python -m build
+
+      - name: Publish release candidate to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
+      - name: Create GitHub prerelease
+        uses: softprops/action-gh-release@v2.0.9
+        with:
+          tag_name: ${{ steps.rc.outputs.tag }}
+          target_commitish: ${{ github.event.pull_request.head.sha }}
+          name: ${{ steps.rc.outputs.tag }}
+          body_path: body.md
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment install instructions on PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYPI_VERSION: ${{ steps.rc.outputs.pypi_version }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr comment "$PR_URL" --body "Published release candidate \`$PYPI_VERSION\` to PyPI:
+
+          \`\`\`
+          pip install --pre nldcsc==$PYPI_VERSION
+          \`\`\`
+
+          Remove and re-add the \`release-candidate\` label to cut a new RC after pushing more commits."
