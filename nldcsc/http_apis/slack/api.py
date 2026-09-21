@@ -41,7 +41,6 @@ class SlackWebhookApi(ApiBaseClass):
         self,
         text: str = None,
         blocks: list[dict[str, Any]] = None,
-        **kwargs,
     ):
         """
         Body could consist of (https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/#advanced_message_formatting)
@@ -57,16 +56,13 @@ class SlackWebhookApi(ApiBaseClass):
 
         data = {}
 
-        if blocks:
+        if blocks is not None:
             if not isinstance(blocks, list):
                 blocks = [blocks]
 
             data["blocks"] = blocks
 
-        if text:
+        if text is not None:
             data["text"] = text
-
-        if kwargs:
-            data.update(kwargs)
 
         return self.call("POST", resource=resource, data=data)
