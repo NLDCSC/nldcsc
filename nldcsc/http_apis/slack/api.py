@@ -49,7 +49,7 @@ class SlackWebhookApi(ApiBaseClass):
         """
         resource = ""
 
-        if not text or blocks:
+        if text is None and blocks is None:
             raise TypeError(
                 "Either message or embed variable should be filled; they cannot all be None"
             )
