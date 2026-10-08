@@ -5,7 +5,7 @@ from nldcsc.http_apis.viper.objects import AsyncSearchResponse
 from .objects import Solutions
 
 
-class SolutionCollection(EndpointCollection, prefix="solutions"):
+class SolutionCollection(EndpointCollection, prefix="solution"):
     @as_object(AsyncSearchResponse)
     def create_async_search(self, solution_id: str):
         resource = "async_search"
