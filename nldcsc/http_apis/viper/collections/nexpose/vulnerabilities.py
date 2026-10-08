@@ -5,7 +5,7 @@ from nldcsc.http_apis.viper.objects import AsyncSearchResponse
 from .objects import Solutions, Vulnerabilities
 
 
-class VulnerabilityCollection(EndpointCollection, prefix="vulnerability"):
+class VulnerabilityDocument(EndpointCollection, prefix="vulnerability"):
     @as_object(AsyncSearchResponse)
     def create_async_search(self, vulnerability_id: str):
         resource = "async_search"
@@ -33,3 +33,13 @@ class VulnerabilityCollection(EndpointCollection, prefix="vulnerability"):
         resource = f"solutions/async_search/{async_search_id}"
 
         return self.call(self.methods.GET, resource)
+
+
+class VulnerabilityCollection(EndpointCollection, prefix="vulnerabilities"):
+    @as_object(AsyncSearchResponse)
+    def create_async_search(self):
+        return self.call(self.methods.POST, "async_search")
+
+    @as_object(Vulnerabilities, transform=Vulnerabilities)
+    def get_async_search(self, async_search_id: str):
+        return self.call(self.methods.GET, f"async_search/{async_search_id}")
