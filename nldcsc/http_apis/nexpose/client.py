@@ -22,6 +22,8 @@ from .objects import (
     NexposeFilter,
     NexposeVulnerability,
     NexposeSolution,
+    NexposeVulnerabilities,
+    NexposeSolutions,
     NexposeVulnerabilitySolutions,
 )
 
@@ -205,6 +207,46 @@ class NexposeClient(CachedAPI):
                 filters=filters,
                 match=match,
             ),
+            offset,
+            batch_size,
+        )
+
+    @as_object(NexposeVulnerabilities, NexposeVulnerabilities.from_dict)
+    def get_vulnerabilities(
+        self, page: int = 0, size: int = 10, sorting: Sorting = None
+    ):
+        """Get a page of vulnerabilities."""
+        return self.call(
+            self.methods.GET,
+            "vulnerabilities",
+            params=self._pss_to_params(page, size, sorting),
+        )
+
+    def iter_vulnerabilities(
+        self, offset: int = 0, batch_size: int = 100, sorting: Sorting = None
+    ):
+        """Iterate over vulnerabilities starting at ``offset``."""
+        yield from self._iter_pages(
+            partial(self.get_vulnerabilities, size=batch_size, sorting=sorting),
+            offset,
+            batch_size,
+        )
+
+    @as_object(NexposeSolutions, NexposeSolutions.from_dict)
+    def get_solutions(self, page: int = 0, size: int = 10, sorting: Sorting = None):
+        """Get a page of remediation solutions."""
+        return self.call(
+            self.methods.GET,
+            "solutions",
+            params=self._pss_to_params(page, size, sorting),
+        )
+
+    def iter_solutions(
+        self, offset: int = 0, batch_size: int = 100, sorting: Sorting = None
+    ):
+        """Iterate over solutions starting at ``offset``."""
+        yield from self._iter_pages(
+            partial(self.get_solutions, size=batch_size, sorting=sorting),
             offset,
             batch_size,
         )

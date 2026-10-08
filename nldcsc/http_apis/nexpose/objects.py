@@ -583,6 +583,20 @@ class NexposeAssets(NexposeDataClassConfig):
 
 
 @dataclass
+class NexposeVulnerabilities(NexposeDataClassConfig):
+    links: list[NexposeLink]
+    page: NexposePage
+    resources: list[NexposeVulnerability]
+
+
+@dataclass
+class NexposeSolutions(NexposeDataClassConfig):
+    links: list[NexposeLink]
+    page: NexposePage
+    resources: list[NexposeSolution]
+
+
+@dataclass
 class NexposeAssetVulnerabilities(NexposeDataClassConfig):
     links: list[NexposeLink]
     page: NexposePage

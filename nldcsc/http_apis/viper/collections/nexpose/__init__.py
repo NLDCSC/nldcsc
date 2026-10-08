@@ -1,7 +1,7 @@
 from nldcsc.http_apis.viper.collections.bases import EndpointCollection
 from .assets import AssetCollection
-from .vulnerabilities import VulnerabilityCollection
-from .solutions import SolutionCollection
+from .vulnerabilities import VulnerabilityCollection, VulnerabilityDocument
+from .solutions import SolutionCollection, SolutionDocument
 
 
 class NexposeCollection(EndpointCollection, prefix="nexpose"):
@@ -15,5 +15,13 @@ class NexposeCollection(EndpointCollection, prefix="nexpose"):
         return self.get_collection(VulnerabilityCollection)
 
     @property
+    def vulnerability(self):
+        return self.get_collection(VulnerabilityDocument)
+
+    @property
     def solutions(self):
         return self.get_collection(SolutionCollection)
+
+    @property
+    def solution(self):
+        return self.get_collection(SolutionDocument)
