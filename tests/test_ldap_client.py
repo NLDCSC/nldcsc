@@ -128,9 +128,7 @@ class TestCreateConnection:
         conn = mock.Mock()
         conn.simple_bind_s.side_effect = ldap.INVALID_CREDENTIALS
 
-        with mock.patch(
-            "nldcsc.auth.ldap_client.ldap.initialize", return_value=conn
-        ):
+        with mock.patch("nldcsc.auth.ldap_client.ldap.initialize", return_value=conn):
             with pytest.raises(ldap.INVALID_CREDENTIALS):
                 client.create_connection()
 
@@ -149,9 +147,7 @@ class TestCreateConnection:
         )
         conn = mock.Mock()
 
-        with mock.patch(
-            "nldcsc.auth.ldap_client.ldap.initialize", return_value=conn
-        ):
+        with mock.patch("nldcsc.auth.ldap_client.ldap.initialize", return_value=conn):
             client.create_connection()
 
         conn.set_option.assert_any_call(
@@ -174,9 +170,7 @@ class TestCreateConnection:
         )
         conn = mock.Mock()
 
-        with mock.patch(
-            "nldcsc.auth.ldap_client.ldap.initialize", return_value=conn
-        ):
+        with mock.patch("nldcsc.auth.ldap_client.ldap.initialize", return_value=conn):
             client.create_connection()
 
         conn.set_option.assert_any_call(
@@ -198,9 +192,7 @@ class TestCreateConnection:
         )
         conn = mock.Mock()
 
-        with mock.patch(
-            "nldcsc.auth.ldap_client.ldap.initialize", return_value=conn
-        ):
+        with mock.patch("nldcsc.auth.ldap_client.ldap.initialize", return_value=conn):
             client.create_connection()
 
         tls_options = {
