@@ -1,0 +1,34 @@
+name: Task or work item
+description: Record planned work, maintenance, or operational tasks.
+title: "T"
+labels: ["task", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the work item, expected outcome, and any dependencies.
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: Who is responsible for delivery?
+      placeholder: Team or individual name
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What work is required and what is out of scope?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Define how the task will be considered complete.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies or blockers
+      description: List any systems, approvals, or dates needed.

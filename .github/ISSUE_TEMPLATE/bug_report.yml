@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible issue in the product or repository.
+title: "BR"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please include enough detail for maintainers to reproduce and triage it quickly.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide the product, service, repo, branch, or version affected.
+      placeholder: e.g. api-prod, repo main, v2.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the bug, expected behavior, and actual behavior.
+      placeholder: "Expected ... but observed ..."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to...
+        2. Click on...
+        3. See error...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Attach logs, screenshots, or error output.
+      placeholder: Paste relevant logs or drag files here.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: Select the impact of the bug.
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true

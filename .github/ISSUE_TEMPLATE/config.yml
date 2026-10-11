@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability report
+    url: https://example.org/security
+    about: Please use the private security reporting process for vulnerabilities.
+  - name: Questions and support
+    url: https://github.com/org/community/discussions
+    about: For general support, ask in the organization discussion forum.
