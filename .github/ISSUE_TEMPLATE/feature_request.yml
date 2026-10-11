@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest an improvement, enhancement, or new capability.
+title: "FR"
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to propose a user-facing improvement or new capability.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Short description of the proposed improvement.
+      placeholder: e.g. Add audit export to the admin console
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: Explain the problem being solved or the opportunity being addressed.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Outline the desired behavior and any acceptance criteria.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Briefly describe other approaches explored.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Nice to have
+        - Important
+        - Must have
+    validations:
+      required: true

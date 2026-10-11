@@ -1,0 +1,49 @@
+name: Question
+description: Ask a question about usage, configuration, or project guidance.
+title: "Q"
+labels: ["question", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reaching out. Please include the context and what you have already tried so maintainers can answer quickly.
+  - type: input
+    id: area
+    attributes:
+      label: Area or repository
+      description: Which product, service, repo, or component does this relate to?
+      placeholder: e.g. api, docs, repo main, deployment
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you need help understanding or deciding?
+      placeholder: Describe the question or problem you are trying to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and background
+      description: Share any relevant setup, configuration, error messages, or constraints.
+      placeholder: Include environment details, versions, logs, or examples if helpful.
+    validations:
+      required: true
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What have you tried?
+      description: Tell us what you already attempted and what happened.
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      description: Select how time-sensitive this question is.
+      options:
+        - Not urgent
+        - Routine
+        - Blocking
+    validations:
+      required: true

@@ -1,0 +1,54 @@
+name: Security report
+description: Report a suspected security vulnerability through the private reporting process.
+title: "SEC"
+labels: ["security", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please use this form only for security-related reports that need private handling.
+        Do not include sensitive details in the public issue body.
+        If this is a vulnerability, follow the private security reporting process instead of posting detailed reproduction steps here.
+  - type: input
+    id: affected_component
+    attributes:
+      label: Affected component
+      description: Which product, service, repo, or version is affected?
+      placeholder: e.g. api, web app, repo main, v2.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary of the report
+      description: Briefly describe the suspected issue and its impact.
+      placeholder: Describe the vulnerability, exploit scenario, or security concern at a high level.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Include any non-sensitive details that help triage the report.
+      placeholder: Include affected endpoints, versions, logs, or notes that do not expose sensitive payloads.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: Select the approximate impact level.
+      options:
+        - Informational
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+  - type: checkboxes
+    id: acknowledgment
+    attributes:
+      label: Confirmation
+      description: Confirm that this report is being submitted privately and does not include sensitive details.
+      options:
+        - label: I confirm this is a non-public security report and I have not included sensitive exploit details.
+          required: true
