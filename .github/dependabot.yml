@@ -1,0 +1,26 @@
+version: 2
+registries:
+  github-private:
+    type: git
+    url: https://github.com
+    username: x-access-token
+    password: ${{secrets.DEPENDABOT_GITHUB_TOKEN}}
+updates:
+  - package-ecosystem: pip
+    directories:
+      - "/"
+      - "/requirements"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "fix(deps)"
+  - package-ecosystem: github-actions
+    directory: "/"
+    registries:
+      - github-private
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 0
+    commit-message:
+      prefix: "chore(deps)"
