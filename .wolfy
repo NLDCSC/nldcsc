@@ -1,0 +1,90 @@
+# Repository settings for the shared template sync and auto-merge workflows.
+# All settings are optional. Uncomment only the settings you need.
+# Full schema: https://github.com/NLDCSC/DCSC-shared#repository-configuration-wolfy
+## Supported ecosystems are pip, docker, docker-compose, github-actions, npm,
+## opentofu, and terraform. Settings for ecosystems not detected in the
+## repository have no effect.
+##
+## Each ignore rule must include at least one of dependency-name, versions, or
+## update-types. dependency-name defaults to "*" when omitted. versions accepts
+## one string or a list of strings; quote values that could be parsed as numbers.
+## update-types accepts version-update:semver-major, version-update:semver-minor,
+## and version-update:semver-patch. Version syntax is specific to each ecosystem.
+## For docker and docker-compose, omit registry hostnames from dependency names;
+## numeric wildcard versions such as "9.*" are converted to ranges.
+##
+## exclude-paths is a list of unique nonempty path strings for each ecosystem.
+## Paths are relative to each detected update directory. "*" matches within a
+## directory; "**" matches across directories. Exclusions are passed unchanged
+## to Dependabot, not used to filter ecosystem or directory detection.
+## Omit exclude-paths or use [] to keep the default (no exclusions).
+##
+# dependabot:
+#   ecosystems:
+#     pip:
+#       exclude-paths:
+#         - "tests/**"
+#         - "vendor/**"
+#       ignore:
+#         - dependency-name: "example-package"
+#           versions: "1.*"
+#           update-types: ["version-update:semver-major"]
+#     docker:
+#       exclude-paths:
+#         - "fixtures/**"
+#       ignore:
+#         - dependency-name: "example/image"
+#           versions: [">= 1, < 2"]
+#           update-types: ["version-update:semver-major"]
+#     docker-compose:
+#       exclude-paths:
+#         - "compose.test.yml"
+#         - "docker-compose.test.yml"
+#       ignore:
+#         - dependency-name: "example/image"
+#           versions: [">= 1, < 2"]
+#           update-types: ["version-update:semver-major"]
+#     github-actions:
+#       exclude-paths:
+#         - ".github/workflows/experimental-*.yml"
+#       ignore:
+#         - dependency-name: "example/action"
+#           versions: ["1.*"]
+#           update-types: ["version-update:semver-major"]
+#         - update-types: ["version-update:semver-minor"]
+#     npm:
+#       exclude-paths:
+#         - "vendor/**"
+#         - "test/fixtures/**"
+#       ignore:
+#         - dependency-name: "example-package"
+#           versions: ["1.*"]
+#           update-types: ["version-update:semver-major"]
+#     opentofu:
+#       exclude-paths:
+#         - "examples/**"
+#       ignore:
+#         - dependency-name: "example/provider"
+#           versions: ["1.*"]
+#           update-types: ["version-update:semver-major"]
+#     terraform:
+#       exclude-paths:
+#         - "examples/**"
+#       ignore:
+#         - dependency-name: "example/provider"
+#           versions: ["1.*"]
+#           update-types: ["version-update:semver-major"]
+##
+## auto-merge overrides the bot-auto-merge-pull-requests workflow inputs for
+## this repository. Settings are read from the default branch and validated
+## against .github/workflow-schemas/bot-auto-merge-pull-requests.schema.json.
+## Set enabled: false to opt this repository out of auto-merge.
+##
+# auto-merge:
+#   enabled: true
+#   conventional-commit-types: ["chore"]
+#   allowed-authors: ["dependabot[bot]", "devops-wolfy[bot]"]
+#   merge-method: squash
+#   bypass-merge-rules: true
+#   rebase: true
+#   merge-cooldown-minutes: 30

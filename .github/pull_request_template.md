@@ -9,6 +9,7 @@ Fixes # (issue number)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation create/update
+- [ ] Refactor (just cleaning up; linting changes etc. Changes that are non-functional)
 
 ## How Has This Been Tested?
 Describe the tests you ran to verify your changes.
