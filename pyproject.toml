@@ -46,7 +46,7 @@ fastapi_cache = ["cache_fastapi"]
 
 [tool.poetry.group.auth.dependencies]
 python-ldap = ">=3.4.3"
-click = "8.1.7"
+click = "8.5.0"
 
 [tool.poetry.group.flask_managers.dependencies]
 gunicorn = ">=21.2.0"
