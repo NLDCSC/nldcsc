@@ -65,6 +65,10 @@ class AuthInfo:
         )
 
 
+class ViperTokenRenewed(HTTPError):
+    """Viper rejected the token; it was renewed, but the request was not sent again."""
+
+
 class ViperAuth(AuthBase):
     def __init__(
         self,
@@ -84,7 +88,7 @@ class ViperAuth(AuthBase):
             return f
 
         @wraps(f)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, replay_on_token_failure: bool = True, **kwargs):
             active_auth = kwargs.setdefault("auth", self)
 
             # Explicit auth=None is used for login and static Bearer tokens.
@@ -120,6 +124,9 @@ class ViperAuth(AuthBase):
                     if rejected_token is None or rejected_token == current_token:
                         self.update_token(force=True)
 
+                if not replay_on_token_failure:
+                    # Requests that start work, such as a batch, must not run twice.
+                    raise ViperTokenRenewed(response=response) from exc
                 return f(*args, **kwargs)
 
         wrapper._auth_wrapped = True

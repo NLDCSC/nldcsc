@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Optional
+from typing import Any, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -102,3 +102,49 @@ class AsyncSearchResponse(DataClassJsonMixin):
     created: int | None = None
     completed: int | None = None
     status: AsyncSearchStatus | None = None
+
+
+@dataclass
+class SearchExclusion(DataClassJsonMixin):
+    """One AND NOT term: leave out records where field matches value."""
+
+    field: str
+    value: str
+
+
+@dataclass
+class BatchSearchQuery(DataClassJsonMixin):
+    """One search in a batch: a source (connector.id) and what to look for."""
+
+    connector_id: str
+    field: str
+    value: str
+    page: int = 0
+    size: int = 10
+    exclusions: Optional[list[SearchExclusion]] = None
+
+
+@dataclass
+class BatchSearchItem(DataClassJsonMixin):
+    """Vipers answer for a single search in a batch."""
+
+    connector_id: str
+    status_code: int
+    search: Optional[AsyncSearchResponse] = None
+    status_url: Optional[str] = None
+    results_url: Optional[str] = None
+    error: Any = None  # text, or {"code": ..., "message": ...}
+    retry_after: Optional[str] = None  # only with 429
+
+    @property
+    def started(self) -> bool:
+        return self.status_code == 201
+
+    @property
+    def error_code(self) -> str | None:
+        return self.error.get("code") if isinstance(self.error, dict) else None
+
+
+@dataclass
+class BatchSearchResponse(DataClassJsonMixin):
+    searches: list[BatchSearchItem]

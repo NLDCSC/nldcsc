@@ -2,6 +2,7 @@ from nldcsc.http_apis.viper.collections.admin import AdminCollection
 from nldcsc.http_apis.viper.collections.async_searches import AsyncSearchCollection
 from nldcsc.http_apis.viper.collections.auth import AuthCollection
 from nldcsc.http_apis.viper.collections.bases import EndpointCollection
+from nldcsc.http_apis.viper.collections.connectors import ConnectorsCollection
 from nldcsc.http_apis.viper.collections.general import GeneralCollection
 from nldcsc.http_apis.viper.collections.kpi import KPICollection
 from nldcsc.http_apis.viper.collections.user import UserCollection
@@ -41,3 +42,7 @@ class V1Collection(EndpointCollection, prefix="v1"):
     @property
     def nexpose(self):
         return self.get_collection(NexposeCollection)
+
+    @property
+    def connectors(self):
+        return self.get_collection(ConnectorsCollection)
