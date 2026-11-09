@@ -11,7 +11,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Check files using the black formatter
         uses: psf/black@stable
         id: action_black
@@ -25,7 +25,7 @@ jobs:
           fi
       - name: Create Pull Request
         if: steps.check_changes.outputs.changes == 'true' && github.ref == 'refs/heads/master'
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Format Python code with psf/black push"
