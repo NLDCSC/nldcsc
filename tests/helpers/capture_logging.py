@@ -1,4 +1,5 @@
 import logging
+import re
 from contextlib import contextmanager
 from typing import List, Tuple
 
@@ -31,4 +32,7 @@ def records_to_tuples(records: List[logging.LogRecord]) -> List[Tuple[str, int, 
     :param records: A list of LogRecord objects.
     :returns: A list of tuples, where each tuple has the format (logger_name, log_level, message)
     """
-    return [(r.name, r.levelno, r.getMessage()) for r in records]
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return [
+        (r.name, r.levelno, ansi_escape.sub("", r.getMessage())) for r in records
+    ]

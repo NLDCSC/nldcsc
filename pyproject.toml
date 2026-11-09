@@ -202,3 +202,11 @@ pytest_add_cli_args_test_selection = [
     "tests/test_sql_migrate.py",
     "tests/test_ldap_client.py",
 ]
+
+[tool.pytest.ini_options]
+addopts = "-ra --cov=nldcsc --cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["nldcsc"]
+relative_files = true

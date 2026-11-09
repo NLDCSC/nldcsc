@@ -1,5 +1,4 @@
 import logging
-import os
 
 import mock
 from mock.mock import patch
@@ -35,8 +34,10 @@ class TestLogger:
         except Exception:
             raise
 
-    def test_handler_types(self):
-        os.environ["GELF_SYSLOG"] = "True"
+    def test_handler_types(self, monkeypatch, tmp_path):
+        monkeypatch.setenv("SYSLOG_ENABLE", "True")
+        monkeypatch.setenv("GELF_SYSLOG", "True")
+        monkeypatch.setenv("LOG_FILE_PATH", str(tmp_path))
 
         from nldcsc.loggers.app_logger import AppLogger
         from logging.handlers import RotatingFileHandler
@@ -51,8 +52,10 @@ class TestLogger:
         assert isinstance(logger.handlers[1], RotatingFileHandler)
         assert isinstance(logger.handlers[2], DCSCGelfUDPHandler)
 
-    def test_syslog_handler(self):
-        os.environ["GELF_SYSLOG"] = "False"
+    def test_syslog_handler(self, monkeypatch, tmp_path):
+        monkeypatch.setenv("SYSLOG_ENABLE", "True")
+        monkeypatch.setenv("GELF_SYSLOG", "False")
+        monkeypatch.setenv("LOG_FILE_PATH", str(tmp_path))
 
         from nldcsc.loggers.app_logger import AppLogger
         from logging.handlers import RotatingFileHandler
@@ -68,8 +71,10 @@ class TestLogger:
         assert isinstance(logger.handlers[2], FullSysLogHandler)
 
     @mock.patch("nldcsc.loggers.handlers.syslog_handler.socket.socket.sendto")
-    def test_syslog_emit(self, sys_socket):
-        os.environ["GELF_SYSLOG"] = "False"
+    def test_syslog_emit(self, sys_socket, monkeypatch, tmp_path):
+        monkeypatch.setenv("SYSLOG_ENABLE", "True")
+        monkeypatch.setenv("GELF_SYSLOG", "False")
+        monkeypatch.setenv("LOG_FILE_PATH", str(tmp_path))
         import socket
 
         from nldcsc.loggers.app_logger import AppLogger
