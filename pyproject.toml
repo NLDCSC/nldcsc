@@ -11,8 +11,7 @@ classifiers=[
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
 ]
 
@@ -147,6 +146,14 @@ mock = "^5.1.0"
 requests-mock = "^1.12.1"
 mutmut = "^3.7.0"
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^9.1.0"
+furo = "^2025.12.19"
+myst-parser = ">=5.1.0"
+sphinx-copybutton = "^0.5.2"
 
 [tool.poetry.group.custom_type_sqlalchemy.dependencies]
 sqlalchemy = ">=2.0.21"
@@ -163,7 +170,7 @@ fastapi = ">=0.136.1"
 redis = ">=5.0.0"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.14,<4.0"
 setuptools = ">=68.1.0"
 
 [build-system]
