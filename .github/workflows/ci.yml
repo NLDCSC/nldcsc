@@ -13,18 +13,18 @@ on:
 
 jobs:
   test:
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-python.yml@4a88878a45e879057c1c1c751b8bbbd01ea7eae5 # v13.18.0
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-python.yml@bc0115a3d016f916258927f9f8db0fb121c912ce # v13.18.1
     with:
       python-version: '3.14'
       min-coverage: 70
 
   security:
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-security.yml@4a88878a45e879057c1c1c751b8bbbd01ea7eae5 # v13.18.0
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-security.yml@bc0115a3d016f916258927f9f8db0fb121c912ce # v13.18.1
     secrets:
       GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   check:
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-conventional-commits.yml@4a88878a45e879057c1c1c751b8bbbd01ea7eae5 # v13.18.0
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-conventional-commits.yml@bc0115a3d016f916258927f9f8db0fb121c912ce # v13.18.1
 
   black:
     permissions:
@@ -32,7 +32,7 @@ jobs:
       pull-requests: write
       checks: write
       issues: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-lint-black.yml@4a88878a45e879057c1c1c751b8bbbd01ea7eae5 # v13.18.0
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-lint-black.yml@bc0115a3d016f916258927f9f8db0fb121c912ce # v13.18.1
     with:
       head-repository: ${{ github.event.pull_request.head.repo.full_name || '' }}
 
@@ -44,7 +44,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/release-gate.yml@4a88878a45e879057c1c1c751b8bbbd01ea7eae5 # v13.18.0
+    uses: NLDCSC/DCSC-shared/.github/workflows/release-gate.yml@bc0115a3d016f916258927f9f8db0fb121c912ce # v13.18.1
     with:
       python-version: '3.14'
     secrets:
@@ -52,10 +52,11 @@ jobs:
       releaser-app-private-key: ${{ secrets.RELEASER_APP_PRIVATE_KEY }}
 
   release-python:
+    if: github.event_name == 'push'
     permissions:
       contents: write
       id-token: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/release-python.yml@4a88878a45e879057c1c1c751b8bbbd01ea7eae5 # v13.18.0
+    uses: NLDCSC/DCSC-shared/.github/workflows/release-python.yml@bc0115a3d016f916258927f9f8db0fb121c912ce # v13.18.1
     with:
       python-version: '3.14'
       publish-to-pypi: true
