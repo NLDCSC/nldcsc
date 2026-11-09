@@ -1,211 +1,74 @@
-# NLDCSC package
+# NLDCSC
 
-[![GitHub Release](https://img.shields.io/github/release/NLDCSC/nldcsc.svg?style=flat)]()
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+NLDCSC is a collection of reusable Python components for application
+infrastructure, service integrations, and development tooling. Applications
+can install the dependencies for only the components they use.
 
+## Contents
 
-[![codecov](https://codecov.io/gh/NLDCSC/nldcsc/graph/badge.svg?token=QSHW4B6ADR)](https://codecov.io/gh/NLDCSC/nldcsc)
-![pypi](https://github.com/NLDCSC/nldcsc/actions/workflows/package_to_pypi.yaml/badge.svg)
-![pytest](https://github.com/NLDCSC/nldcsc/actions/workflows/tox_tests.yaml/badge.svg)
+- [Functionality](#functionality)
+- [Installation and usage](#installation-and-usage)
+- [Development](#development)
+- [Local documentation](#local-documentation)
 
-This package contains generic re-usable code.
+## Functionality
 
-Install the full package:
+- **Application integration:** Flask application management, middleware,
+  Elasticsearch, Kafka, Redis and SQLAlchemy extensions, and OpenID Connect SSO.
+- **Authentication and logging:** LDAP client, application and Gunicorn logging,
+  with optional file, syslog and GELF output.
+- **HTTP and integrations:** synchronous and cached `requests` clients,
+  synchronous/asynchronous HTTPX clients, DCSC Transfer, DNS-over-HTTPS,
+  GeoIP, Hybrid Analysis, WhoisXML, and clients for Confluence, Discord, FBF,
+  Mailgun, Nexpose, OTRS, Providentia, Slack and Viper.
+- **Data and caching:** Redis and FastAPI caching, server-side DataTables for
+  SQL and Elasticsearch, SQLAlchemy custom types, and vulnerability data models
+  for CSAF, CVE records, NIST and OSV.
+- **Developer tools and utilities:** Flask and Alembic-based SQL migration
+  helpers, the `nldcsc db` CLI, rate limiting, and generic date/time and
+  environment utilities.
 
-```
-pip install nldcsc[all]
-```
+See the [module reference](https://github.com/NLDCSC/nldcsc/blob/master/docs/source/reference/index.md)
+for the complete package map.
 
-Package has several modules which can be installed separately by specifying them 
-as an extra requirement. To install the loggers module only, specify:
+## Installation and usage
 
-```
-pip install nldcsc[loggers]
-```
-Or for multiple modules:
-```
-pip install nldcsc[loggers, flask_managers]
-```
+Install the base package and the extras required by your application:
 
-## Modules
-
-The following modules are available in the nldcsc package:
-
-* auth
-* datatables
-* flask_managers
-* flask_middleware
-* flask_plugins
-* http_apis
-* http_apis_cached
-* httpx_apis
-* loggers
-* sql_migrations
-* sso
-* plugins
-    - plugin_doh
-    - plugin_geo_ip
-    - plugin_sql_migrate
-    - plugin_redis
-    - plugin_mailgun
-    - plugin_nexpose
-    - plugin_viper
-* custom_types
-    - custom_type_sqlalchemy
-
-### Loggers
-
-There are two loggers provided:
-* AppLogger (nldcsc.loggers.app_logger.AppLogger)
-* GunicornLogger (nldcsc.loggers.app_logger.GunicornLogger)
-
-The AppLogger is intended to be used as a loggerClass to be used for the 
-standard python logging module.
-
-```python
-import logging
-from nldcsc.loggers.app_logger import AppLogger
-
-logging.setLoggerClass(AppLogger)
-
-mylogger = logging.getLogger(__name__)
-```
-The 'mylogger' instance has all the proper formatting and handlers 
-(according to the desired config) to log messages.
-
-The Gunicorn logger is intended to be used for as a loggerClass for the 
-gunicorn webserver; it enables the FlaskAppManager to set the necessary 
-formatting and handles according to the AppLogger specs and a custom format
-for the gunicorn access logging.
-
-### Flask app manager
-
-The FlaskAppManager is intended to be used to 'run' flask applications in 
-both test, development as in production environments. 
-
-```python
-from YADA import app
-from nldcsc.flask_managers.flask_app_manager import FlaskAppManager
-
-fam = FlaskAppManager(version="1.0", app=app)
-fam.run()
-```
-Depending on the configuration the FlaskAppManager uses a werkzeug (DEBUG == True)
-or a gunicorn webserver. TLS could be set for both webservers iaw the module specific
-README.md.
-
-### HTTP apis cached
-
-Baseclass for http api communication is present under
-nldcsc.http_apis.base_class.cached_base_class.CachedApi
-
-This baseclass utilizes requests_cache to cache requests automagically.
-
-### HTTP apis
-
-Baseclass for http api communication is present under 
-nldcsc.http_apis.base_class.api_base_class.ApiBaseClass
-
-### HTTPX apis
-
-Baseclass for httpx api communication is present under 
-nldcsc.httpx_apis.base_class.httpx_base_class.HTTPXBaseClass
-
-### SQL Migrations
-
-The sql migrations can be used to facilitate migration between different
-versions of sql models / versions. It relies on flask migrate to perform
-the different migrations. It has a CLI as well as an python class based API.
-
-Check the command line help
-```
-python3 -m nldcsc.sql_migrations.flask_sql_migrate -a /path/to/script_with_flask_app.py -i
-python3 -m nldcsc.sql_migrations.flask_sql_migrate -a /path/to/script_with_flask_app.py -m
-python3 -m nldcsc.sql_migrations.flask_sql_migrate -a /path/to/script_with_flask_app.py -u
+```sh
+python -m pip install "nldcsc[loggers,flask_managers]"
 ```
 
-Or initiate the FlaskSqlMigrate as a class and initiate the migration 
-process from there: 
-```python
-from nldcsc.sql_migrations.flask_sql_migrate import FlaskSqlMigrate
-fsm = FlaskSqlMigrate(app_ref="/path/to/script_with_flask_app.py")
+Alternatively, `python -m pip install "nldcsc[all]"` installs all dependency
+groups, including development and documentation tools.
 
-fsm.db_init()
-fsm.db_migrate()
-fsm.db_update()
+See the [usage guide](https://github.com/NLDCSC/nldcsc/blob/master/docs/source/usage/index.md)
+for examples and [configuration](https://github.com/NLDCSC/nldcsc/blob/master/docs/source/configuration/index.md)
+for the available extras and runtime settings.
+
+## Development
+
+From the repository root, install the project and contributor dependencies,
+then run the tests:
+
+```sh
+poetry install --all-extras --with tests,dev,docs
+poetry run pytest
 ```
 
-### Plugins
+See the [development guide](https://github.com/NLDCSC/nldcsc/blob/master/docs/source/development/index.md)
+and [testing guide](https://github.com/NLDCSC/nldcsc/blob/master/docs/source/development/testing.md)
+for repository structure, focused tests and quality checks.
 
-There are several off the shelf plugins that can be used in other projects. Every plugin can be installed with:
-```
-pip install nldcsc[plugin-<plugin-name>]
-```
-or if you rather install all the plugins:
-```
-pip install nldcsc[plugins]
-```
+## Local documentation
 
-#### plugin-sql-migrate
+With the documentation dependency group installed, build the Sphinx site from
+the repository root:
 
-The sql_migrate plugin serves as a wrapper around alembic but replaces the naming convention of migration files to support multiple branches of development. To make use of this plugin the CLI can be used.
-
-Check the command line help
-```
-python3 -m nldcsc db --help
-```
-OR
-```
-nldcsc db --help
+```sh
+poetry run make -C docs html
 ```
 
-The plugin expects to be pointed towards a python configuration file that looks something like this:
-```python
-from my_awesome_project.db import get_engine
-from my_awesome_project.models.base import ModelBase
-
-#This should be a SQLAlchemy engine object.
-db = get_engine()
-
-#This should be the modelbase class metadata
-metadata = ModelBase.metadata
-```
-
-### Custom types
-
-Custom types is a collection of custom types or objects that can be used with other libraries
-
-#### custom_type_sqlalchemy
-
-This is a collection of types to be used together with sqlalchemy. If these types are to be used make sure to inherit from the ModelBase within the NLDCSC package. As the types get mapped to their SQL equivalents there.
-
-## Adding modules and/or groups
-
-Everything for this package is defined in the pyproject.toml file. Dependencies are managed by poetry and grouped in, you guessed it, groups. Every poetry group can be installed as an extra using pip. 
-
-Extra extras or group on group/extra dependencies can also be defined in the [tool.nldcsc.group.dependencies] section. Everything defined here will also become an extra if no group already exists. You can use everything defined here as dependency for another group, order does **not** matter.
-
-example:
-```toml
-[tool.nldcsc.group.dependencies]
-my_awesome_extra = ["my_awesome_group", "my_other_group"]
-my_awesome_group = ["my_logging_group"]
-
-[tool.poetry.group.my_awesome_group.dependencies]
-<dependency here>
-
-[tool.poetry.group.my_other_group.dependencies]
-<dependency here>
-
-[tool.poetry.group.my_logging_group.dependencies]
-<dependency here>
-```
-
-Using this example the following extras exist with the correct dependencies:
-```
-pip install nldcsc[all]
-pip install nldcsc[my-awesome-extra]
-pip install nldcsc[my-awesome-group]
-pip install nldcsc[my-other-group]
-pip install nldcsc[my-logging-group]
-```
+Open `docs/build/html/index.html` in a browser. The
+[documentation source](https://github.com/NLDCSC/nldcsc/blob/master/docs/source/index.md)
+links to the full usage, configuration, development, testing and reference guides.
