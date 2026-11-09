@@ -133,13 +133,9 @@ def test_cache_miss_then_hit_sets_status_and_etag():
 
     async def run():
         first_response = Response()
-        first = await endpoint(
-            4, request=make_request(), response=first_response
-        )
+        first = await endpoint(4, request=make_request(), response=first_response)
         second_response = Response()
-        second = await endpoint(
-            4, request=make_request(), response=second_response
-        )
+        second = await endpoint(4, request=make_request(), response=second_response)
         return first, first_response, second, second_response
 
     first, first_response, second, second_response = asyncio.run(run())
@@ -186,4 +182,7 @@ def test_cache_handles_backend_failures_without_losing_result():
     def endpoint():
         return "available"
 
-    assert asyncio.run(endpoint(request=make_request(), response=Response())) == "available"
+    assert (
+        asyncio.run(endpoint(request=make_request(), response=Response()))
+        == "available"
+    )

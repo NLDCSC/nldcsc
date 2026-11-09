@@ -50,9 +50,7 @@ def test_upload_helper_prepares_batches_and_tracks_chunks():
 
 
 def test_sync_transfer_methods_parse_responses_and_upload_chunks():
-    api = DCSCTransferAPI(
-        "https://transfer.test", "token", use_async_client=False
-    )
+    api = DCSCTransferAPI("https://transfer.test", "token", use_async_client=False)
 
     def response(data):
         return httpx.Response(200, json=data)
@@ -87,9 +85,7 @@ def test_sync_transfer_methods_parse_responses_and_upload_chunks():
 
 
 def test_sync_transfer_paginates_hashes_and_uploads_files():
-    api = DCSCTransferAPI(
-        "https://transfer.test", "token", use_async_client=False
-    )
+    api = DCSCTransferAPI("https://transfer.test", "token", use_async_client=False)
     api.list_hashes = Mock(
         side_effect=[
             {"files": ["a", "b"], "start": 0, "size": 2},
@@ -144,9 +140,7 @@ def test_async_transfer_methods_and_hash_iteration():
 
 def test_transfer_methods_reject_wrong_client_mode_and_parse_errors():
     async_api = DCSCTransferAPI("https://transfer.test", "token")
-    sync_api = DCSCTransferAPI(
-        "https://transfer.test", "token", use_async_client=False
-    )
+    sync_api = DCSCTransferAPI("https://transfer.test", "token", use_async_client=False)
 
     with pytest.raises(AttributeError, match="async method whilst using a sync client"):
         asyncio.run(sync_api.a_get_file("id"))

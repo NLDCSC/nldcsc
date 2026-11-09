@@ -184,9 +184,7 @@ def test_login_and_authorize_routes_store_tokens_and_profile(sso_app):
 
     response = client.get("/auth/sso_login?next=%2Fwelcome")
     assert response.data == b"login redirect"
-    oauth_client.authorize_redirect.assert_called_once_with(
-        "https://app.test/callback"
-    )
+    oauth_client.authorize_redirect.assert_called_once_with("https://app.test/callback")
 
     response = client.get("/auth/sso_authorize")
     assert response.status_code == 302

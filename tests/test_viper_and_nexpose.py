@@ -14,7 +14,10 @@ from nldcsc.http_apis.nexpose.objects import (
 from nldcsc.http_apis.viper.auth import AuthInfo, ViperAuth
 from nldcsc.http_apis.viper.client import ViperClient
 from nldcsc.http_apis.viper.collections.auth.objects import AuthResponse
-from nldcsc.http_apis.viper.collections.bases import EndpointCollection, PaginatedResponse
+from nldcsc.http_apis.viper.collections.bases import (
+    EndpointCollection,
+    PaginatedResponse,
+)
 from nldcsc.http_apis.viper.collections.utils import as_object
 
 

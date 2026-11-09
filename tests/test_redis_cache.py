@@ -51,7 +51,9 @@ def test_sync_cache_decorator_uses_cached_value_and_can_bypass(monkeypatch):
     pipeline = Mock()
     client.pipeline = Mock(return_value=pipeline)
     script = Mock()
-    monkeypatch.setattr(redis_cache_module, "get_cache_lua_fn", Mock(return_value=script))
+    monkeypatch.setattr(
+        redis_cache_module, "get_cache_lua_fn", Mock(return_value=script)
+    )
     cache = RedisCache(client).cache(ttl=20, namespace="items")
     calls = []
 
@@ -97,7 +99,9 @@ def test_async_cache_decorator_supports_async_function(monkeypatch):
     client = AsyncRedis()
     client.get = AsyncMock(return_value=None)
     script = AsyncMock()
-    monkeypatch.setattr(redis_cache_module, "get_cache_lua_fn", Mock(return_value=script))
+    monkeypatch.setattr(
+        redis_cache_module, "get_cache_lua_fn", Mock(return_value=script)
+    )
     cache = RedisCache(client).cache(ttl=5)
 
     @cache

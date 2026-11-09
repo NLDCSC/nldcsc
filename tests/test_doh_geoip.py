@@ -47,9 +47,12 @@ def test_reverse_dns_data_models_and_pointer_conversion():
 
 
 def test_reverse_pointer_converts_ipv6_addresses():
-    assert reverse_pointer_ip(
-        "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.ip6.arpa"
-    ) == "8000::1"
+    assert (
+        reverse_pointer_ip(
+            "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.ip6.arpa"
+        )
+        == "8000::1"
+    )
 
 
 def test_doh_requester_builds_queries_and_converts_ptr_records(monkeypatch):
@@ -112,7 +115,9 @@ def test_doh_parser_parses_responses_and_skips_malformed_payloads(monkeypatch):
             "AD": False,
             "CD": False,
             "Question": [{"name": "example.test", "type": 1}],
-            "Answer": [{"name": "example.test", "type": 1, "TTL": 10, "data": "192.0.2.1"}],
+            "Answer": [
+                {"name": "example.test", "type": 1, "TTL": 10, "data": "192.0.2.1"}
+            ],
             "Authority": [],
         }
     )
@@ -128,7 +133,10 @@ def test_doh_parser_parses_responses_and_skips_malformed_payloads(monkeypatch):
     assert len(parsed) == 1
     assert parsed[0].Question[0].original_ip is None
     assert parsed[0].reverse_data_lookups == ["192.0.2.1"]
-    assert any("yielded fields that could not be parsed" in call.args[0] for call in warning.call_args_list)
+    assert any(
+        "yielded fields that could not be parsed" in call.args[0]
+        for call in warning.call_args_list
+    )
 
 
 def test_doh_parser_performs_forward_and_reverse_requests():
@@ -142,7 +150,9 @@ def test_doh_parser_performs_forward_and_reverse_requests():
             "AD": False,
             "CD": False,
             "Question": [{"name": "example.test", "type": 1}],
-            "Answer": [{"name": "example.test", "type": 1, "TTL": 10, "data": "192.0.2.1"}],
+            "Answer": [
+                {"name": "example.test", "type": 1, "TTL": 10, "data": "192.0.2.1"}
+            ],
         }
     )
     reverse = dns_response(
