@@ -23,7 +23,7 @@ updates:
     registries:
       - github-private
     schedule:
-      interval: weekly
+      interval: daily
     cooldown:
       default-days: 0
     commit-message:
