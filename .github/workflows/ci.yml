@@ -13,18 +13,18 @@ on:
 
 jobs:
   test:
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-python.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-python.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
     with:
       python-version: '3.14'
       min-coverage: 70
 
   security:
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-security.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-security.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
     secrets:
       GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   check:
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-conventional-commits.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-conventional-commits.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
 
   black:
     permissions:
@@ -32,7 +32,7 @@ jobs:
       pull-requests: write
       checks: write
       issues: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/ci-lint-black.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/ci-lint-black.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
     with:
       head-repository: ${{ github.event.pull_request.head.repo.full_name || '' }}
 
@@ -44,7 +44,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/release-gate.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/release-gate.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
     with:
       python-version: '3.14'
     secrets:
@@ -56,7 +56,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/release-python.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/release-python.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
     with:
       python-version: '3.14'
       publish-to-pypi: true
@@ -66,7 +66,7 @@ jobs:
       contents: read
       pages: write
       id-token: write
-    uses: NLDCSC/DCSC-shared/.github/workflows/deploy-docs-pages.yml@b40874a27a85e38aa7ee737dbdbf18ecfaa63b0f # v13.19.8
+    uses: NLDCSC/DCSC-shared/.github/workflows/deploy-docs-pages.yml@edf74bc57de9b79574ec521edf37471a047d30e2 # v13.19.10
     with:
       python-version: '3.14'
       poetry-version: 2.5.1
