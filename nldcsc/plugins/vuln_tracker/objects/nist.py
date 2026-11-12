@@ -230,12 +230,14 @@ class Version(Validations):
     version: str
     status: str
 
+
 @dataclass_json
 @dataclass
 class AffectedData(Validations):
     vendor: str
     product: str
     versions: list[Version]
+
 
 @dataclass_json
 @dataclass
@@ -252,8 +254,11 @@ class Nist(Validations):
     lastModified: str
     references: list[Reference]
     descriptions: list[LangString]
-    
-    affected: list[]
+
+    affected: Optional[list[Affected]] = field(
+        metadata=json_config(exclude=exclude_optional_dict), default=None
+    )
+
     sourceIdentifier: Optional[str] = field(
         metadata=json_config(exclude=exclude_optional_dict), default=None
     )
