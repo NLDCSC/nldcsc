@@ -226,13 +226,34 @@ class VendorComment(Validations):
 
 @dataclass_json
 @dataclass
+class Version(Validations):
+    version: str
+    status: str
+
+@dataclass_json
+@dataclass
+class AffectedData(Validations):
+    vendor: str
+    product: str
+    versions: list[Version]
+
+@dataclass_json
+@dataclass
+class Affected(Validations):
+    source: str
+    affectedData: list[AffectedData]
+
+
+@dataclass_json
+@dataclass
 class Nist(Validations):
     id: str
     published: str
     lastModified: str
     references: list[Reference]
     descriptions: list[LangString]
-
+    
+    affected: list[]
     sourceIdentifier: Optional[str] = field(
         metadata=json_config(exclude=exclude_optional_dict), default=None
     )
