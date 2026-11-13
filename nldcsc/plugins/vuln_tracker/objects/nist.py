@@ -119,6 +119,16 @@ class Cvss2(Validations):
 
 @dataclass_json
 @dataclass
+class SsvcData(Validations):
+    timestamp: str
+    id: str
+    role: str
+    version: str
+    options: list[dict]
+
+
+@dataclass_json
+@dataclass
 class Metric(Validations):
     cvssMetricV40: Optional[list[Cvss40]] = field(
         metadata=json_config(exclude=exclude_optional_dict), default=None
@@ -130,6 +140,10 @@ class Metric(Validations):
         metadata=json_config(exclude=exclude_optional_dict), default=None
     )
     cvssMetricV2: Optional[list[Cvss2]] = field(
+        metadata=json_config(exclude=exclude_optional_dict), default=None
+    )
+
+    ssvcV203: Optional[list[SsvcData]] = field(
         metadata=json_config(exclude=exclude_optional_dict), default=None
     )
 
