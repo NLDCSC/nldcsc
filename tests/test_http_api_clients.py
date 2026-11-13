@@ -18,9 +18,7 @@ from nldcsc.http_apis.slack.api import SlackWebhookApi
 def test_webhook_clients_validate_payloads_and_build_requests():
     discord = DiscordWebhookApi("webhook", "token")
     discord.call = Mock(return_value={"ok": True})
-    assert discord._build_url("") == (
-        "https://discord.com/api/webhooks/webhook/token"
-    )
+    assert discord._build_url("") == ("https://discord.com/api/webhooks/webhook/token")
     assert discord.post_to_webhook(
         embeds={"title": "alert"}, username="bot", tts=True, allowed_mentions={}
     ) == {"ok": True}
@@ -116,9 +114,7 @@ def test_mailgun_ping_and_application_methods(monkeypatch, tmp_path):
     }
 
     output = tmp_path / "download.mjml"
-    api.get_application_template = Mock(
-        return_value={"mjml_content": expected_content}
-    )
+    api.get_application_template = Mock(return_value={"mjml_content": expected_content})
     assert api.download_application_template("alerts", "weekly", output) is True
     assert output.read_bytes() == b"<mjml>hello</mjml>"
     api.get_application_template.return_value = {}

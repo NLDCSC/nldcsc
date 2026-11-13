@@ -33,6 +33,4 @@ def records_to_tuples(records: List[logging.LogRecord]) -> List[Tuple[str, int, 
     :returns: A list of tuples, where each tuple has the format (logger_name, log_level, message)
     """
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-    return [
-        (r.name, r.levelno, ansi_escape.sub("", r.getMessage())) for r in records
-    ]
+    return [(r.name, r.levelno, ansi_escape.sub("", r.getMessage())) for r in records]

@@ -40,13 +40,13 @@ def test_sql_datatable_applies_sort_pagination_and_global_search():
 
     with app.app_context():
         db.create_all()
-        db.session.add_all([Item(name="alpha"), Item(name="beta"), Item(name="alphabet")])
+        db.session.add_all(
+            [Item(name="alpha"), Item(name="beta"), Item(name="alphabet")]
+        )
         db.session.commit()
 
         with app.test_request_context(
-            query_string=make_datatable_query(
-                **{"search[value]": "alpha"}
-            )
+            query_string=make_datatable_query(**{"search[value]": "alpha"})
         ):
             table = SQLServerSideDataTable(
                 request=request,
@@ -78,7 +78,9 @@ def test_sql_datatable_supports_column_filters_custom_filters_and_hooks():
 
     with app.app_context():
         db.create_all()
-        db.session.add_all([Item(name="alpha"), Item(name="beta"), Item(name="alphabet")])
+        db.session.add_all(
+            [Item(name="alpha"), Item(name="beta"), Item(name="alphabet")]
+        )
         db.session.commit()
 
         custom_calls = []
