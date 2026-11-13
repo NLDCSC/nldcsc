@@ -17,7 +17,10 @@ def test_uuid_type_converts_to_and_from_database_values():
     value = uuid_module.UUID("12345678-1234-5678-1234-567812345678")
 
     assert column_type.process_bind_param(value, None) == value.hex
-    assert column_type.process_bind_param("12345678-1234-5678-1234-567812345678", None) == value.hex
+    assert (
+        column_type.process_bind_param("12345678-1234-5678-1234-567812345678", None)
+        == value.hex
+    )
     assert column_type.process_bind_param(None, None) is None
     assert column_type.process_result_value(value.hex, None) == str(value)
     assert column_type.process_result_value(None, None) is None
@@ -72,7 +75,8 @@ def test_debug_logging_middleware_logs_request_metadata():
     app.add_url_rule("/", view_func=lambda: "ok")
 
     response = app.test_client().get(
-        "/?search=value", headers={"X-Request-ID": "request-1", "X-Forwarded-For": "192.0.2.1"}
+        "/?search=value",
+        headers={"X-Request-ID": "request-1", "X-Forwarded-For": "192.0.2.1"},
     )
 
     assert response.status_code == 200

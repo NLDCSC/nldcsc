@@ -16,7 +16,9 @@ from nldcsc.plugins.redis_client.wrapper import RedisWrapper
 
 def test_standalone_application_loads_supported_configuration():
     app = Flask(__name__)
-    server = StandaloneApplication(app, {"bind": "127.0.0.1:5000", "unknown": "ignored"})
+    server = StandaloneApplication(
+        app, {"bind": "127.0.0.1:5000", "unknown": "ignored"}
+    )
 
     assert server.load() is app
     assert server.cfg.bind == ["127.0.0.1:5000"]
@@ -34,9 +36,7 @@ def test_flask_app_manager_reads_settings_and_runs_debug_server(monkeypatch):
     manager.run()
 
     assert manager.kwargs == {"workers": 3}
-    app.run.assert_called_once_with(
-        host="127.0.0.1", port=5010, ssl_context="adhoc"
-    )
+    app.run.assert_called_once_with(host="127.0.0.1", port=5010, ssl_context="adhoc")
 
 
 def test_flask_app_manager_uses_gunicorn_and_validates_workers(monkeypatch):
@@ -85,7 +85,9 @@ def test_flask_app_manager_rejects_non_flask_application():
 def test_redis_wrapper_builds_client_from_url_and_environment(monkeypatch):
     client = Mock()
     redis_constructor = Mock(return_value=client)
-    monkeypatch.setattr("nldcsc.plugins.redis_client.wrapper.redis.Redis", redis_constructor)
+    monkeypatch.setattr(
+        "nldcsc.plugins.redis_client.wrapper.redis.Redis", redis_constructor
+    )
     monkeypatch.setenv("REDIS_CACHE_DB", "3")
     monkeypatch.setenv("REDIS_KWARGS", '{"decode_responses": true}')
 

@@ -42,9 +42,15 @@ def test_vulnerability_score_models_round_trip_nested_data():
 
     assert restored.baseScore == 8
     assert restored.to_dict()["attackVector"] == "NETWORK"
-    assert CVSS40(
-        version="4.0", vectorString="CVSS:4.0/AV:N", baseScore=8.0, baseSeverity="HIGH"
-    ).baseScore == 8.0
+    assert (
+        CVSS40(
+            version="4.0",
+            vectorString="CVSS:4.0/AV:N",
+            baseScore=8.0,
+            baseSeverity="HIGH",
+        ).baseScore
+        == 8.0
+    )
 
 
 def test_osv_builds_nested_objects_and_exposes_identifier_properties():
@@ -86,7 +92,9 @@ def test_csaf_builds_nested_document_and_renders_identity():
             "current_release_date": "2025-01-01T00:00:00Z",
             "id": "ADV-1",
             "initial_release_date": "2024-12-01T00:00:00Z",
-            "revision_history": [{"date": "2025-01-01", "number": "1", "summary": "Update"}],
+            "revision_history": [
+                {"date": "2025-01-01", "number": "1", "summary": "Update"}
+            ],
             "status": "final",
             "version": "1",
             "generator": {"engine": {"name": "test"}},
@@ -237,9 +245,7 @@ def test_whois_nested_records_and_date_helpers():
 
 
 def test_http_api_schema_models_serialize_field_names_and_defaults():
-    info = FBFInfo.from_dict(
-        {"ApplicationName": "feed", "ApplicationVersion": "2"}
-    )
+    info = FBFInfo.from_dict({"ApplicationName": "feed", "ApplicationVersion": "2"})
     update = NCSCFeedUpdateSquence.from_dict(
         {"timestamp": 10, "updates": [{"name": "feed", "count": 2}]}
     )
