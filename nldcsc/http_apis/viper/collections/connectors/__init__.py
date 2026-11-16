@@ -4,7 +4,6 @@ from uuid import UUID
 from nldcsc.http_apis.viper.collections.bases import EndpointCollection
 from nldcsc.http_apis.viper.objects import BatchSearchResponse, BatchSearchQuery
 
-
 MAX_BATCH_SEARCH_SIZE = 20
 
 
