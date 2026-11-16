@@ -14,7 +14,10 @@ from nldcsc.http_apis.nexpose.objects import (
 from nldcsc.http_apis.viper.auth import AuthInfo, ViperAuth
 from nldcsc.http_apis.viper.client import ViperClient
 from nldcsc.http_apis.viper.collections.auth.objects import AuthResponse
-from nldcsc.http_apis.viper.collections.bases import EndpointCollection, PaginatedResponse
+from nldcsc.http_apis.viper.collections.bases import (
+    EndpointCollection,
+    PaginatedResponse,
+)
 from nldcsc.http_apis.viper.collections.utils import as_object
 
 
@@ -37,7 +40,8 @@ def auth_response(
 
 
 def test_viper_auth_info_updates_and_expires_tokens(monkeypatch):
-    monkeypatch.setattr("nldcsc.http_apis.viper.auth.time.time", lambda: 100)
+    # Expiry is measured on the monotonic clock, so a wall-clock change cannot affect it.
+    monkeypatch.setattr("nldcsc.http_apis.viper.auth.time.monotonic", lambda: 100)
     info = AuthInfo(username="user", password="password")
     info.update_with_response(auth_response())
 
@@ -46,7 +50,7 @@ def test_viper_auth_info_updates_and_expires_tokens(monkeypatch):
     assert info.valid() is True
     assert info.refresh_valid() is True
 
-    monkeypatch.setattr("nldcsc.http_apis.viper.auth.time.time", lambda: 4000)
+    monkeypatch.setattr("nldcsc.http_apis.viper.auth.time.monotonic", lambda: 4000)
     assert info.valid() is False
     assert info.refresh_valid() is False
 
@@ -61,9 +65,10 @@ def test_viper_auth_logs_in_then_refreshes_and_sets_request_header():
     assert request.headers["Authorization"] == "Bearer access"
     login.assert_called_once()
 
-    auth.auth_info.access_expiry = 0
+    # Viper's refresh route needs a valid access token: refresh shortly before expiry.
+    auth.auth_info.access_expiry = 600
     auth.auth_info.refresh_expiry = 3600
-    auth.auth_info.last_updated = int(time.time())
+    auth.auth_info.last_updated = time.monotonic() - 590
     request = requests.Request("GET", "https://example.test").prepare()
     auth(request)
     assert request.headers["Authorization"] == "Bearer refreshed"
@@ -103,6 +108,89 @@ def test_viper_auth_wrapper_retries_token_failures_only():
 
     with pytest.raises(requests.HTTPError):
         auth.auth_wrap(forbidden)("/resource")
+
+
+def http_error(status_code):
+    response = requests.Response()
+    response.status_code = status_code
+    return requests.HTTPError(response=response)
+
+
+def nearly_expired_auth(login, refresh):
+    """Signed in, with the access token in its last seconds: the next call refreshes."""
+    auth = ViperAuth(("user", "password"), login, refresh)
+    auth.auth_info.update_with_response(auth_response())
+    auth.auth_info.last_updated = time.monotonic() - 590
+    return auth
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"access_token": ""},
+        {"refresh_token": ""},
+        {"expires_in": 0},
+        {"expires_in": float("inf")},
+        {"refresh_expires_in": -1},
+    ],
+)
+def test_viper_auth_info_rejects_an_unusable_token_response(changes):
+    info = AuthInfo(username="user", password="password")
+
+    with pytest.raises(ValueError, match="Invalid Viper token response"):
+        info.update_with_response(auth_response(**changes))
+
+    assert info.access_token is None
+
+
+def test_viper_auth_info_counts_token_lifetime_from_the_request(monkeypatch):
+    monkeypatch.setattr("nldcsc.http_apis.viper.auth.time.monotonic", lambda: 700)
+    info = AuthInfo(username="user", password="password")
+
+    # Requested at 50 and answered at 700: the 600 second token has expired.
+    info.update_with_response(auth_response(), requested_at=50)
+
+    assert info.last_updated == 50
+    assert info.access_valid() is False
+
+
+def test_viper_auth_logs_in_again_when_the_access_token_has_expired():
+    login = Mock(return_value=auth_response(access_token="new-login"))
+    refresh = Mock()
+    auth = ViperAuth(("user", "password"), login, refresh)
+    auth.auth_info.update_with_response(auth_response())
+    auth.auth_info.last_updated = time.monotonic() - 601
+
+    auth.update_token()
+
+    refresh.assert_not_called()
+    login.assert_called_once_with(username="user", password="password")
+    assert auth.auth_info.access_token == "new-login"
+
+
+@pytest.mark.parametrize("status_code", [400, 401, 403, 422])
+def test_viper_auth_logs_in_when_viper_rejects_the_refresh(status_code):
+    login = Mock(return_value=auth_response(access_token="new-login"))
+    refresh = Mock(side_effect=http_error(status_code))
+    auth = nearly_expired_auth(login, refresh)
+
+    auth.update_token()
+
+    refresh.assert_called_once_with(refresh_token="refresh")
+    login.assert_called_once()
+    assert auth.auth_info.access_token == "new-login"
+
+
+def test_viper_auth_raises_a_refresh_server_error_without_logging_in():
+    login = Mock()
+    refresh = Mock(side_effect=http_error(503))
+    auth = nearly_expired_auth(login, refresh)
+
+    with pytest.raises(requests.HTTPError):
+        auth.update_token()
+
+    login.assert_not_called()
+    assert auth.auth_info.access_token == "access"
 
 
 def test_viper_client_builds_collection_paths_and_objects():
